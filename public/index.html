@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Contratos com bula: cada cláusula com um resumo em palavras simples, assinatura com prova de que a pessoa entendeu e um selo que qualquer um confere.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%279%27 fill=%27%235b3fd1%27/%3E%3Crect x=%277%27 y=%2713%27 width=%2718%27 height=%277%27 rx=%271%27 fill=%27%23ffdf3d%27/%3E%3C/svg%3E">
+  <title>Contratos com bula</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,500..800&family=IBM+Plex+Mono:wght@400;500&family=Lexend:wght@300..700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+  <link rel="stylesheet" href="/estatico/app.css">
+  <link rel="stylesheet" href="/estatico/site.css">
+  <script type="module" src="/estatico/site.js"></script>
+</head>
+<body class="site">
+  <!-- O produto ainda não tem nome: "Contratos" é provisório e aparece só
+       aqui no topo, no <title> e no rodapé. Textos jurídicos desta página
+       precisam de revisão de advogado antes de ir ao ar (docs/VALIDADE-JURIDICA.md). -->
+  <header class="site-topo">
+    <a class="site-marca" href="/"><span class="marca-icone" aria-hidden="true"></span>Contratos</a>
+    <nav aria-label="Principal">
+      <a href="/verificar">Conferir um contrato</a>
+      <a class="botao secundario" href="/painel">Entrar</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="abre">
+      <div class="abre-texto">
+        <h1 class="titulo-bula">Contrato com bula</h1>
+        <p class="abre-sub">Cada cláusula vem com um resumo em palavras simples. Quem assina entende o que assina, e você guarda a prova de que entendeu.</p>
+        <div class="abre-acoes">
+          <a class="botao" href="/painel">Começar</a>
+          <a class="link-botao" href="#como">Ver como funciona</a>
+        </div>
+      </div>
+
+      <!-- O momento da página: a cláusula de verdade, como o signatário vê. -->
+      <article class="clausula critica abre-clausula" aria-label="Exemplo de cláusula na tela de assinatura">
+        <p class="cl-num">Cláusula 11 <span class="destaque">Em destaque</span></p>
+        <h2 class="titulo-bula">Da multa por resilição antecipada</h2>
+        <p class="bula"><span class="rotulo">Em palavras simples</span><mark>Quem encerrar o contrato antes do fim, sem motivo, paga ao outro multa de 20% do valor que ainda faltava pagar.</mark></p>
+        <div class="texto-juridico">
+          <p class="rotulo">Texto do contrato</p>
+          <p><span class="pnum">11.1</span>A parte que, sem justa causa, resilir este contrato antes do término do prazo pagará à outra multa de 20% sobre o valor correspondente às parcelas que se venceriam até o fim do prazo contratado.</p>
+        </div>
+        <div class="ciencia" id="demo-ciencia">
+          <button class="botao secundario" type="button" id="demo-botao">Li e entendi esta cláusula</button>
+        </div>
+        <p class="abre-trilha" id="demo-trilha" role="status"></p>
+      </article>
+    </section>
+
+    <section class="bloco" aria-labelledby="q-serve">
+      <h2 class="titulo-bula" id="q-serve">Para que serve?</h2>
+      <div class="bloco-corpo duas">
+        <p class="resposta">Para tirar o contrato da gaveta do Word. Os modelos montam o texto sozinhos a partir dos dados: pessoa física ou jurídica, MEI, prazo certo ou indeterminado, com ou sem exclusividade. A cláusula certa entra, a errada sai, e a numeração e as remissões se acertam.</p>
+        <ul class="lista-bula">
+          <li><strong>Prestação de serviços</strong> com pessoa física, MEI ou empresa</li>
+          <li><strong>Termo do colaborador</strong>: confidencialidade, LGPD e uso de equipamento</li>
+          <li><strong>Aditivo e distrato</strong> nascidos do contrato original</li>
+          <li><strong>Os seus modelos</strong>, migrados com as suas cláusulas</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="bloco" id="como" aria-labelledby="q-como">
+      <h2 class="titulo-bula" id="q-como">Como funciona?</h2>
+      <ol class="passos">
+        <li>
+          <h3>Gere o contrato</h3>
+          <p>Preencha o formulário do modelo, ou suba a planilha de funcionários e gere um contrato para cada pessoa de uma vez.</p>
+        </li>
+        <li>
+          <h3>A pessoa lê com a bula</h3>
+          <p>Ela recebe um link, confirma a identidade por código e lê o contrato com o resumo de cada cláusula. Nas cláusulas em destaque, confirma uma a uma que entendeu.</p>
+        </li>
+        <li>
+          <h3>O documento sai selado</h3>
+          <p>O PDF assinado leva um QR e um código em cada página. Qualquer pessoa confere se o arquivo é o mesmo que foi assinado.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="bloco" aria-labelledby="q-vale">
+      <h2 class="titulo-bula" id="q-vale">Tem validade jurídica?</h2>
+      <div class="bloco-corpo duas">
+        <div>
+          <p class="resposta">Sim. A lei aceita a assinatura eletrônica quando as partes admitem o meio (MP 2.200-2/2001, art. 10, §2º), e o contrato eletrônico dispensa testemunhas quando a integridade é conferida pelo provedor de assinatura (CPC, art. 784, §4º).</p>
+          <p class="resposta-menor">Para cada contrato fica um dossiê de provas: identidade confirmada por código, cada ciência com horário, a leitura até o fim e uma trilha de eventos encadeada, em que mexer em um evento quebra a corrente. Para quem precisa, a assinatura com certificado digital ICP-Brasil e o carimbo do tempo também estão disponíveis.</p>
+        </div>
+        <figure class="selo-amostra" aria-label="Rodapé do PDF assinado">
+          <div class="selo-papel">
+            <span class="selo-faixa" aria-hidden="true"></span>
+            <p class="selo-titulo">Contrato de Prestação de Serviços</p>
+            <p class="selo-linhas" aria-hidden="true"><i></i><i></i><i></i><i></i></p>
+            <div class="selo-rodape">
+              <span class="selo-qr" aria-hidden="true"></span>
+              <span><b>Documento assinado eletronicamente</b> · código <code>R937-R4UV-6JB3</code><br>Confira a autenticidade no endereço impresso ou leia o QR.</span>
+            </div>
+          </div>
+          <figcaption>O selo em cada página do PDF assinado.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="bloco" aria-labelledby="q-depois">
+      <h2 class="titulo-bula" id="q-depois">E depois de assinado?</h2>
+      <div class="bloco-corpo duas">
+        <p class="resposta">O contrato continua vivo. O sistema sabe quando ele vence, quando reajusta e por qual índice, e avisa antes. O reajuste pelo IPCA ou pelo IGP-M sai calculado com a série oficial do Banco Central, e o aditivo e o distrato nascem do contrato original, já preenchidos.</p>
+        <dl class="agenda-amostra">
+          <div><dt>01/11/2027</dt><dd>Reajuste anual pelo IPCA</dd></div>
+          <div><dt>02/10/2027</dt><dd>Aviso: o contrato vence em 30 dias</dd></div>
+          <div><dt>31/10/2027</dt><dd>Fim do prazo de 12 meses</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="bloco" aria-labelledby="q-quem">
+      <h2 class="titulo-bula" id="q-quem">Para quem é?</h2>
+      <div class="publicos">
+        <div><h3>RH e departamento pessoal</h3><p>Sobe a planilha que já tem, confere a prévia e manda todos os termos de uma vez. A empresa assina o lote inteiro por um link só.</p></div>
+        <div><h3>Escritórios e cartórios</h3><p>Modelos com regras, cláusulas versionadas, assinatura com certificado ICP-Brasil e dossiê pronto para juntar ao processo.</p></div>
+        <div><h3>Sistemas que já existem</h3><p>API com chave, webhooks assinados e o seu identificador em cada contrato. O contrato nasce no seu sistema e volta assinado para ele.</p></div>
+      </div>
+    </section>
+
+    <section class="bloco contra" aria-labelledby="q-contra">
+      <h2 class="titulo-bula" id="q-contra">Contraindicações</h2>
+      <ul class="lista-bula">
+        <li>Não substitui o advogado na redação dos seus modelos. Ajuda a aplicá-los sem erro.</li>
+        <li>O resumo explica a cláusula, mas o que vale é o texto do contrato, que fica sempre visível logo abaixo.</li>
+        <li>Para assinatura com presunção legal plena, quem assina precisa ter certificado digital ICP-Brasil.</li>
+      </ul>
+    </section>
+
+    <section class="bloco conferir" aria-labelledby="q-conferir">
+      <h2 class="titulo-bula" id="q-conferir">Recebeu um contrato?</h2>
+      <form class="conferir-form" id="form-conferir" action="/verificar">
+        <label class="campo">
+          <span>Digite o código do rodapé</span>
+          <input id="codigo-conferir" class="codigo-otp" autocomplete="off" autocapitalize="characters" placeholder="XXXX-XXXX-XXXX" required>
+        </label>
+        <button class="botao">Conferir</button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-rodape">
+    <span>Contratos</span>
+    <a href="/verificar">Conferir um contrato</a>
+    <a href="/painel">Entrar</a>
+  </footer>
+</body>
+</html>

@@ -380,7 +380,8 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     res.set('Cache-Control', 'no-cache')
     pagina('index.html', PAINEL)(req, res)
   })
-  app.get('/', (req, res) => res.redirect('/painel'))
+  // Site de apresentação.
+  app.get('/', pagina('index.html'))
 
   // ── Desenvolvimento ───────────────────────────────────────────────────────
   if (dev) {
