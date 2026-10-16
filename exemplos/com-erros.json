@@ -1,0 +1,7 @@
+{
+  "modelo": "prestacao_servicos",
+  "dados": {
+    "contratado": { "tipo": "pf", "nome": "Fulano Exemplo", "cpf": "123.456.789-00", "email": "fulano@" },
+    "contrato": { "objeto": "consultoria", "valor": 1000, "forma_pagamento": "mensal", "prazo_tipo": "determinado", "data_inicio": "31/02/2026" }
+  }
+}

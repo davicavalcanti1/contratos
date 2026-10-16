@@ -1,0 +1,23 @@
+{
+  "modelo": "prestacao_servicos",
+  "dados": {
+    "contratado": {
+      "tipo": "pf",
+      "nome": "João da Silva Exemplo",
+      "cpf": "529.982.247-25",
+      "estado_civil": "solteiro",
+      "profissao": "técnico em informática",
+      "endereco": { "logradouro": "Rua das Trincheiras", "numero": "45", "complemento": "apto 302", "bairro": "Centro", "cidade": "João Pessoa", "uf": "PB", "cep": "58011000" },
+      "email": "joao.exemplo@exemplo.com"
+    },
+    "contrato": {
+      "objeto": "manutenção preventiva e corretiva dos computadores da recepção, com visita semanal",
+      "valor": "2.350,00",
+      "forma_pagamento": "mensal",
+      "prazo_tipo": "determinado",
+      "data_inicio": "2026-11-01",
+      "duracao_meses": 12,
+      "foro_comarca": "João Pessoa/PB"
+    }
+  }
+}

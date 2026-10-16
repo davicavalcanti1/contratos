@@ -1,0 +1,24 @@
+{
+  "modelo": "prestacao_servicos",
+  "dados": {
+    "contratado": {
+      "tipo": "pj",
+      "nome": "Limpeza Exemplo Ltda.",
+      "cnpj": "11.444.777/0001-61",
+      "endereco": "Rua Duque de Caxias, nº 200, Centro, João Pessoa/PB, CEP 58010-821",
+      "email": "contato@limpezaexemplo.com",
+      "representante_nome": "Carlos Exemplo",
+      "representante_cpf": "111.444.777-35"
+    },
+    "contrato": {
+      "objeto": "limpeza e conservação das instalações da sede, de segunda a sábado",
+      "valor": 8900,
+      "forma_pagamento": "mensal",
+      "dia_pagamento": 5,
+      "prazo_tipo": "indeterminado",
+      "data_inicio": "01/11/2026",
+      "indice_reajuste": "IGP-M",
+      "foro_comarca": "João Pessoa/PB"
+    }
+  }
+}

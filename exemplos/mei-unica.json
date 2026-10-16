@@ -1,0 +1,23 @@
+{
+  "modelo": "prestacao_servicos",
+  "dados": {
+    "contratado": {
+      "tipo": "mei",
+      "nome": "Ana Exemplo Design",
+      "cnpj": "11.444.777/0001-61",
+      "cpf": "111.444.777-35",
+      "endereco": { "logradouro": "Rua Exemplo", "numero": "12", "cidade": "Campina Grande", "uf": "PB" },
+      "email": "ana@exemplo.com"
+    },
+    "contrato": {
+      "objeto": "criação da identidade visual da clínica (logotipo, papelaria e manual de marca)",
+      "valor": 4500,
+      "forma_pagamento": "unica",
+      "prazo_tipo": "determinado",
+      "data_inicio": "2026-11-01",
+      "duracao_meses": 3,
+      "multa_percentual": 10,
+      "foro_comarca": "Campina Grande/PB"
+    }
+  }
+}

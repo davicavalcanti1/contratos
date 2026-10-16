@@ -1,0 +1,230 @@
+[
+  {
+    "chave": "partes",
+    "versao": 1,
+    "categoria": "partes",
+    "titulo": "Das partes",
+    "paragrafos": [
+      "CONTRATANTE: {{organizacao.razao_social}}, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº {{organizacao.cnpj}}, com sede em {{organizacao.endereco}}, neste ato representada por {{organizacao.representante_nome}}, {{organizacao.representante_cargo}}.",
+      {
+        "quando": { "campo": "contratado.tipo", "op": "eq", "valor": "pf" },
+        "texto": "CONTRATADO: {{contratado.nome}}, {{contratado.nacionalidade}}, {{contratado.estado_civil}}, {{contratado.profissao}}, inscrito(a) no CPF sob o nº {{contratado.cpf}}, residente e domiciliado(a) em {{contratado.endereco}}, endereço eletrônico {{contratado.email}}."
+      },
+      {
+        "quando": { "campo": "contratado.tipo", "op": "eq", "valor": "pj" },
+        "texto": "CONTRATADA: {{contratado.nome}}, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº {{contratado.cnpj}}, com sede em {{contratado.endereco}}, endereço eletrônico {{contratado.email}}, neste ato representada por {{contratado.representante_nome}}, inscrito(a) no CPF sob o nº {{contratado.representante_cpf}}, doravante denominada CONTRATADO."
+      },
+      {
+        "quando": { "campo": "contratado.tipo", "op": "eq", "valor": "mei" },
+        "texto": "CONTRATADO: {{contratado.nome}}, microempreendedor individual inscrito no CNPJ sob o nº {{contratado.cnpj}}, com sede em {{contratado.endereco}}, endereço eletrônico {{contratado.email}}, cujo titular é inscrito no CPF sob o nº {{contratado.cpf}}."
+      },
+      "Os signatários declaram possuir poderes para assumir as obrigações deste instrumento e que os dados acima são verdadeiros, obrigando-se a comunicar qualquer alteração à outra parte."
+    ],
+    "base_legal": "CC arts. 104 e 107"
+  },
+  {
+    "chave": "objeto",
+    "versao": 1,
+    "categoria": "objeto",
+    "titulo": "Do objeto",
+    "paragrafos": [
+      "O presente contrato tem por objeto a prestação, pelo CONTRATADO, dos seguintes serviços: {{contrato.objeto}}.",
+      "Serviços não descritos acima dependem de ajuste escrito entre as partes, inclusive quanto ao preço."
+    ],
+    "resumo_simples": "O que será feito: {{contrato.objeto}}. Qualquer coisa fora disso precisa de novo acordo por escrito.",
+    "base_legal": "CC arts. 593 a 609"
+  },
+  {
+    "chave": "prazo_determinado",
+    "versao": 1,
+    "categoria": "prazo",
+    "titulo": "Do prazo",
+    "paragrafos": [
+      "Este contrato vigora por {{contrato.duracao_meses|com_extenso}} meses, a contar de {{contrato.data_inicio}}.",
+      "Findo o prazo, o contrato se extingue de pleno direito, salvo prorrogação ajustada por escrito antes do término."
+    ],
+    "resumo_simples": "O contrato dura {{contrato.duracao_meses}} meses a partir de {{contrato.data_inicio}} e termina sozinho no fim do prazo, se ninguém combinar renovação.",
+    "base_legal": "CC art. 598"
+  },
+  {
+    "chave": "prazo_indeterminado",
+    "versao": 1,
+    "categoria": "prazo",
+    "titulo": "Do prazo",
+    "paragrafos": [
+      "Este contrato vigora por prazo indeterminado, a contar de {{contrato.data_inicio}}.",
+      "Qualquer das partes poderá resili-lo mediante aviso por escrito com antecedência mínima de {{contrato.aviso_previo_dias}} dias, sem multa."
+    ],
+    "resumo_simples": "O contrato não tem data para acabar. Quem quiser sair avisa com {{contrato.aviso_previo_dias}} dias de antecedência, sem multa.",
+    "base_legal": "CC arts. 473 e 599"
+  },
+  {
+    "chave": "preco",
+    "versao": 1,
+    "categoria": "preco",
+    "titulo": "Do preço e do pagamento",
+    "paragrafos": [
+      {
+        "quando": { "campo": "contrato.forma_pagamento", "op": "eq", "valor": "mensal" },
+        "texto": "Pelos serviços, a CONTRATANTE pagará ao CONTRATADO o valor mensal de {{contrato.valor}}, até o dia {{contrato.dia_pagamento}} do mês seguinte ao da prestação."
+      },
+      {
+        "quando": { "campo": "contrato.forma_pagamento", "op": "eq", "valor": "unica" },
+        "texto": "Pelos serviços, a CONTRATANTE pagará ao CONTRATADO o valor total de {{contrato.valor}}, em parcela única, em até 10 (dez) dias após a conclusão e aceite dos serviços."
+      },
+      "O pagamento fica condicionado à emissão do documento fiscal correspondente pelo CONTRATADO, quando exigível.",
+      "O atraso no pagamento sujeita o valor devido a multa de 2% (dois por cento), juros de mora de 1% (um por cento) ao mês e correção monetária pelo {{contrato.indice_reajuste}}.",
+      {
+        "quando": {
+          "ou": [
+            { "campo": "contrato.prazo_tipo", "op": "eq", "valor": "indeterminado" },
+            { "campo": "contrato.duracao_meses", "op": "gte", "valor": 12 }
+          ]
+        },
+        "texto": "O valor será reajustado a cada 12 (doze) meses de vigência, pela variação acumulada do {{contrato.indice_reajuste}} no período."
+      }
+    ],
+    "resumo_simples": "Você recebe {{contrato.valor|numero}}. Atraso no pagamento gera multa de 2% e juros de 1% ao mês.",
+    "base_legal": "CC arts. 395, 406 e 597; Lei 10.192/2001 art. 2º §1º"
+  },
+  {
+    "chave": "obrigacoes_contratado",
+    "versao": 1,
+    "categoria": "obrigacoes",
+    "titulo": "Das obrigações do contratado",
+    "paragrafos": [
+      "Executar os serviços com diligência, qualidade técnica e observância das normas aplicáveis à sua atividade.",
+      "Arcar com os tributos, contribuições e encargos incidentes sobre a sua atividade, inclusive os previdenciários.",
+      "Responder pelos danos que causar à CONTRATANTE ou a terceiros por dolo ou culpa na execução dos serviços."
+    ],
+    "base_legal": "CC arts. 186 e 927"
+  },
+  {
+    "chave": "obrigacoes_contratante",
+    "versao": 1,
+    "categoria": "obrigacoes",
+    "titulo": "Das obrigações da contratante",
+    "paragrafos": [
+      "Fornecer ao CONTRATADO as informações e o acesso necessários à execução dos serviços.",
+      "Efetuar os pagamentos nos prazos e condições deste contrato."
+    ]
+  },
+  {
+    "chave": "autonomia",
+    "versao": 1,
+    "categoria": "autonomia",
+    "titulo": "Da autonomia e da inexistência de vínculo empregatício",
+    "paragrafos": [
+      "O CONTRATADO executará os serviços com autonomia técnica e organizacional, definindo os meios e a forma de execução, sem subordinação jurídica à CONTRATANTE.",
+      "Este contrato não gera vínculo empregatício entre as partes, nem entre a CONTRATANTE e eventuais prepostos do CONTRATADO.",
+      {
+        "quando": { "campo": "contratado.tipo", "op": "in", "valor": ["pf", "mei"] },
+        "texto": "As partes reconhecem tratar-se de contratação de profissional autônomo, nos termos do art. 442-B da Consolidação das Leis do Trabalho."
+      }
+    ],
+    "resumo_simples": "Você trabalha por conta própria, decide como fazer o serviço e não é empregado da contratante: não há carteira assinada nem direitos trabalhistas por este contrato.",
+    "critica": true,
+    "base_legal": "CC art. 593; CLT art. 442-B"
+  },
+  {
+    "chave": "confidencialidade",
+    "versao": 1,
+    "categoria": "confidencialidade",
+    "titulo": "Da confidencialidade",
+    "paragrafos": [
+      "As partes manterão sigilo sobre as informações não públicas a que tiverem acesso em razão deste contrato, durante a vigência e por 2 (dois) anos após o seu término.",
+      "Não é confidencial a informação que já era pública, que se tornou pública sem culpa da parte ou cuja divulgação seja exigida por lei ou ordem judicial."
+    ],
+    "resumo_simples": "O que você souber da outra parte por causa deste contrato fica em sigilo, até 2 anos depois de ele acabar."
+  },
+  {
+    "chave": "protecao_dados",
+    "versao": 1,
+    "categoria": "protecao_dados",
+    "titulo": "Da proteção de dados pessoais",
+    "paragrafos": [
+      "Cada parte tratará os dados pessoais da outra e de seus representantes exclusivamente para a celebração, a execução e a prova deste contrato, com base no art. 7º, V, da Lei 13.709/2018 (LGPD).",
+      "Se a execução dos serviços envolver tratamento de dados pessoais de terceiros em nome da CONTRATANTE, o CONTRATADO atuará como operador, seguindo as instruções lícitas da CONTRATANTE, adotando medidas de segurança adequadas e comunicando-lhe qualquer incidente em até 48 (quarenta e oito) horas."
+    ],
+    "resumo_simples": "Seus dados são usados só para este contrato. Se você mexer com dados de clientes da contratante, segue as regras dela e avisa qualquer vazamento em até 48 horas.",
+    "base_legal": "Lei 13.709/2018, arts. 7º, V, 39 e 46"
+  },
+  {
+    "chave": "rescisao",
+    "versao": 1,
+    "categoria": "rescisao",
+    "titulo": "Da rescisão",
+    "paragrafos": [
+      "O contrato poderá ser rescindido por qualquer das partes, independentemente de aviso prévio, em caso de descumprimento de obrigação não sanado em até 10 (dez) dias após notificação da outra parte.",
+      {
+        "quando": { "campo": "contrato.prazo_tipo", "op": "eq", "valor": "determinado" },
+        "texto": "A resilição antecipada, sem justa causa, sujeita a parte que a promover à multa prevista na {{ref:multa_rescisoria}}."
+      },
+      "Na extinção do contrato, por qualquer causa, serão devidos os valores dos serviços efetivamente prestados até a data do término."
+    ],
+    "resumo_simples": "Qualquer lado pode encerrar o contrato se o outro não cumprir o combinado e não corrigir em 10 dias. O serviço já feito é sempre pago.",
+    "base_legal": "CC arts. 474, 475 e 603"
+  },
+  {
+    "chave": "multa_rescisoria",
+    "versao": 1,
+    "categoria": "multa",
+    "titulo": "Da multa por resilição antecipada",
+    "paragrafos": [
+      "A parte que, sem justa causa, resilir este contrato antes do término do prazo pagará à outra multa de {{contrato.multa_percentual}} sobre o valor correspondente às parcelas que se venceriam até o fim do prazo contratado.",
+      "A multa poderá ser reduzida equitativamente se a obrigação tiver sido cumprida em parte, nos termos do art. 413 do Código Civil."
+    ],
+    "resumo_simples": "Se você (ou a contratante) encerrar o contrato antes do fim sem motivo, paga multa de {{contrato.multa_percentual}} do que ainda faltava receber.",
+    "critica": true,
+    "base_legal": "CC arts. 408 a 413"
+  },
+  {
+    "chave": "limitacao_responsabilidade",
+    "versao": 1,
+    "categoria": "responsabilidade",
+    "titulo": "Da limitação de responsabilidade",
+    "paragrafos": [
+      "Ressalvados os casos de dolo, culpa grave, violação de confidencialidade ou de proteção de dados, a responsabilidade de cada parte por perdas e danos decorrentes deste contrato fica limitada ao valor total pago ou devido ao CONTRATADO nos 12 (doze) meses anteriores ao fato.",
+      "Nenhuma das partes responde por lucros cessantes ou danos indiretos, salvo nas hipóteses ressalvadas acima."
+    ],
+    "resumo_simples": "Se algo der errado sem má-fé, o máximo que um lado cobra do outro é o que foi pago nos últimos 12 meses. Esse limite não vale para fraude, vazamento de dados ou quebra de sigilo.",
+    "critica": true,
+    "base_legal": "CC arts. 402, 421 e 421-A"
+  },
+  {
+    "chave": "comunicacoes",
+    "versao": 1,
+    "categoria": "comunicacoes",
+    "titulo": "Das comunicações",
+    "paragrafos": [
+      "As notificações relativas a este contrato serão feitas por escrito, valendo como tal a mensagem enviada aos endereços eletrônicos indicados na qualificação das partes, que se obrigam a mantê-los atualizados."
+    ],
+    "resumo_simples": "Avisos oficiais deste contrato chegam pelo seu e-mail. Mantenha-o atualizado."
+  },
+  {
+    "chave": "assinatura_eletronica",
+    "versao": 1,
+    "categoria": "assinatura_eletronica",
+    "titulo": "Da assinatura eletrônica e da força executiva",
+    "paragrafos": [
+      "As partes admitem como válida e reconhecem a autoria e a integridade deste instrumento assinado por meio eletrônico, ainda que sem certificado emitido pela ICP-Brasil, nos termos do art. 10, § 2º, da Medida Provisória 2.200-2/2001.",
+      "As evidências de autenticação dos signatários, os registros de data e hora e o código de integridade do documento, mantidos pelo provedor de assinatura, integram este contrato e podem ser conferidos a qualquer tempo.",
+      "Este contrato constitui título executivo extrajudicial, nos termos do art. 784, III e § 4º, do Código de Processo Civil, dispensada a assinatura de testemunhas, uma vez que sua integridade é conferida pelo provedor de assinatura."
+    ],
+    "resumo_simples": "Assinar por aqui tem o mesmo valor que assinar no papel. Se alguém não pagar, o outro pode cobrar na Justiça direto, sem precisar de testemunhas.",
+    "critica": true,
+    "base_legal": "MP 2.200-2/2001 art. 10 §2º; CPC art. 784, III e §4º; Lei 14.063/2020"
+  },
+  {
+    "chave": "foro",
+    "versao": 1,
+    "categoria": "foro",
+    "titulo": "Do foro",
+    "paragrafos": [
+      "Fica eleito o foro da comarca de {{contrato.foro_comarca}} para dirimir as questões oriundas deste contrato, com renúncia a qualquer outro, por mais privilegiado que seja."
+    ],
+    "resumo_simples": "Se houver processo por causa deste contrato, ele corre em {{contrato.foro_comarca}}.",
+    "critica": true,
+    "base_legal": "CPC art. 63"
+  }
+]
