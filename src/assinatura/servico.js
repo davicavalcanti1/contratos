@@ -51,15 +51,33 @@ export const CONFIG_PADRAO = {
   sessaoHoras: 2,
 }
 
-export function criarServico({ repo, biblioteca, notificar, config = {}, agora = () => new Date() }) {
+// `aoEvento(organizacaoId, tipo, dados)`: chamado nos momentos que interessam a
+// quem integra (assinou, selou, recusou, expirou, cancelou). A plataforma liga
+// isto aos webhooks; o serviço não sabe que webhook existe.
+export function criarServico({ repo, biblioteca, notificar, config = {}, agora = () => new Date(), aoEvento = () => {} }) {
   const cfg = { ...CONFIG_PADRAO, ...config }
   const trilha = criarTrilha(repo, agora)
   const agoraIso = () => agora().toISOString()
   const depois = (ms) => new Date(agora().getTime() + ms).toISOString()
 
+  function avisar(c, tipo, extra = {}) {
+    try {
+      aoEvento(c.organizacao_id, tipo, {
+        contrato: { ...resumoContrato(c), referencia: c.referencia || null, lote_id: c.lote_id || null },
+        verificacao_url: c.codigo_verificacao ? `${cfg.baseUrl}/v/${c.codigo_verificacao}` : null,
+        ...extra,
+      })
+    } catch (e) {
+      // Aviso a terceiros nunca derruba a assinatura.
+      console.error('[aoEvento]', e)
+    }
+  }
+  const signatarioPublico = (s) => ({ id: s.id, nome: s.nome, email: s.email, papel: s.papel, assinado_em: s.assinado_em || null })
+
   // ── Organização: gerar, enviar, consultar ─────────────────────────────────
 
-  async function gerar({ organizacaoId, organizacao, modelo: chave, dados }) {
+  async function gerar({ organizacaoId, organizacao, modelo: chave, dados, referencia, lote_id }) {
+    const ref = referencia == null ? null : String(referencia).trim().slice(0, 120) || null
     const modelo = acharModelo(biblioteca, chave)
     const r = montarContrato({ modelo, biblioteca: biblioteca.indice, dados: { ...dados, organizacao }, agora: agora() })
     if (!r.ok) throw new ErroNegocio(422, 'O contrato tem lacunas e não pode ser gerado.', { faltando: r.faltando, invalidos: r.invalidos })
@@ -73,6 +91,10 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       modelo: r.contrato.modelo,
       snapshot: r.contrato,
       conteudo_sha256: r.contrato.conteudo_sha256,
+      // `referencia`: o id do contrato no sistema de quem integra (ex.: o
+      // parceiro no ExameQR). Volta em toda consulta e webhook.
+      referencia: ref,
+      lote_id: lote_id || null,
       criado_em: agoraIso(),
     })
     const arquivo = repo.salvarArquivo(`${c.id}-original.pdf`, buffer)
@@ -159,6 +181,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     if (!['gerado', ...EM_ASSINATURA].includes(c.status)) throw new ErroNegocio(409, `Contrato "${c.status}" não pode ser cancelado.`)
     repo.atualizar('contratos', c.id, { status: 'cancelado', cancelado_em: agoraIso() })
     trilha.registrar(c.id, 'contrato.cancelado', { ator: `organizacao:${organizacaoId}`, dados: { motivo: motivo || null } })
+    avisar(repo.obter('contratos', c.id), 'contrato.cancelado', { motivo: motivo || null })
     return resumoContrato(repo.obter('contratos', c.id))
   }
 
@@ -171,6 +194,29 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
         assinado_em: s.assinado_em || null, recusado_em: s.recusado_em || null, recusa_motivo: s.recusa_motivo || null,
       })),
       eventos: trilha.listar(c.id).map(e => ({ seq: e.seq, tipo: e.tipo, em: e.em })),
+    }
+  }
+
+  // Lista paginada, do mais novo para o mais velho. `busca` procura no título,
+  // na referência e no nome/e-mail de quem assina.
+  function listarContratos(organizacaoId, { status, referencia, busca, lote_id, limite = 50, pagina = 1 } = {}) {
+    const lim = Math.min(Math.max(Number(limite) || 50, 1), 200)
+    const pag = Math.max(Number(pagina) || 1, 1)
+    const termo = String(busca || '').trim().toLowerCase()
+    const todos = repo.listar('contratos', c => c.organizacao_id === organizacaoId)
+      .map(checarExpiracao)
+      .filter(c => !status || String(status).split(',').includes(c.status))
+      .filter(c => !referencia || c.referencia === referencia)
+      .filter(c => !lote_id || c.lote_id === lote_id)
+      .map(c => ({ c, sigs: signatariosDe(c.id) }))
+      .filter(({ c, sigs }) => !termo || [c.titulo, c.referencia, ...sigs.flatMap(s => [s.nome, s.email])].some(x => String(x || '').toLowerCase().includes(termo)))
+      .sort((a, b) => b.c.criado_em.localeCompare(a.c.criado_em))
+    return {
+      total: todos.length, pagina: pag, limite: lim,
+      itens: todos.slice((pag - 1) * lim, pag * lim).map(({ c, sigs }) => ({
+        ...resumoContrato(c),
+        signatarios: sigs.map(s => ({ id: s.id, nome: s.nome, email: s.email, papel: s.papel, status: s.status })),
+      })),
     }
   }
 
@@ -394,6 +440,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       ...evidencia(ctx),
     })
 
+    avisar(repo.obter('contratos', c.id), 'signatario.assinou', { signatario: signatarioPublico(repo.obter('signatarios', s.id)) })
     await posAssinatura(c, s)
     return { assinado_em: em, contrato_status: repo.obter('contratos', c.id).status }
   }
@@ -418,6 +465,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     repo.atualizar('signatarios', s.id, { status: 'recusado', recusado_em: em, recusa_motivo: m })
     repo.atualizar('contratos', c.id, { status: 'recusado', recusado_em: em })
     trilha.registrar(c.id, 'assinatura.recusada', { ator: `signatario:${s.id}`, dados: { motivo: m }, ...evidencia(ctx) })
+    avisar(repo.obter('contratos', c.id), 'contrato.recusado', { signatario: signatarioPublico(repo.obter('signatarios', s.id)), motivo: m })
     return { recusado_em: em }
   }
 
@@ -621,6 +669,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
         dados: { metodo: 'otp_email_lote', via_lote: lote.id, contratos_assinados_juntos: pendentes.length, nome_digitado: nome, ciencias: criticasDoContrato.length, geo: geoLimpa },
         ...evidencia(ctx),
       })
+      avisar(repo.obter('contratos', c.id), 'signatario.assinou', { signatario: signatarioPublico(repo.obter('signatarios', s.id)), via_lote: lote.id })
       await posAssinatura(repo.obter('contratos', c.id), repo.obter('signatarios', s.id))
       assinados.push(c.id)
     }
@@ -656,6 +705,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     repo.atualizar('contratos', c.id, { status: 'assinado', assinado_em: em, codigo_verificacao: codigo, pdf_final: { arquivo, sha256: pdfSha } })
     const verif = trilha.verificar(c.id)
     trilha.registrar(c.id, 'documento.selado', { dados: { codigo_verificacao: codigo, pdf_final_sha256: pdfSha, trilha_hash_ate_aqui: verif.hash_final } })
+    avisar(repo.obter('contratos', c.id), 'contrato.assinado', { signatarios: signatariosDe(c.id).map(signatarioPublico) })
 
     for (const s of signatariosDe(c.id)) {
       await notificar({
@@ -711,6 +761,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     if (c && EM_ASSINATURA.has(c.status) && c.expira_em && c.expira_em < agoraIso()) {
       repo.atualizar('contratos', c.id, { status: 'expirado' })
       trilha.registrar(c.id, 'contrato.expirado', { dados: { expira_em: c.expira_em } })
+      avisar(repo.obter('contratos', c.id), 'contrato.expirado')
       return repo.obter('contratos', c.id)
     }
     return c
@@ -748,7 +799,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
 
   return {
     config: cfg, trilha,
-    gerar, enviar, reenviar, cancelar, consultar, arquivo, dossie,
+    gerar, enviar, reenviar, cancelar, consultar, listarContratos, arquivo, dossie,
     abrir, solicitarCodigo, validarCodigo, conteudo, darCiencia, registrarLeitura, assinar, recusar, arquivoDoSignatario,
     verificar, conferirHash,
     convidarAssinanteLote, abrirLote, solicitarCodigoLote, validarCodigoLote, conteudoLote,
@@ -787,6 +838,7 @@ function resumoContrato(c) {
     pdf_final_sha256: c.pdf_final?.sha256 || null, codigo_verificacao: c.codigo_verificacao || null,
     ordem: c.ordem || null, criado_em: c.criado_em, enviado_em: c.enviado_em || null,
     expira_em: c.expira_em || null, assinado_em: c.assinado_em || null,
+    referencia: c.referencia || null, lote_id: c.lote_id || null,
   }
 }
 

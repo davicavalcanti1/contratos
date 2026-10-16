@@ -52,6 +52,18 @@ export function camposDaRegra(regra, acc = new Set()) {
   return acc
 }
 
+// Os campos que a avaliação DE FATO consulta com estes dados, respeitando o
+// curto-circuito: em "indeterminado OU duração ≥ 12", se o prazo é
+// indeterminado a duração nem é olhada — e o formulário não deve pedi-la.
+export function camposConsultados(regra, dados, acc = new Set()) {
+  if (!regra) return acc
+  if (regra.e) { for (const r of regra.e) { camposConsultados(r, dados, acc); if (!avaliar(r, dados)) break } return acc }
+  if (regra.ou) { for (const r of regra.ou) { camposConsultados(r, dados, acc); if (avaliar(r, dados)) break } return acc }
+  if (regra.nao) return camposConsultados(regra.nao, dados, acc)
+  acc.add(regra.campo)
+  return acc
+}
+
 export function validarRegra(regra, caminho = 'regra') {
   const erros = []
   if (!regra) return erros

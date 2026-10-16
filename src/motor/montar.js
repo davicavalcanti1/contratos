@@ -13,7 +13,7 @@
 
 import { createHash } from 'node:crypto'
 import { TIPOS, vazio } from './tipos.js'
-import { avaliar, camposDaRegra, ler } from './regras.js'
+import { avaliar, camposConsultados, camposDaRegra, ler } from './regras.js'
 
 const PLACEHOLDER = /\{\{\s*([\w.:]+)(?:\s*\|\s*(\w+))?\s*\}\}/g
 
@@ -133,6 +133,28 @@ export function montarContrato({ modelo, biblioteca, dados, agora = new Date() }
 
 // Hash do CONTEÚDO (não do PDF): o que foi acordado, independente de layout.
 // Exclui gerado_em para que gerar duas vezes o mesmo texto dê o mesmo hash.
+// Quais variáveis ESTE contrato precisa, dados os valores atuais: os campos que
+// decidem regras, mais os placeholders das cláusulas e parágrafos que entram.
+// É o que deixa o formulário mostrar CNPJ só quando a parte é PJ.
+export function camposNecessarios({ modelo, biblioteca, dados }) {
+  const idx = biblioteca instanceof Map ? biblioteca : indexarBiblioteca(biblioteca)
+  const necessarios = new Set()
+  const usar = (texto) => placeholdersDe(texto).forEach(p => { if (!p.chave.startsWith('ref:')) necessarios.add(p.chave) })
+  for (const b of modelo.blocos) {
+    camposConsultados(b.quando, dados, necessarios)
+    const c = idx.get(`${b.clausula}@${b.versao}`)
+    if (!c || !avaliar(b.quando, dados)) continue
+    for (const p of paragrafosDe(c)) {
+      camposConsultados(p.quando, dados, necessarios)
+      if (avaliar(p.quando, dados)) usar(p.texto)
+    }
+    if (c.resumo_simples) usar(c.resumo_simples)
+  }
+  ;[modelo.titulo, modelo.preambulo, modelo.fecho].filter(Boolean).forEach(usar)
+  ;(modelo.signatarios_da_parte || []).forEach(sp => camposConsultados(sp.quando, dados, necessarios))
+  return necessarios
+}
+
 export function hashConteudo(contrato) {
   const { gerado_em, conteudo_sha256, ...resto } = contrato
   return createHash('sha256').update(JSON.stringify(resto)).digest('hex')

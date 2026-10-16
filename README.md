@@ -3,18 +3,22 @@
 SaaS de contratos, multi-tenant e independente: modelos inteligentes, contrato
 gerado a partir dos dados da empresa e assinatura com validade jurídica.
 
-> **Fase atual: 3 — contratos em lote a partir da planilha** (ainda sem banco e sem e-mail real).
+> **Fase atual: 4 — plataforma: painel, organizações, API e webhooks** (ainda sem banco e sem e-mail real).
 > Origem: o módulo de contratos do ExameQR (`exam-qr-system`), generalizado.
 
 ## Rodar
 
 ```bash
 npm install
-npm start                 # http://localhost:3000/dev (avulso) e /dev/lotes (planilha do RH)
-npm test                  # 54 testes: motor, assinatura, trilha, lote, HTTP
+npm run build             # compila o painel (React)
+npm start                 # http://localhost:3000/painel  (e-mails de teste em /dev)
+npm test                  # 81 testes: motor, assinatura, lote, plataforma, webhooks, painel, HTTP
 npm run lint:modelos      # linter jurídico em todos os modelos da biblioteca
 npm run exemplos          # gera saida/*.pdf a partir de exemplos/*.json
 ```
+
+Logins de teste (senha `senha-de-teste-local`): `dev@contratos.local` (plataforma) e
+`admin@clinica-exemplo.com.br` (empresa de exemplo). Ver [docs/PLATAFORMA.md](docs/PLATAFORMA.md).
 
 `exemplos/com-erros.json` é recusado de propósito: mostra o motor dizendo **o
 que falta e onde resolver**, em vez de mandar lacuna para assinatura.
@@ -32,8 +36,10 @@ que falta e onde resolver**, em vez de mandar lacuna para assinatura.
 | `src/motor/pdf.js` | PDF com cláusula crítica em destaque (CDC 54 §4º); na via final, QR + código em cada página e página de assinaturas |
 | `src/assinatura/` | serviço de assinatura (código, sessão, bula, selo), trilha encadeada, dossiê em PDF |
 | `src/lote/` | planilha (CSV/XLSX do Excel brasileiro), mapeamento de colunas, prévia, lote e progresso |
+| `src/plataforma/` | organizações, usuários, convites, sessão, chaves de API, planos, auditoria e webhooks |
+| `painel/` | painel em React + Vite (developer e organização), compilado para `public/painel` |
 | `src/servidor/` | HTTP: API da organização, rotas do signatário, verificação pública, `/dev` |
-| `public/` | tela de assinatura (mobile-first), página do selo, painel de teste. HTML/JS puros, sem build |
+| `public/` | tela de assinatura (mobile-first), assinatura em lote, página do selo e `/dev`. HTML/JS puros, sem build |
 
 ⚠️ O texto da biblioteca foi redigido a partir da legislação citada em cada
 cláusula, mas **não passou por advogado**. Ver `docs/VALIDADE-JURIDICA.md` §6.
@@ -49,3 +55,4 @@ cláusula, mas **não passou por advogado**. Ver `docs/VALIDADE-JURIDICA.md` §6
 | [docs/VALIDADE-JURIDICA.md](docs/VALIDADE-JURIDICA.md) | O que dá validade à assinatura, o que guardamos, o que não fazemos |
 | [docs/ASSINATURA.md](docs/ASSINATURA.md) | Fase 2: fluxo do signatário, selo, dossiê, API, segurança e o que ainda é provisório |
 | [docs/LOTE.md](docs/LOTE.md) | Fase 3: planilha → colunas → conferência → envio, e a empresa assinando tudo de uma vez |
+| [docs/PLATAFORMA.md](docs/PLATAFORMA.md) | Fase 4: papéis, contas, planos, API, webhooks e painel |

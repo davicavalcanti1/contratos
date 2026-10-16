@@ -11,8 +11,8 @@ import { randomUUID } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const COLECOES = ['contratos', 'signatarios', 'eventos', 'sessoes', 'caixa', 'lotes', 'planilhas', 'mapeamentos']
-const SO_ANEXA = new Set(['eventos'])
+const COLECOES = ['contratos', 'signatarios', 'eventos', 'sessoes', 'caixa', 'lotes', 'planilhas', 'mapeamentos', 'organizacoes', 'usuarios', 'convites', 'chaves_api', 'webhooks', 'entregas', 'auditoria']
+const SO_ANEXA = new Set(['eventos', 'auditoria'])
 
 export function criarRepo({ dir = null } = {}) {
   const dados = Object.fromEntries(COLECOES.map(c => [c, new Map()]))

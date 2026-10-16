@@ -152,7 +152,7 @@ export function criarLotes({ repo, biblioteca, servico, agora = () => new Date()
       const base = { numero: l.linha.numero, resumo: resumoDaLinha(modelo, l.dados) }
       if (l.problemas.length) { registro.push({ ...base, problemas: l.problemas }); continue }
       try {
-        const c = await servico.gerar({ organizacaoId, organizacao, modelo: modelo.chave, dados: l.dados })
+        const c = await servico.gerar({ organizacaoId, organizacao, modelo: modelo.chave, dados: l.dados, lote_id: lote.id })
         const signatarios = [
           ...l.signatarios.map(s => ({ ...s, papel: s.papel || 'parte' })),
           ...(assinante ? [{ nome: assinante.nome, email: assinante.email, papel: 'representante', canal: 'lote', lote_id: lote.id }] : []),

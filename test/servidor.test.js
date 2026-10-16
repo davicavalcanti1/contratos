@@ -2,44 +2,15 @@ import { test, before, after } from 'node:test'
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
-import { createServer } from 'node:http'
-import { criarRepo } from '../src/armazenamento/repo.js'
-import { criarServico } from '../src/assinatura/servico.js'
-import { carregarBiblioteca } from '../src/biblioteca.js'
-import { transporteCaixa } from '../src/notificacoes.js'
-import { criarLotes } from '../src/lote/lotes.js'
-import { criarApp, mascararCaminho } from '../src/servidor/app.js'
+import { mascararCaminho } from '../src/servidor/app.js'
+import { CHAVE, subirServidor } from './apoio-http.js'
 
-let servidor, base, repo
-const CHAVE = 'chave-teste'
-
+let ambiente, base, repo, api, json, caixa
 before(async () => {
-  // O serviço precisa da baseUrl real (vai nos links), que só se conhece
-  // depois do listen — então o servidor sobe primeiro e o app entra depois.
-  servidor = createServer()
-  await new Promise(r => servidor.listen(0, '127.0.0.1', r))
-  base = `http://127.0.0.1:${servidor.address().port}`
-  const biblioteca = carregarBiblioteca()
-  repo = criarRepo()
-  const organizacoes = { org1: { api_key: CHAVE, dados: JSON.parse(readFileSync('exemplos/_organizacao.json', 'utf8')) } }
-  const servico = criarServico({ repo, biblioteca, notificar: transporteCaixa(repo, { log: false }), config: { baseUrl: base } })
-  const lotes = criarLotes({ repo, biblioteca, servico })
-  servidor.on('request', criarApp({ servico, lotes, repo, biblioteca, organizacoes, dev: true, log: false }))
+  ambiente = await subirServidor()
+  ;({ base, repo, api, json, caixa } = ambiente)
 })
-after(() => servidor.close())
-
-const api = (caminho, { metodo = 'GET', corpo, chave = CHAVE, sessao } = {}) =>
-  fetch(base + caminho, {
-    method: metodo,
-    headers: {
-      'content-type': 'application/json',
-      ...(chave ? { authorization: `Bearer ${chave}` } : {}),
-      ...(sessao ? { 'x-sessao': sessao } : {}),
-    },
-    body: corpo ? JSON.stringify(corpo) : undefined,
-  })
-const json = async (r) => ({ status: r.status, corpo: await r.json() })
-const caixa = (para, tipo) => repo.listar('caixa', m => m.para === para && m.meta.tipo === tipo).at(-1)
+after(() => ambiente.fechar())
 
 test('API da organização exige chave', async () => {
   assert.equal((await api('/v1/modelos', { chave: 'errada' })).status, 401)
