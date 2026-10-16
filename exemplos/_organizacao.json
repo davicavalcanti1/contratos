@@ -1,7 +1,15 @@
 {
   "razao_social": "Exemplo Serviços Médicos Ltda.",
   "cnpj": "11.222.333/0001-81",
-  "endereco": { "logradouro": "Av. Epitácio Pessoa", "numero": "1000", "bairro": "Tambauzinho", "cidade": "João Pessoa", "uf": "PB", "cep": "58040000" },
+  "endereco": {
+    "logradouro": "Av. Epitácio Pessoa",
+    "numero": "1000",
+    "bairro": "Tambauzinho",
+    "cidade": "João Pessoa",
+    "uf": "PB",
+    "cep": "58040000"
+  },
   "representante_nome": "Maria Exemplo",
-  "representante_cargo": "sócia-administradora"
+  "representante_cargo": "sócia-administradora",
+  "encarregado_email": "dpo@clinica-exemplo.com.br"
 }

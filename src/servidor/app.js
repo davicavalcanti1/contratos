@@ -16,7 +16,7 @@ import { ErroNegocio } from '../assinatura/servico.js'
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const PUBLICO = join(RAIZ, 'public')
 
-export function criarApp({ servico, repo, biblioteca, organizacoes, dev = false, log = true }) {
+export function criarApp({ servico, lotes, repo, biblioteca, organizacoes, dev = false, log = true }) {
   const app = express()
   app.disable('x-powered-by')
   // Atrás do proxy do EasyPanel: o IP real vem no X-Forwarded-For. É evidência
@@ -71,6 +71,23 @@ export function criarApp({ servico, repo, biblioteca, organizacoes, dev = false,
     if (req.query.formato === 'pdf') return enviarPdf(res, { buffer: await gerarDossiePdf(d), nome: `dossie-${d.contrato.id}.pdf` })
     res.json(d)
   }))
+
+  // Lote: planilha → mapeamento → prévia → criar → progresso
+  const planilhaCrua = express.raw({ type: () => true, limit: '10mb' })
+  v1.post('/lotes/planilha', planilhaCrua, h(async (req, res) => {
+    res.status(201).json(await lotes.receberPlanilha(req.org.id, req.body, String(req.query.nome || '')))
+  }))
+  v1.get('/lotes/planilha/:id/sugestao', (req, res) => res.json(lotes.sugerir(req.org.id, req.params.id, req.query.modelo)))
+  v1.post('/lotes/previa', (req, res) => res.json(lotes.previa(req.org.id, req.org.dados, req.body || {})))
+  v1.post('/lotes', h(async (req, res) => res.status(201).json(await lotes.criar(req.org.id, req.org.dados, req.body || {}))))
+  v1.get('/lotes', (req, res) => res.json(lotes.listar(req.org.id)))
+  v1.get('/lotes/:id', (req, res) => res.json(lotes.progresso(req.org.id, req.params.id)))
+  v1.post('/lotes/:id/lembrar', h(async (req, res) => res.json(await lotes.lembrar(req.org.id, req.params.id))))
+  v1.get('/lotes/:id/relatorio.csv', (req, res) => {
+    res.set('Content-Type', 'text/csv; charset=utf-8')
+    res.set('Content-Disposition', `attachment; filename="lote-${req.params.id.slice(0, 8)}.csv"`)
+    res.send(lotes.relatorioCsv(req.org.id, req.params.id))
+  })
   app.use('/v1', v1)
 
   // ── Signatário ────────────────────────────────────────────────────────────
@@ -88,6 +105,18 @@ export function criarApp({ servico, repo, biblioteca, organizacoes, dev = false,
   assinar.post('/recusar', (req, res) => res.json(servico.recusar(req.params.token, sess(req), req.body, ctx(req))))
   assinar.get('/arquivo', (req, res) => enviarPdf(res, servico.arquivoDoSignatario(req.params.token, sess(req), req.query.qual)))
   app.use('/api/assinar/:token', assinar)
+
+  // ── Representante assinando o lote ────────────────────────────────────────
+  const lote = express.Router({ mergeParams: true })
+  lote.use((req, res, next) => { res.set('Cache-Control', 'no-store'); next() })
+  lote.get('/', (req, res) => res.json(servico.abrirLote(req.params.token, ctx(req))))
+  lote.post('/codigo', limitador, h(async (req, res) => res.json(await servico.solicitarCodigoLote(req.params.token, ctx(req)))))
+  lote.post('/codigo/validar', limitador, (req, res) => res.json(servico.validarCodigoLote(req.params.token, req.body?.codigo, ctx(req))))
+  lote.get('/conteudo', (req, res) => res.json(servico.conteudoLote(req.params.token, sess(req))))
+  lote.post('/ciencia', (req, res) => res.json(servico.darCienciaLote(req.params.token, sess(req), req.body?.clausula, req.body, ctx(req))))
+  lote.post('/leitura', (req, res) => res.json(servico.registrarLeituraLote(req.params.token, sess(req), req.body, ctx(req))))
+  lote.post('/assinar', h(async (req, res) => res.json(await servico.assinarLote(req.params.token, sess(req), req.body, ctx(req)))))
+  app.use('/api/lote/:token', lote)
 
   // ── Público ───────────────────────────────────────────────────────────────
   app.get('/api/verificar/:codigo', (req, res) => {
@@ -107,6 +136,7 @@ export function criarApp({ servico, repo, biblioteca, organizacoes, dev = false,
     res.sendFile(join(PUBLICO, arquivo))
   }
   app.get('/assinar/:token', pagina('assinar.html'))
+  app.get('/lote/:token', pagina('lote.html'))
   app.get(['/v/:codigo', '/verificar'], pagina('verificar.html'))
   app.get('/', (req, res) => res.redirect(dev ? '/dev' : '/verificar'))
   app.use('/estatico', express.static(join(PUBLICO, 'estatico'), { maxAge: dev ? 0 : '1h' }))
@@ -115,6 +145,8 @@ export function criarApp({ servico, repo, biblioteca, organizacoes, dev = false,
   if (dev) {
     const orgDev = Object.entries(organizacoes)[0]
     app.get('/dev', pagina('dev.html'))
+    app.get('/dev/lotes', pagina('lotes.html'))
+    app.get('/dev/exemplo-funcionarios.csv', (req, res) => res.download(join(RAIZ, 'exemplos', 'planilhas', 'funcionarios.csv'), 'funcionarios-exemplo.csv'))
     app.get('/dev/api/estado', (req, res) => {
       res.json({
         organizacao: { id: orgDev[0], nome: orgDev[1].dados.razao_social, api_key: orgDev[1].api_key },
@@ -149,7 +181,7 @@ function enviarPdf(res, { buffer, nome, sha256 }) {
 
 // O token do link e a sessão não vão para o log (o stdout vai para o EasyPanel).
 export function mascararCaminho(p) {
-  return String(p).replace(/(\/assinar\/)[^/?]+/, '$1***')
+  return String(p).replace(/(\/(?:assinar|lote)\/)[^/?]+/, '$1***')
 }
 
 function limitarPorIp({ janelaMs, maximo }) {

@@ -1,0 +1,7 @@
+﻿Matrícula;Nome Completo;CPF;E-mail;Cargo;Setor
+1001;Ana Paula Conceição;12345678909;ana.paula@empresa-exemplo.com.br;Recepcionista;Atendimento
+1002;José Antônio Brandão;1234567890;jose.brandao@empresa-exemplo.com.br;Técnico de radiologia;Imagem
+1003;Márcia Regina Exemplo;123.456.789-00;marcia@empresa-exemplo.com.br;Enfermeira;Assistencial
+1004;Fábio Sem Email;98765432100;;Motorista;Apoio
+1005;Luciana Prado Exemplo;45612378955;luciana.prado@empresa-exemplo.com.br;Analista de faturamento;Financeiro
+1006;Ricardo Nunes Exemplo;32165498791;ricardo.nunes@empresa-exemplo.com.br;Médico radiologista;Laudos

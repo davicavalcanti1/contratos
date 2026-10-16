@@ -94,7 +94,21 @@ export function lintModelo(modelo, biblioteca) {
 
   // ── Base legal mínima ─────────────────────────────────────────────────────
   const todoTexto = blocos.flatMap(({ c }) => paragrafosDe(c).map(p => p.texto)).join('\n')
-  if (!/784/.test(todoTexto)) aviso('sem referência ao art. 784 do CPC — o contrato não afirma valer como título executivo extrajudicial')
+  // `titulo_executivo: false` = documento que não é para cobrar (um termo de
+  // conduta, por exemplo): a referência ao CPC 784 não se aplica.
+  if (modelo.titulo_executivo !== false && !/784/.test(todoTexto)) aviso('sem referência ao art. 784 do CPC — o contrato não afirma valer como título executivo extrajudicial')
+
+  // ── Quem assina pela parte (usado no lote) ────────────────────────────────
+  for (const [i, sp] of (modelo.signatarios_da_parte || []).entries()) {
+    const onde = `signatarios_da_parte[${i}]`
+    for (const campo of ['nome', 'email', 'cpf']) {
+      if (sp[campo] && !defs.has(sp[campo])) grave(`aponta para variável inexistente: ${sp[campo]}`, onde)
+    }
+    if (!sp.nome || !sp.email) grave('precisa de "nome" e "email"', onde)
+    const erros = validarRegra(sp.quando, 'quando')
+    erros.forEach(e => grave(e, onde))
+    if (erros.length) regrasQuebradas = true
+  }
 
   // ── Combinações ───────────────────────────────────────────────────────────
   // Com regra quebrada não dá para simular: reporta o que já tem e para aqui.
@@ -104,8 +118,9 @@ export function lintModelo(modelo, biblioteca) {
   const { combinacoes, truncado } = enumerarCombinacoes(modelo, blocos, defs)
   if (truncado) aviso(`mais de ${LIMITE_COMBINACOES} combinações de regras — só as primeiras foram conferidas`)
 
-  const faltas = new Map(), dobras = new Map()
+  const faltas = new Map(), dobras = new Map(), semSignatario = []
   for (const combo of combinacoes) {
+    if (modelo.signatarios_da_parte && !modelo.signatarios_da_parte.some(sp => avaliar(sp.quando, combo.dados))) semSignatario.push(combo.rotulo)
     const cats = []
     for (const { b, c } of blocos) {
       if (!avaliar(b.quando, combo.dados)) continue
@@ -123,6 +138,7 @@ export function lintModelo(modelo, biblioteca) {
     assinatura_eletronica: ' — é dela que depende a validade fora da ICP-Brasil (MP 2.200-2/2001, art. 10 §2º)',
   }
   for (const [cat, combos] of faltas) grave(`sem cláusula de "${cat}" quando ${combos.slice(0, 3).join(' | ')}${combos.length > 3 ? ` (+${combos.length - 3})` : ''}${msgCat[cat] || ''}`)
+  if (semSignatario.length) grave(`ninguém assina pela parte quando ${semSignatario.slice(0, 3).join(' | ')} — confira signatarios_da_parte`)
   for (const [cat, combos] of dobras) grave(`duas cláusulas de "${cat}" ao mesmo tempo quando ${combos.slice(0, 3).join(' | ')}`)
 
   return { ok: graves.length === 0, graves, avisos, combinacoes: combinacoes.length }
@@ -147,6 +163,7 @@ function enumerarCombinacoes(modelo, blocos, defs) {
     if (['gt', 'gte', 'lt', 'lte'].includes(r.op)) acumular(limiares, r.campo, r.valor)
   }
   modelo.blocos.forEach(b => coletar(b.quando))
+  ;(modelo.signatarios_da_parte || []).forEach(sp => coletar(sp.quando))
   blocos.forEach(({ c }) => paragrafosDe(c).forEach(p => coletar(p.quando)))
 
   const dominios = [...campos].map(campo => {

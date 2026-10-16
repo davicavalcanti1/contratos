@@ -1,0 +1,39 @@
+{
+  "chave": "termo_confidencialidade_colaborador",
+  "versao": 1,
+  "titulo": "Termo de Confidencialidade e Proteção de Dados do Colaborador",
+  "descricao": "Termo que a empresa inteira assina de uma vez: sigilo, LGPD e uso dos recursos corporativos. Feito para lote a partir da base de funcionários.",
+  "preambulo": "Pelo presente instrumento, a EMPRESA e o COLABORADOR abaixo qualificados firmam este Termo de Confidencialidade e Proteção de Dados, que integra o contrato de trabalho entre eles.",
+  "fecho": "E, por estarem de acordo, as partes assinam este termo eletronicamente, na forma da {{ref:col_assinatura}}, em {{sistema.data_geracao|extenso}}.",
+  "titulo_executivo": false,
+  "categorias_obrigatorias": ["partes", "objeto", "confidencialidade", "protecao_dados", "assinatura_eletronica"],
+  "variaveis": [
+    { "chave": "organizacao.razao_social", "rotulo": "razão social da empresa", "tipo": "texto", "origem": "organizacao" },
+    { "chave": "organizacao.cnpj", "rotulo": "CNPJ da empresa", "tipo": "cnpj", "origem": "organizacao" },
+    { "chave": "organizacao.endereco", "rotulo": "endereço da empresa", "tipo": "endereco", "origem": "organizacao" },
+    { "chave": "organizacao.representante_nome", "rotulo": "representante da empresa", "tipo": "texto", "origem": "organizacao" },
+    { "chave": "organizacao.representante_cargo", "rotulo": "cargo do representante", "tipo": "texto", "origem": "organizacao" },
+    { "chave": "organizacao.encarregado_email", "rotulo": "e-mail do encarregado de dados (DPO)", "tipo": "email", "origem": "organizacao" },
+
+    { "chave": "colaborador.nome", "rotulo": "nome do colaborador", "tipo": "texto", "origem": "fonte" },
+    { "chave": "colaborador.cpf", "rotulo": "CPF do colaborador", "tipo": "cpf", "origem": "fonte" },
+    { "chave": "colaborador.email", "rotulo": "e-mail do colaborador", "tipo": "email", "origem": "fonte" },
+    { "chave": "colaborador.cargo", "rotulo": "cargo", "tipo": "texto", "origem": "fonte" },
+    { "chave": "colaborador.matricula", "rotulo": "matrícula", "tipo": "texto", "origem": "fonte", "obrigatoria": false },
+    { "chave": "termo.anos_sigilo", "rotulo": "anos de sigilo após o desligamento", "tipo": "numero", "origem": "parametro", "padrao": 5 }
+  ],
+  "blocos": [
+    { "clausula": "col_partes", "versao": 1 },
+    { "clausula": "col_objeto", "versao": 1 },
+    { "clausula": "col_sigilo", "versao": 1 },
+    { "clausula": "col_dados", "versao": 1 },
+    { "clausula": "col_monitoramento", "versao": 1 },
+    { "clausula": "col_devolucao", "versao": 1 },
+    { "clausula": "col_descumprimento", "versao": 1 },
+    { "clausula": "col_assinatura", "versao": 1 }
+  ],
+  "signatarios_da_parte": [
+    { "papel": "parte", "nome": "colaborador.nome", "email": "colaborador.email", "cpf": "colaborador.cpf" }
+  ],
+  "resumo_lote": ["colaborador.nome", "colaborador.cargo", "colaborador.matricula"]
+}

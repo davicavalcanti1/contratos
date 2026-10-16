@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%231f3a5f%27/%3E%3Crect x=%279%27 y=%2711%27 width=%2714%27 height=%276%27 fill=%27%23ffe98a%27/%3E%3C/svg%3E">
+  <title>Contratos em lote</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+  <link rel="stylesheet" href="/estatico/app.css">
+  <script type="module" src="/estatico/lotes.js"></script>
+</head>
+<body>
+  <header class="topo">
+    <p class="emissor" id="org">Painel de teste, só existe fora de produção. <a href="/dev">Contrato avulso</a></p>
+    <h1>Contratos em lote a partir da planilha</h1>
+  </header>
+  <main class="conteudo largo">
+    <ol class="etapas" id="etapas">
+      <li data-etapa="planilha">Planilha</li>
+      <li data-etapa="colunas">Colunas</li>
+      <li data-etapa="conferir">Conferir</li>
+      <li data-etapa="acompanhar">Acompanhar</li>
+    </ol>
+    <div id="erro" class="aviso erro" role="alert" hidden></div>
+
+    <!-- 1 -->
+    <section id="passo-planilha" class="passos-rh duas">
+      <form class="cartao" id="form-planilha">
+        <h2>Qual contrato e qual planilha?</h2>
+        <label class="campo">
+          <span>Modelo</span>
+          <select id="modelo" required></select>
+          <small id="modelo-desc"></small>
+        </label>
+        <label class="campo">
+          <span>Planilha (.xlsx ou .csv)</span>
+          <input type="file" id="arquivo" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required>
+          <small>Primeira linha com os títulos das colunas, uma pessoa por linha. <a href="/dev/exemplo-funcionarios.csv">Baixar uma planilha de exemplo</a>.</small>
+        </label>
+        <button class="botao largo">Ler planilha</button>
+      </form>
+      <section class="cartao">
+        <h2>Lotes enviados</h2>
+        <table class="tabela"><tbody id="lista"></tbody></table>
+      </section>
+    </section>
+
+    <!-- 2 -->
+    <section id="passo-colunas" class="cartao" hidden>
+      <h2>De qual coluna vem cada informação?</h2>
+      <p id="colunas-origem"></p>
+      <table class="mapa">
+        <thead><tr><th>No contrato</th><th>Vem de</th><th>Exemplo da 1ª linha</th></tr></thead>
+        <tbody id="mapa"></tbody>
+      </table>
+      <p></p>
+      <button class="botao" id="btn-conferir">Conferir as linhas</button>
+      <button class="link-botao" id="btn-voltar-planilha" type="button">Trocar a planilha</button>
+    </section>
+
+    <!-- 3 -->
+    <section id="passo-conferir" class="passos-rh duas" hidden>
+      <section class="cartao">
+        <h2>Conferência, linha a linha</h2>
+        <div class="totais" id="totais-previa"></div>
+        <div id="aviso-org"></div>
+        <div class="rolagem"><table class="tabela" id="previa"></table></div>
+      </section>
+      <form class="cartao" id="form-enviar">
+        <h2>Enviar</h2>
+        <label class="campo">
+          <span>Nome do lote</span>
+          <input id="nome-lote" placeholder="Ex.: Termos de confidencialidade, outubro">
+        </label>
+        <p><strong>Quem assina pela empresa</strong><br><small>Recebe um link só e assina todos de uma vez. Deixe em branco se a empresa não assina.</small></p>
+        <label class="campo"><span class="sr">Nome</span><input id="rep-nome" placeholder="Nome completo"></label>
+        <label class="campo"><span class="sr">E-mail</span><input id="rep-email" type="email" placeholder="E-mail"></label>
+        <button class="botao largo" id="btn-enviar">Enviar</button>
+        <button class="link-botao" id="btn-voltar-colunas" type="button">Ajustar as colunas</button>
+      </form>
+    </section>
+
+    <!-- 4 -->
+    <section id="passo-acompanhar" class="cartao" hidden>
+      <h2 id="lote-nome"></h2>
+      <p id="lote-sub"></p>
+      <div class="totais" id="totais-lote"></div>
+      <div class="acoes" id="acoes-lote">
+        <button class="botao secundario" id="btn-lembrar">Lembrar quem ainda não assinou</button>
+        <button class="botao secundario" id="btn-relatorio">Baixar relatório (Excel)</button>
+        <button class="botao secundario" id="btn-novo">Novo lote</button>
+      </div>
+      <div id="lembrete" role="status"></div>
+      <div class="rolagem"><table class="tabela" id="linhas-lote"></table></div>
+    </section>
+  </main>
+</body>
+</html>

@@ -205,3 +205,35 @@ a { color: var(--marinho); }
    de propósito, por causa da leitura). */
 .conteudo.largo { max-width: none; padding-left: 24px; padding-right: 24px; }
 .dev .coluna { display: grid; gap: 18px; }
+
+/* ── Lote ──────────────────────────────────────────────────────────────── */
+/* Campo do modelo: o que muda de contrato para contrato. Sublinhado
+   pontilhado, como lacuna de formulário preenchida a lápis. */
+.var { font-family: var(--sans); font-size: .9em; color: var(--marinho); border-bottom: 1.5px dotted var(--marinho); padding: 0 1px; white-space: nowrap; }
+.condicao { font: 600 13px var(--sans); color: var(--tinta-2); background: var(--marinho-claro); border-radius: 4px; padding: 1px 6px; }
+p.condicao { display: inline-block; margin: 0 0 8px; }
+.tabela-lote { margin-top: 18px; }
+.rolagem { overflow-x: auto; }
+.tabela tr.fora td { color: var(--tinta-3); }
+
+/* Fluxo do RH */
+.passos-rh { display: grid; gap: 18px; }
+@media (min-width: 1100px) { .passos-rh.duas { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: start; } }
+.mapa { width: 100%; border-collapse: collapse; font-size: 15px; }
+.mapa td, .mapa th { padding: 8px 6px; border-bottom: 1px solid var(--linha); vertical-align: middle; text-align: left; }
+.mapa th { color: var(--tinta-3); font-weight: 400; font-size: 14px; }
+.mapa select, .mapa input { width: 100%; min-height: 40px; padding: 6px 8px; font: inherit; color: var(--tinta); background: var(--folha); border: 1.5px solid var(--linha); border-radius: 8px; }
+.mapa .amostra { color: var(--tinta-3); font-size: 14px; overflow-wrap: anywhere; }
+.mapa .obrig { color: var(--erro); }
+.totais { display: flex; flex-wrap: wrap; gap: 10px 26px; margin: 0 0 16px; }
+.totais div { font-size: 14px; color: var(--tinta-2); }
+.totais strong { display: block; font: 700 28px/1.1 var(--serif); color: var(--tinta); }
+.totais .ok strong { color: var(--ok); }
+.totais .mal strong { color: var(--erro); }
+.linha-problema td { background: var(--erro-claro); }
+.lista-curta { margin: 0; padding-left: 18px; font-size: 14px; }
+.lista-curta.avisos { color: var(--tinta-2); }
+
+/* Rótulos do modelo vêm em minúscula (também servem no meio de frases); em
+   cabeçalho de tabela, a inicial sobe. */
+.tabela th::first-letter, .mapa td:first-child::first-letter { text-transform: uppercase; }

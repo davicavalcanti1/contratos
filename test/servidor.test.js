@@ -7,6 +7,7 @@ import { criarRepo } from '../src/armazenamento/repo.js'
 import { criarServico } from '../src/assinatura/servico.js'
 import { carregarBiblioteca } from '../src/biblioteca.js'
 import { transporteCaixa } from '../src/notificacoes.js'
+import { criarLotes } from '../src/lote/lotes.js'
 import { criarApp, mascararCaminho } from '../src/servidor/app.js'
 
 let servidor, base, repo
@@ -22,7 +23,8 @@ before(async () => {
   repo = criarRepo()
   const organizacoes = { org1: { api_key: CHAVE, dados: JSON.parse(readFileSync('exemplos/_organizacao.json', 'utf8')) } }
   const servico = criarServico({ repo, biblioteca, notificar: transporteCaixa(repo, { log: false }), config: { baseUrl: base } })
-  servidor.on('request', criarApp({ servico, repo, biblioteca, organizacoes, dev: true, log: false }))
+  const lotes = criarLotes({ repo, biblioteca, servico })
+  servidor.on('request', criarApp({ servico, lotes, repo, biblioteca, organizacoes, dev: true, log: false }))
 })
 after(() => servidor.close())
 
@@ -107,4 +109,27 @@ test('código inexistente no selo é 404, e o token não vai para o log', async 
   assert.equal((await api('/api/verificar/AAAA-BBBB-CCCC', { chave: null })).status, 404)
   assert.equal(mascararCaminho('/api/assinar/abcDEF123_-x/conteudo'), '/api/assinar/***/conteudo')
   assert.equal(mascararCaminho('/assinar/abcDEF123'), '/assinar/***')
+  assert.equal(mascararCaminho('/api/lote/abcDEF123/codigo'), '/api/lote/***/codigo')
+})
+
+test('lote pelo HTTP: sobe CSV cru, sugere, prévia, cria, progresso e relatório', async () => {
+  const csv = ['Nome;CPF;E-mail;Cargo', 'Ana Paula Conceição;529.982.247-25;ana.paula@empresa-exemplo.com.br;Recepcionista'].join(String.fromCharCode(13, 10))
+  const r = await fetch(`${base}/v1/lotes/planilha?nome=func.csv`, { method: 'POST', headers: { authorization: `Bearer ${CHAVE}`, 'content-type': 'text/csv' }, body: csv })
+  assert.equal(r.status, 201)
+  const { planilha_id, total } = await r.json()
+  assert.equal(total, 1)
+  const modelo = 'termo_confidencialidade_colaborador'
+  const { corpo: sug } = await json(await api(`/v1/lotes/planilha/${planilha_id}/sugestao?modelo=${modelo}`))
+  const { corpo: pre } = await json(await api('/v1/lotes/previa', { metodo: 'POST', corpo: { planilha_id, modelo, mapeamento: sug.mapeamento } }))
+  assert.equal(pre.prontas, 1)
+  const criado = await json(await api('/v1/lotes', { metodo: 'POST', corpo: { planilha_id, modelo, mapeamento: sug.mapeamento, nome: 'Teste HTTP', assinante_organizacao: { nome: 'Maria Exemplo Souza', email: 'maria.dir@empresa-exemplo.com.br' } } }))
+  assert.equal(criado.status, 201)
+  assert.equal(criado.corpo.totais.contratos, 1)
+  const link = caixa('maria.dir@empresa-exemplo.com.br', 'link_lote').meta.link
+  assert.equal((await fetch(link)).status, 200)
+  const token = link.split('/lote/')[1]
+  assert.equal((await json(await api(`/api/lote/${token}`, { chave: null }))).corpo.pendentes, 1)
+  const rel = await api(`/v1/lotes/${criado.corpo.id}/relatorio.csv`)
+  assert.match(rel.headers.get('content-type'), /^text\/csv/)
+  assert.match(await rel.text(), /Ana Paula Conceição/)
 })

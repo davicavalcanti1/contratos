@@ -265,5 +265,109 @@
     "resumo_simples": "Se houver processo por causa deste contrato, ele corre em {{contrato.foro_comarca}}.",
     "critica": true,
     "base_legal": "CPC art. 63"
+  },
+  {
+    "chave": "col_partes",
+    "versao": 1,
+    "categoria": "partes",
+    "titulo": "Das partes",
+    "paragrafos": [
+      "EMPRESA: {{organizacao.razao_social}}, inscrita no CNPJ sob o nº {{organizacao.cnpj}}, com sede em {{organizacao.endereco}}, neste ato representada por {{organizacao.representante_nome}}, {{organizacao.representante_cargo}}.",
+      "COLABORADOR: {{colaborador.nome}}, inscrito(a) no CPF sob o nº {{colaborador.cpf}}, ocupante do cargo de {{colaborador.cargo}}, endereço eletrônico {{colaborador.email}}.",
+      {
+        "quando": {
+          "campo": "colaborador.matricula",
+          "op": "existe"
+        },
+        "texto": "O COLABORADOR é identificado internamente pela matrícula nº {{colaborador.matricula}}."
+      }
+    ],
+    "base_legal": "CC art. 104"
+  },
+  {
+    "chave": "col_objeto",
+    "versao": 1,
+    "categoria": "objeto",
+    "titulo": "Do objeto",
+    "paragrafos": [
+      "Este termo estabelece as obrigações do COLABORADOR quanto ao sigilo das informações da EMPRESA e ao tratamento dos dados pessoais a que tiver acesso em razão de suas funções.",
+      "Este termo não altera salário, jornada nem qualquer outra condição do contrato de trabalho."
+    ],
+    "resumo_simples": "Este termo trata de sigilo e de dados pessoais. Não muda salário, horário nem outra condição do trabalho."
+  },
+  {
+    "chave": "col_sigilo",
+    "versao": 1,
+    "categoria": "confidencialidade",
+    "titulo": "Do sigilo",
+    "paragrafos": [
+      "O COLABORADOR manterá sigilo sobre as informações não públicas da EMPRESA, de seus clientes, pacientes e parceiros, inclusive dados técnicos, comerciais, financeiros e estratégicos, a que tiver acesso em razão do trabalho.",
+      "A obrigação de sigilo vale durante o contrato de trabalho e por {{termo.anos_sigilo|com_extenso}} anos após o seu término, por qualquer motivo.",
+      "Não é confidencial a informação que já era pública, que se tornou pública sem culpa do COLABORADOR ou cuja divulgação seja exigida por lei ou ordem judicial, caso em que o COLABORADOR avisará a EMPRESA, se a lei permitir."
+    ],
+    "resumo_simples": "O que a pessoa souber da empresa, de clientes ou de pacientes por causa do trabalho fica em sigilo, inclusive por {{termo.anos_sigilo}} anos depois de sair da empresa.",
+    "critica": true,
+    "base_legal": "CLT art. 482, g; Lei 9.279/1996 art. 195, XI"
+  },
+  {
+    "chave": "col_dados",
+    "versao": 1,
+    "categoria": "protecao_dados",
+    "titulo": "Da proteção de dados pessoais",
+    "paragrafos": [
+      "O COLABORADOR acessará apenas os dados pessoais necessários às suas funções, não os copiará para dispositivos ou contas pessoais e seguirá as políticas de segurança da EMPRESA.",
+      "Qualquer suspeita de incidente com dados pessoais será comunicada imediatamente ao encarregado de dados da EMPRESA, pelo endereço {{organizacao.encarregado_email}}.",
+      "A EMPRESA trata os dados pessoais do COLABORADOR para executar o contrato de trabalho e cumprir obrigações legais, nos termos do art. 7º, II e V, da Lei 13.709/2018 (LGPD), e os guarda pelo prazo que a lei exigir."
+    ],
+    "resumo_simples": "Só se acessa o dado pessoal que o trabalho exige, sem copiar para celular ou e-mail pessoal. Vazamento ou suspeita se avisa na hora para {{organizacao.encarregado_email}}.",
+    "base_legal": "Lei 13.709/2018, arts. 7º, 46 e 48"
+  },
+  {
+    "chave": "col_monitoramento",
+    "versao": 1,
+    "categoria": "monitoramento",
+    "titulo": "Do uso dos recursos corporativos",
+    "paragrafos": [
+      "Computadores, e-mail, sistemas e contas fornecidos pela EMPRESA destinam-se ao trabalho e podem ser monitorados para fins de segurança da informação e de cumprimento deste termo.",
+      "O monitoramento se limita aos recursos corporativos e não alcança dispositivos e contas pessoais do COLABORADOR."
+    ],
+    "resumo_simples": "Computador, e-mail e sistemas da empresa são para o trabalho e podem ser monitorados por segurança. Celular e contas pessoais não são monitorados.",
+    "critica": true,
+    "base_legal": "CLT art. 2º (poder diretivo); Lei 13.709/2018 art. 6º"
+  },
+  {
+    "chave": "col_devolucao",
+    "versao": 1,
+    "categoria": "devolucao",
+    "titulo": "Da devolução",
+    "paragrafos": [
+      "No término do contrato de trabalho, o COLABORADOR devolverá os equipamentos, documentos e materiais da EMPRESA e apagará as cópias de informações confidenciais que estejam em seu poder."
+    ],
+    "resumo_simples": "Ao sair da empresa, devolve-se tudo o que é dela e apagam-se as cópias de informações confidenciais."
+  },
+  {
+    "chave": "col_descumprimento",
+    "versao": 1,
+    "categoria": "penalidade",
+    "titulo": "Do descumprimento",
+    "paragrafos": [
+      "A violação deste termo pode caracterizar falta grave, inclusive violação de segredo da empresa (art. 482, g, da CLT), sem prejuízo da responsabilidade civil e criminal cabível."
+    ],
+    "resumo_simples": "Quebrar o sigilo ou as regras de dados pode levar à demissão por justa causa, além de processo civil e criminal.",
+    "critica": true,
+    "base_legal": "CLT art. 482, g; CP art. 154"
+  },
+  {
+    "chave": "col_assinatura",
+    "versao": 1,
+    "categoria": "assinatura_eletronica",
+    "titulo": "Da assinatura eletrônica",
+    "paragrafos": [
+      "As partes admitem como válida e reconhecem a autoria e a integridade deste termo assinado por meio eletrônico, ainda que sem certificado emitido pela ICP-Brasil, nos termos do art. 10, § 2º, da Medida Provisória 2.200-2/2001.",
+      "As evidências de autenticação, os registros de data e hora e o código de integridade do documento, mantidos pelo provedor de assinatura, integram este termo e podem ser conferidos a qualquer tempo."
+    ],
+    "resumo_simples": "Assinar por aqui vale o mesmo que assinar no papel.",
+    "critica": true,
+    "base_legal": "MP 2.200-2/2001 art. 10 §2º. Sem cláusula de foro: em matéria trabalhista a competência é fixada pela CLT (art. 651), e eleição de foro não vale"
   }
 ]

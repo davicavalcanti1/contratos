@@ -12,6 +12,7 @@ import { join } from 'node:path'
 import { criarRepo } from '../armazenamento/repo.js'
 import { criarServico } from '../assinatura/servico.js'
 import { carregarBiblioteca } from '../biblioteca.js'
+import { criarLotes } from '../lote/lotes.js'
 import { lintModelo } from '../motor/linter.js'
 import { transporteCaixa } from '../notificacoes.js'
 import { criarApp } from './app.js'
@@ -36,7 +37,8 @@ for (const m of biblioteca.modelos) {
 
 const repo = criarRepo({ dir: process.env.DADOS_DIR || join(process.cwd(), 'dados') })
 const servico = criarServico({ repo, biblioteca, notificar: transporteCaixa(repo), config: { baseUrl } })
-const app = criarApp({ servico, repo, biblioteca, organizacoes: carregarOrganizacoes(), dev: !producao })
+const lotes = criarLotes({ repo, biblioteca, servico })
+const app = criarApp({ servico, lotes, repo, biblioteca, organizacoes: carregarOrganizacoes(), dev: !producao })
 
 app.listen(porta, () => {
   console.log(`contratos-saas em ${baseUrl}${producao ? '' : `  ·  painel de teste: ${baseUrl}/dev`}`)

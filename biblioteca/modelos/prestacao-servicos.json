@@ -6,69 +6,331 @@
   "preambulo": "Pelo presente instrumento particular, as partes abaixo qualificadas celebram este Contrato de Prestação de Serviços, que se regerá pelas cláusulas seguintes.",
   "fecho": "E, por estarem de acordo, as partes assinam este instrumento eletronicamente, na forma da {{ref:assinatura_eletronica}}, em {{sistema.data_geracao|extenso}}.",
   "variaveis": [
-    { "chave": "organizacao.razao_social", "rotulo": "razão social da contratante", "tipo": "texto", "origem": "organizacao" },
-    { "chave": "organizacao.cnpj", "rotulo": "CNPJ da contratante", "tipo": "cnpj", "origem": "organizacao" },
-    { "chave": "organizacao.endereco", "rotulo": "endereço da contratante", "tipo": "endereco", "origem": "organizacao" },
-    { "chave": "organizacao.representante_nome", "rotulo": "representante da contratante", "tipo": "texto", "origem": "organizacao" },
-    { "chave": "organizacao.representante_cargo", "rotulo": "cargo do representante da contratante", "tipo": "texto", "origem": "organizacao" },
-
-    { "chave": "contratado.tipo", "rotulo": "tipo do contratado", "tipo": "enum", "origem": "parte",
+    {
+      "chave": "organizacao.razao_social",
+      "rotulo": "razão social da contratante",
+      "tipo": "texto",
+      "origem": "organizacao"
+    },
+    {
+      "chave": "organizacao.cnpj",
+      "rotulo": "CNPJ da contratante",
+      "tipo": "cnpj",
+      "origem": "organizacao"
+    },
+    {
+      "chave": "organizacao.endereco",
+      "rotulo": "endereço da contratante",
+      "tipo": "endereco",
+      "origem": "organizacao"
+    },
+    {
+      "chave": "organizacao.representante_nome",
+      "rotulo": "representante da contratante",
+      "tipo": "texto",
+      "origem": "organizacao"
+    },
+    {
+      "chave": "organizacao.representante_cargo",
+      "rotulo": "cargo do representante da contratante",
+      "tipo": "texto",
+      "origem": "organizacao"
+    },
+    {
+      "chave": "contratado.tipo",
+      "rotulo": "tipo do contratado",
+      "tipo": "enum",
+      "origem": "parte",
       "opcoes": [
-        { "valor": "pf", "texto": "pessoa física" },
-        { "valor": "pj", "texto": "pessoa jurídica" },
-        { "valor": "mei", "texto": "microempreendedor individual" }
-      ] },
-    { "chave": "contratado.nome", "rotulo": "nome ou razão social do contratado", "tipo": "texto", "origem": "parte" },
-    { "chave": "contratado.cpf", "rotulo": "CPF do contratado (ou do titular do MEI)", "tipo": "cpf", "origem": "parte" },
-    { "chave": "contratado.cnpj", "rotulo": "CNPJ do contratado", "tipo": "cnpj", "origem": "parte" },
-    { "chave": "contratado.nacionalidade", "rotulo": "nacionalidade do contratado", "tipo": "texto", "origem": "parte", "padrao": "brasileiro(a)" },
-    { "chave": "contratado.estado_civil", "rotulo": "estado civil do contratado", "tipo": "texto", "origem": "parte" },
-    { "chave": "contratado.profissao", "rotulo": "profissão do contratado", "tipo": "texto", "origem": "parte" },
-    { "chave": "contratado.endereco", "rotulo": "endereço do contratado", "tipo": "endereco", "origem": "parte" },
-    { "chave": "contratado.email", "rotulo": "e-mail do contratado", "tipo": "email", "origem": "parte" },
-    { "chave": "contratado.representante_nome", "rotulo": "representante legal da contratada", "tipo": "texto", "origem": "parte" },
-    { "chave": "contratado.representante_cpf", "rotulo": "CPF do representante legal da contratada", "tipo": "cpf", "origem": "parte" },
-
-    { "chave": "contrato.objeto", "rotulo": "descrição dos serviços", "tipo": "texto", "origem": "manual" },
-    { "chave": "contrato.valor", "rotulo": "valor", "tipo": "moeda", "origem": "manual" },
-    { "chave": "contrato.forma_pagamento", "rotulo": "forma de pagamento", "tipo": "enum", "origem": "manual",
+        {
+          "valor": "pf",
+          "texto": "pessoa física"
+        },
+        {
+          "valor": "pj",
+          "texto": "pessoa jurídica"
+        },
+        {
+          "valor": "mei",
+          "texto": "microempreendedor individual"
+        }
+      ]
+    },
+    {
+      "chave": "contratado.nome",
+      "rotulo": "nome ou razão social do contratado",
+      "tipo": "texto",
+      "origem": "parte"
+    },
+    {
+      "chave": "contratado.cpf",
+      "rotulo": "CPF do contratado (ou do titular do MEI)",
+      "tipo": "cpf",
+      "origem": "parte"
+    },
+    {
+      "chave": "contratado.cnpj",
+      "rotulo": "CNPJ do contratado",
+      "tipo": "cnpj",
+      "origem": "parte"
+    },
+    {
+      "chave": "contratado.nacionalidade",
+      "rotulo": "nacionalidade do contratado",
+      "tipo": "texto",
+      "origem": "parte",
+      "padrao": "brasileiro(a)"
+    },
+    {
+      "chave": "contratado.estado_civil",
+      "rotulo": "estado civil do contratado",
+      "tipo": "texto",
+      "origem": "parte"
+    },
+    {
+      "chave": "contratado.profissao",
+      "rotulo": "profissão do contratado",
+      "tipo": "texto",
+      "origem": "parte"
+    },
+    {
+      "chave": "contratado.endereco",
+      "rotulo": "endereço do contratado",
+      "tipo": "endereco",
+      "origem": "parte"
+    },
+    {
+      "chave": "contratado.email",
+      "rotulo": "e-mail do contratado",
+      "tipo": "email",
+      "origem": "parte"
+    },
+    {
+      "chave": "contratado.representante_nome",
+      "rotulo": "representante legal da contratada",
+      "tipo": "texto",
+      "origem": "parte"
+    },
+    {
+      "chave": "contratado.representante_cpf",
+      "rotulo": "CPF do representante legal da contratada",
+      "tipo": "cpf",
+      "origem": "parte"
+    },
+    {
+      "chave": "contrato.objeto",
+      "rotulo": "descrição dos serviços",
+      "tipo": "texto",
+      "origem": "manual"
+    },
+    {
+      "chave": "contrato.valor",
+      "rotulo": "valor",
+      "tipo": "moeda",
+      "origem": "manual"
+    },
+    {
+      "chave": "contrato.forma_pagamento",
+      "rotulo": "forma de pagamento",
+      "tipo": "enum",
+      "origem": "manual",
       "opcoes": [
-        { "valor": "mensal", "texto": "mensal" },
-        { "valor": "unica", "texto": "parcela única" }
-      ] },
-    { "chave": "contrato.dia_pagamento", "rotulo": "dia do pagamento", "tipo": "numero", "origem": "parametro", "padrao": 10 },
-    { "chave": "contrato.prazo_tipo", "rotulo": "tipo de prazo", "tipo": "enum", "origem": "manual",
+        {
+          "valor": "mensal",
+          "texto": "mensal"
+        },
+        {
+          "valor": "unica",
+          "texto": "parcela única"
+        }
+      ]
+    },
+    {
+      "chave": "contrato.dia_pagamento",
+      "rotulo": "dia do pagamento",
+      "tipo": "numero",
+      "origem": "parametro",
+      "padrao": 10
+    },
+    {
+      "chave": "contrato.prazo_tipo",
+      "rotulo": "tipo de prazo",
+      "tipo": "enum",
+      "origem": "manual",
       "opcoes": [
-        { "valor": "determinado", "texto": "prazo determinado" },
-        { "valor": "indeterminado", "texto": "prazo indeterminado" }
-      ] },
-    { "chave": "contrato.data_inicio", "rotulo": "data de início", "tipo": "data", "origem": "manual" },
-    { "chave": "contrato.duracao_meses", "rotulo": "duração em meses", "tipo": "numero", "origem": "manual", "obrigatoria": false },
-    { "chave": "contrato.aviso_previo_dias", "rotulo": "aviso prévio (dias)", "tipo": "numero", "origem": "parametro", "padrao": 30 },
-    { "chave": "contrato.multa_percentual", "rotulo": "multa por resilição antecipada", "tipo": "percentual", "origem": "parametro", "padrao": 20 },
-    { "chave": "contrato.indice_reajuste", "rotulo": "índice de reajuste", "tipo": "enum", "origem": "parametro", "padrao": "IPCA",
+        {
+          "valor": "determinado",
+          "texto": "prazo determinado"
+        },
+        {
+          "valor": "indeterminado",
+          "texto": "prazo indeterminado"
+        }
+      ]
+    },
+    {
+      "chave": "contrato.data_inicio",
+      "rotulo": "data de início",
+      "tipo": "data",
+      "origem": "manual"
+    },
+    {
+      "chave": "contrato.duracao_meses",
+      "rotulo": "duração em meses",
+      "tipo": "numero",
+      "origem": "manual",
+      "obrigatoria": false
+    },
+    {
+      "chave": "contrato.aviso_previo_dias",
+      "rotulo": "aviso prévio (dias)",
+      "tipo": "numero",
+      "origem": "parametro",
+      "padrao": 30
+    },
+    {
+      "chave": "contrato.multa_percentual",
+      "rotulo": "multa por resilição antecipada",
+      "tipo": "percentual",
+      "origem": "parametro",
+      "padrao": 20
+    },
+    {
+      "chave": "contrato.indice_reajuste",
+      "rotulo": "índice de reajuste",
+      "tipo": "enum",
+      "origem": "parametro",
+      "padrao": "IPCA",
       "opcoes": [
-        { "valor": "IPCA", "texto": "IPCA/IBGE" },
-        { "valor": "IGP-M", "texto": "IGP-M/FGV" }
-      ] },
-    { "chave": "contrato.foro_comarca", "rotulo": "comarca do foro", "tipo": "texto", "origem": "parametro" }
+        {
+          "valor": "IPCA",
+          "texto": "IPCA/IBGE"
+        },
+        {
+          "valor": "IGP-M",
+          "texto": "IGP-M/FGV"
+        }
+      ]
+    },
+    {
+      "chave": "contrato.foro_comarca",
+      "rotulo": "comarca do foro",
+      "tipo": "texto",
+      "origem": "parametro"
+    }
   ],
   "blocos": [
-    { "clausula": "partes", "versao": 1 },
-    { "clausula": "objeto", "versao": 1 },
-    { "clausula": "prazo_determinado", "versao": 1, "quando": { "campo": "contrato.prazo_tipo", "op": "eq", "valor": "determinado" } },
-    { "clausula": "prazo_indeterminado", "versao": 1, "quando": { "campo": "contrato.prazo_tipo", "op": "eq", "valor": "indeterminado" } },
-    { "clausula": "preco", "versao": 1 },
-    { "clausula": "obrigacoes_contratado", "versao": 1 },
-    { "clausula": "obrigacoes_contratante", "versao": 1 },
-    { "clausula": "autonomia", "versao": 1 },
-    { "clausula": "confidencialidade", "versao": 1 },
-    { "clausula": "protecao_dados", "versao": 1 },
-    { "clausula": "rescisao", "versao": 1 },
-    { "clausula": "multa_rescisoria", "versao": 1, "quando": { "campo": "contrato.prazo_tipo", "op": "eq", "valor": "determinado" } },
-    { "clausula": "limitacao_responsabilidade", "versao": 1 },
-    { "clausula": "comunicacoes", "versao": 1 },
-    { "clausula": "assinatura_eletronica", "versao": 1 },
-    { "clausula": "foro", "versao": 1 }
+    {
+      "clausula": "partes",
+      "versao": 1
+    },
+    {
+      "clausula": "objeto",
+      "versao": 1
+    },
+    {
+      "clausula": "prazo_determinado",
+      "versao": 1,
+      "quando": {
+        "campo": "contrato.prazo_tipo",
+        "op": "eq",
+        "valor": "determinado"
+      }
+    },
+    {
+      "clausula": "prazo_indeterminado",
+      "versao": 1,
+      "quando": {
+        "campo": "contrato.prazo_tipo",
+        "op": "eq",
+        "valor": "indeterminado"
+      }
+    },
+    {
+      "clausula": "preco",
+      "versao": 1
+    },
+    {
+      "clausula": "obrigacoes_contratado",
+      "versao": 1
+    },
+    {
+      "clausula": "obrigacoes_contratante",
+      "versao": 1
+    },
+    {
+      "clausula": "autonomia",
+      "versao": 1
+    },
+    {
+      "clausula": "confidencialidade",
+      "versao": 1
+    },
+    {
+      "clausula": "protecao_dados",
+      "versao": 1
+    },
+    {
+      "clausula": "rescisao",
+      "versao": 1
+    },
+    {
+      "clausula": "multa_rescisoria",
+      "versao": 1,
+      "quando": {
+        "campo": "contrato.prazo_tipo",
+        "op": "eq",
+        "valor": "determinado"
+      }
+    },
+    {
+      "clausula": "limitacao_responsabilidade",
+      "versao": 1
+    },
+    {
+      "clausula": "comunicacoes",
+      "versao": 1
+    },
+    {
+      "clausula": "assinatura_eletronica",
+      "versao": 1
+    },
+    {
+      "clausula": "foro",
+      "versao": 1
+    }
+  ],
+  "signatarios_da_parte": [
+    {
+      "papel": "parte",
+      "nome": "contratado.nome",
+      "email": "contratado.email",
+      "cpf": "contratado.cpf",
+      "quando": {
+        "campo": "contratado.tipo",
+        "op": "in",
+        "valor": [
+          "pf",
+          "mei"
+        ]
+      }
+    },
+    {
+      "papel": "representante",
+      "nome": "contratado.representante_nome",
+      "email": "contratado.email",
+      "cpf": "contratado.representante_cpf",
+      "quando": {
+        "campo": "contratado.tipo",
+        "op": "eq",
+        "valor": "pj"
+      }
+    }
+  ],
+  "resumo_lote": [
+    "contratado.nome",
+    "contratado.tipo",
+    "contrato.valor",
+    "contrato.data_inicio"
   ]
 }

@@ -13,7 +13,7 @@ const ROTULO = {
 
 async function carregar(primeira = false) {
   estado = await api('/dev/api/estado')
-  $('#org').textContent = `Organização de teste: ${estado.organizacao.nome}`
+  $('#org').innerHTML = `Organização de teste: ${esc(estado.organizacao.nome.replace(/\.$/, ''))}. <a href="/dev/lotes">Contratos em lote a partir da planilha</a>`
   if (primeira) {
     $('#exemplo').innerHTML = estado.exemplos.map(e => `<option value="${esc(e.nome)}">${esc(e.nome)}</option>`).join('')
     preencherSignatarios()

@@ -13,6 +13,7 @@ import QRCode from 'qrcode'
 import { acharModelo } from '../biblioteca.js'
 import { montarContrato } from '../motor/montar.js'
 import { gerarPdf } from '../motor/pdf.js'
+import { textoDoModelo } from '../motor/texto-modelo.js'
 import { TIPOS } from '../motor/tipos.js'
 import { criarTrilha } from './trilha.js'
 import {
@@ -89,7 +90,10 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     return checarExpiracao(c)
   }
 
-  async function enviar(id, organizacaoId, { signatarios, ordem = 'paralela', prazo_dias } = {}) {
+  // `interno`: só o módulo de lote marca um signatário com canal 'lote'. Esse
+  // signatário não recebe link por contrato — assina todos de uma vez pelo
+  // link do lote. Pela API pública, todo signatário é 'email'.
+  async function enviar(id, organizacaoId, { signatarios, ordem = 'paralela', prazo_dias } = {}, { interno = false } = {}) {
     const c = contratoDaOrg(id, organizacaoId)
     if (c.status !== 'gerado') throw new ErroNegocio(409, `Contrato está "${c.status}" — só se envia um contrato recém-gerado.`)
     if (!['paralela', 'sequencial'].includes(ordem)) throw new ErroNegocio(400, 'ordem deve ser "paralela" ou "sequencial".')
@@ -102,7 +106,8 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       email: s.email.trim().toLowerCase(),
       cpf: s.cpf ? TIPOS.cpf.formatar(s.cpf) : null,
       papel: s.papel || 'parte',
-      canal: 'email',
+      canal: interno && s.canal === 'lote' ? 'lote' : 'email',
+      lote_id: interno ? s.lote_id || null : null,
       status: 'aguardando',
       ciencias: {},
     }))
@@ -115,7 +120,8 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       dados: { ordem, expira_em: repo.obter('contratos', c.id).expira_em, signatarios: lista.map(s => ({ id: s.id, nome: s.nome, email: s.email, papel: s.papel, ordem: s.ordem })) },
     })
 
-    const aNotificar = ordem === 'paralela' ? lista : lista.slice(0, 1)
+    const porEmail = lista.filter(s => s.canal !== 'lote')
+    const aNotificar = ordem === 'paralela' ? porEmail : porEmail.slice(0, 1)
     const links = []
     for (const s of aNotificar) links.push({ signatario_id: s.id, nome: s.nome, link: await notificarSignatario(c.id, s) })
     return { contrato: resumoContrato(repo.obter('contratos', c.id)), links }
@@ -238,51 +244,74 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     }
   }
 
+  // ── Código de uso único e sessão ──────────────────────────────────────────
+  // O mesmo mecanismo serve ao signatário de um contrato e ao representante
+  // que assina um lote: só muda onde o OTP fica guardado.
+
+  async function emitirCodigo({ alvoId, email, otpAtual, salvarOtp, meta }) {
+    const desde = otpAtual?.enviado_em ? (agora() - new Date(otpAtual.enviado_em)) / 1000 : Infinity
+    if (desde < cfg.otpIntervaloSeg) {
+      const aguardar_s = Math.ceil(cfg.otpIntervaloSeg - desde)
+      throw new ErroNegocio(429, `Aguarde ${aguardar_s}s para pedir outro código.`, { aguardar_s })
+    }
+    const { codigo, hash } = novoOtp(alvoId)
+    const expira_em = depois(cfg.otpMinutos * 60e3)
+    salvarOtp({ hash, expira_em, tentativas: 0, enviado_em: agoraIso() })
+    await notificar({
+      para: email,
+      canal: 'email',
+      assunto: `Seu código para assinar: ${codigo}`,
+      texto: `Seu código é ${codigo}. Ele vale ${cfg.otpMinutos} minutos.\n\nSe não foi você quem pediu, ignore esta mensagem — sem o código ninguém assina em seu nome.`,
+      meta: { tipo: 'codigo', codigo, ...meta },
+    })
+    return { enviado_para: mascararEmail(email), expira_em, reenviar_em_s: cfg.otpIntervaloSeg }
+  }
+
+  function conferirCodigo({ alvoId, otp, codigo, salvarOtp, aoFalhar }) {
+    if (!otp) throw new ErroNegocio(400, 'Peça um código primeiro.')
+    if (otp.expira_em < agoraIso()) throw new ErroNegocio(400, 'O código expirou. Peça outro.')
+    if (otp.tentativas >= cfg.otpTentativas) throw new ErroNegocio(429, 'Muitas tentativas erradas. Peça um código novo.')
+    if (!iguais(hashOtp(alvoId, codigo), otp.hash)) {
+      const tentativas = otp.tentativas + 1
+      salvarOtp({ ...otp, tentativas })
+      aoFalhar(tentativas)
+      const restam = cfg.otpTentativas - tentativas
+      throw new ErroNegocio(400, restam > 0 ? `Código incorreto. Restam ${restam} tentativa(s).` : 'Código incorreto. Peça um código novo.', { restam })
+    }
+  }
+
+  function abrirSessao(dono) {
+    const { token: sessao, hash } = novoToken()
+    const expira_em = depois(cfg.sessaoHoras * 3600e3)
+    repo.inserir('sessoes', { ...dono, hash, expira_em, criada_em: agoraIso() })
+    return { sessao, expira_em }
+  }
+
   async function solicitarCodigo(token, ctx = {}) {
     const { s, c } = porToken(token)
     if (c.status !== 'assinado') exigirEmAssinatura(c, s)
-    const desde = s.otp?.enviado_em ? (agora() - new Date(s.otp.enviado_em)) / 1000 : Infinity
-    if (desde < cfg.otpIntervaloSeg) {
-      throw new ErroNegocio(429, `Aguarde ${Math.ceil(cfg.otpIntervaloSeg - desde)}s para pedir outro código.`, { aguardar_s: Math.ceil(cfg.otpIntervaloSeg - desde) })
-    }
-    const { codigo, hash } = novoOtp(s.id)
-    const expira_em = depois(cfg.otpMinutos * 60e3)
-    repo.atualizar('signatarios', s.id, { otp: { hash, expira_em, tentativas: 0, enviado_em: agoraIso() } })
-    await notificar({
-      para: s.email,
-      canal: s.canal,
-      assunto: `Seu código para assinar: ${codigo}`,
-      texto: `Seu código é ${codigo}. Ele vale ${cfg.otpMinutos} minutos.\n\nSe não foi você quem pediu, ignore esta mensagem — sem o código ninguém assina em seu nome.`,
-      meta: { tipo: 'codigo', contrato_id: c.id, signatario_id: s.id, codigo },
+    const r = await emitirCodigo({
+      alvoId: s.id, email: s.email, otpAtual: s.otp,
+      salvarOtp: (otp) => repo.atualizar('signatarios', s.id, { otp }),
+      meta: { contrato_id: c.id, signatario_id: s.id },
     })
     trilha.registrar(c.id, 'otp.enviado', { ator: `signatario:${s.id}`, dados: { canal: s.canal, destino: mascararEmail(s.email) }, ...evidencia(ctx) })
-    return { enviado_para: mascararEmail(s.email), expira_em, reenviar_em_s: cfg.otpIntervaloSeg }
+    return r
   }
 
   function validarCodigo(token, codigo, ctx = {}) {
     const { s, c } = porToken(token)
     if (c.status !== 'assinado') exigirEmAssinatura(c, s)
-    const otp = s.otp
-    if (!otp) throw new ErroNegocio(400, 'Peça um código primeiro.')
-    if (otp.expira_em < agoraIso()) throw new ErroNegocio(400, 'O código expirou. Peça outro.')
-    if (otp.tentativas >= cfg.otpTentativas) throw new ErroNegocio(429, 'Muitas tentativas erradas. Peça um código novo.')
-
-    if (!iguais(hashOtp(s.id, codigo), otp.hash)) {
-      const tentativas = otp.tentativas + 1
-      repo.atualizar('signatarios', s.id, { otp: { ...otp, tentativas } })
-      trilha.registrar(c.id, 'otp.falhou', { ator: `signatario:${s.id}`, dados: { tentativa: tentativas }, ...evidencia(ctx) })
-      const restam = cfg.otpTentativas - tentativas
-      throw new ErroNegocio(400, restam > 0 ? `Código incorreto. Restam ${restam} tentativa(s).` : 'Código incorreto. Peça um código novo.', { restam })
-    }
-
+    conferirCodigo({
+      alvoId: s.id, otp: s.otp, codigo,
+      salvarOtp: (otp) => repo.atualizar('signatarios', s.id, { otp }),
+      aoFalhar: (tentativa) => trilha.registrar(c.id, 'otp.falhou', { ator: `signatario:${s.id}`, dados: { tentativa }, ...evidencia(ctx) }),
+    })
     const patch = { otp: null }
     if (!s.identificado_em) { patch.identificado_em = agoraIso(); patch.status = s.status === 'notificado' ? 'identificado' : s.status }
     repo.atualizar('signatarios', s.id, patch)
-    const { token: sessao, hash } = novoToken()
-    const expira_em = depois(cfg.sessaoHoras * 3600e3)
-    repo.inserir('sessoes', { signatario_id: s.id, hash, expira_em, criada_em: agoraIso() })
     trilha.registrar(c.id, 'otp.validado', { ator: `signatario:${s.id}`, dados: { canal: s.canal }, ...evidencia(ctx) })
-    return { sessao, expira_em }
+    return abrirSessao({ signatario_id: s.id })
   }
 
   // O que a tela de leitura precisa: o texto, a bula, o que já foi confirmado.
@@ -365,17 +394,19 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       ...evidencia(ctx),
     })
 
-    const todos = signatariosDe(c.id)
-    if (todos.every(x => x.status === 'assinado')) {
-      await selar(c.id)
-    } else {
-      repo.atualizar('contratos', c.id, { status: 'parcialmente_assinado' })
-      if (c.ordem === 'sequencial') {
-        const proximo = todos.find(x => x.ordem === s.ordem + 1)
-        if (proximo?.status === 'aguardando') await notificarSignatario(c.id, proximo)
-      }
-    }
+    await posAssinatura(c, s)
     return { assinado_em: em, contrato_status: repo.obter('contratos', c.id).status }
+  }
+
+  // Depois de cada assinatura: sela se foi a última; senão avança a fila.
+  async function posAssinatura(c, s) {
+    const todos = signatariosDe(c.id)
+    if (todos.every(x => x.status === 'assinado')) return selar(c.id)
+    repo.atualizar('contratos', c.id, { status: 'parcialmente_assinado' })
+    if (c.ordem === 'sequencial') {
+      const proximo = todos.find(x => x.ordem === s.ordem + 1)
+      if (proximo?.status === 'aguardando' && proximo.canal !== 'lote') await notificarSignatario(c.id, proximo)
+    }
   }
 
   function recusar(token, sessao, { motivo } = {}, ctx = {}) {
@@ -393,6 +424,210 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
   function arquivoDoSignatario(token, sessao, qual) {
     const { c } = comSessao(token, sessao)
     return lerPdf(c, qual)
+  }
+
+  // ── Representante da empresa assinando um lote ────────────────────────────
+  // Num lote de 40 contratos, a empresa assina os 40. Sem isto o diretor abre
+  // 40 links. Aqui ele confirma UM código, lê o MODELO (com as variações
+  // indicadas) e a tabela com os dados de cada pessoa, dá ciência às cláusulas
+  // em destaque e assina todos. Cada contrato recebe na própria trilha os
+  // mesmos eventos de uma assinatura individual, marcados com o lote.
+
+  async function convidarAssinanteLote(loteId) {
+    const lote = repo.obter('lotes', loteId)
+    if (!lote?.assinante) throw new ErroNegocio(400, 'Este lote não tem representante da empresa para assinar.')
+    const { token, hash } = novoToken()
+    repo.atualizar('lotes', loteId, { assinante: { ...lote.assinante, token_hash: hash, notificado_em: agoraIso() } })
+    const link = `${cfg.baseUrl}/lote/${token}`
+    const n = itensDoLote(lote).length
+    await notificar({
+      para: lote.assinante.email,
+      canal: 'email',
+      assunto: `${n} contratos aguardam a sua assinatura: ${lote.nome}`,
+      texto: `Olá, ${lote.assinante.nome.split(' ')[0]}.\n\nO lote "${lote.nome}" tem ${n} contratos de "${lote.modelo_titulo}" que precisam da assinatura da empresa.\n\nVocê lê o modelo uma vez, confere os dados de cada pessoa e assina todos de uma vez:\n${link}\n\nPor segurança, pediremos um código enviado a este e-mail.`,
+      meta: { tipo: 'link_lote', lote_id: loteId, link },
+    })
+    trilha.registrar(`lote:${loteId}`, 'link.enviado', { dados: { destino: mascararEmail(lote.assinante.email) } })
+    return link
+  }
+
+  function porTokenLote(token) {
+    const hash = sha256(String(token || ''))
+    const lote = repo.listar('lotes', l => l.assinante?.token_hash === hash)[0]
+    if (!lote) throw new ErroNegocio(404, 'Link inválido ou substituído por um mais novo. Use o último link recebido.')
+    return lote
+  }
+
+  function comSessaoLote(token, sessao) {
+    const lote = porTokenLote(token)
+    const h = sha256(String(sessao || ''))
+    const ok = repo.listar('sessoes', x => x.lote_id === lote.id && x.hash === h && x.expira_em > agoraIso())[0]
+    if (!ok) throw new ErroNegocio(401, 'Sessão expirada. Confirme o código de novo.')
+    return lote
+  }
+
+  function itensDoLote(lote) {
+    return (lote.linhas || []).filter(l => l.contrato_id).map(linha => {
+      const c = checarExpiracao(repo.obter('contratos', linha.contrato_id))
+      const s = signatariosDe(c.id).find(x => x.canal === 'lote' && x.lote_id === lote.id)
+      return { linha, c, s }
+    })
+  }
+
+  const pendenteNoLote = ({ c, s }) => s && EM_ASSINATURA.has(c.status) && !['assinado', 'recusado'].includes(s.status)
+
+  // Cláusulas que aparecem em pelo menos um contrato do lote, e em quantos.
+  function clausulasDoLote(itens) {
+    const contagem = new Map(), criticas = new Set()
+    for (const { c } of itens) {
+      for (const cl of c.snapshot.clausulas) {
+        contagem.set(cl.chave, (contagem.get(cl.chave) || 0) + 1)
+        if (cl.critica) criticas.add(cl.chave)
+      }
+    }
+    return { contagem, criticas }
+  }
+
+  function abrirLote(token, ctx = {}) {
+    const lote = porTokenLote(token)
+    trilha.registrar(`lote:${lote.id}`, 'link.aberto', { ator: 'assinante_lote', ...evidencia(ctx) })
+    const itens = itensDoLote(lote)
+    return {
+      organizacao: lote.organizacao_nome,
+      lote: lote.nome,
+      modelo: lote.modelo_titulo,
+      total: itens.length,
+      pendentes: itens.filter(pendenteNoLote).length,
+      assinante: { nome: lote.assinante.nome, email: mascararEmail(lote.assinante.email), status: lote.assinante.status || 'aguardando' },
+    }
+  }
+
+  async function solicitarCodigoLote(token, ctx = {}) {
+    const lote = porTokenLote(token)
+    const r = await emitirCodigo({
+      alvoId: lote.id, email: lote.assinante.email, otpAtual: lote.assinante.otp,
+      salvarOtp: (otp) => repo.atualizar('lotes', lote.id, { assinante: { ...repo.obter('lotes', lote.id).assinante, otp } }),
+      meta: { lote_id: lote.id },
+    })
+    trilha.registrar(`lote:${lote.id}`, 'otp.enviado', { ator: 'assinante_lote', dados: { destino: mascararEmail(lote.assinante.email) }, ...evidencia(ctx) })
+    return r
+  }
+
+  function validarCodigoLote(token, codigo, ctx = {}) {
+    const lote = porTokenLote(token)
+    const salvarOtp = (otp) => repo.atualizar('lotes', lote.id, { assinante: { ...repo.obter('lotes', lote.id).assinante, otp } })
+    conferirCodigo({
+      alvoId: lote.id, otp: lote.assinante.otp, codigo, salvarOtp,
+      aoFalhar: (tentativa) => trilha.registrar(`lote:${lote.id}`, 'otp.falhou', { ator: 'assinante_lote', dados: { tentativa }, ...evidencia(ctx) }),
+    })
+    const a = repo.obter('lotes', lote.id).assinante
+    repo.atualizar('lotes', lote.id, { assinante: { ...a, otp: null, identificado_em: a.identificado_em || agoraIso(), ip_identificacao: ctx.ip || null } })
+    trilha.registrar(`lote:${lote.id}`, 'otp.validado', { ator: 'assinante_lote', ...evidencia(ctx) })
+    return abrirSessao({ lote_id: lote.id })
+  }
+
+  function conteudoLote(token, sessao) {
+    const lote = comSessaoLote(token, sessao)
+    const itens = itensDoLote(lote)
+    const { contagem, criticas } = clausulasDoLote(itens)
+    const modelo = acharModelo(biblioteca, lote.modelo.chave)
+    const texto = textoDoModelo(modelo, biblioteca.indice, { chaves: new Set(contagem.keys()), contagem })
+    const a = lote.assinante
+    return {
+      organizacao: lote.organizacao_nome,
+      lote: lote.nome,
+      ...texto,
+      clausulas: texto.clausulas.map(cl => ({ ...cl, critica: criticas.has(cl.chave), ciente_em: a.ciencias?.[cl.chave]?.em || null })),
+      colunas: lote.colunas_resumo,
+      contratos: itens.map(({ linha, c, s }) => ({
+        contrato_id: c.id,
+        linha: linha.numero,
+        resumo: linha.resumo,
+        contrato_status: c.status,
+        assinatura_empresa: s?.status || null,
+        outros: signatariosDe(c.id).filter(x => x.canal !== 'lote').map(x => ({ nome: x.nome, status: x.status })),
+      })),
+      pendentes: itens.filter(pendenteNoLote).length,
+      assinante: { nome: a.nome, status: a.status || 'aguardando', leitura_completa_em: a.leitura_completa_em || null, assinado_em: a.assinado_em || null },
+    }
+  }
+
+  function darCienciaLote(token, sessao, chave, { tempo_leitura_ms } = {}, ctx = {}) {
+    const lote = comSessaoLote(token, sessao)
+    const { criticas } = clausulasDoLote(itensDoLote(lote))
+    if (!criticas.has(chave)) throw new ErroNegocio(400, 'Esta cláusula não pede ciência individual neste lote.')
+    const a = lote.assinante
+    if (a.ciencias?.[chave]) return { ciente_em: a.ciencias[chave].em }
+    const em = agoraIso()
+    const tempo = Number.isFinite(Number(tempo_leitura_ms)) ? Math.max(0, Math.round(Number(tempo_leitura_ms))) : null
+    repo.atualizar('lotes', lote.id, { assinante: { ...a, ciencias: { ...a.ciencias, [chave]: { em, tempo_leitura_ms: tempo } } } })
+    trilha.registrar(`lote:${lote.id}`, 'clausula.ciencia', { ator: 'assinante_lote', dados: { clausula: chave, tempo_leitura_ms_informado: tempo }, ...evidencia(ctx) })
+    return { ciente_em: em }
+  }
+
+  function registrarLeituraLote(token, sessao, { tempos } = {}, ctx = {}) {
+    const lote = comSessaoLote(token, sessao)
+    const a = lote.assinante
+    if (a.leitura_completa_em) return { leitura_completa_em: a.leitura_completa_em }
+    const em = agoraIso()
+    repo.atualizar('lotes', lote.id, { assinante: { ...a, leitura_completa_em: em } })
+    trilha.registrar(`lote:${lote.id}`, 'documento.lido_ate_o_fim', { ator: 'assinante_lote', dados: { tempos_por_clausula_ms_informado: limparTempos(tempos) }, ...evidencia(ctx) })
+    return { leitura_completa_em: em }
+  }
+
+  async function assinarLote(token, sessao, { nome_digitado, concordo, geo } = {}, ctx = {}) {
+    const lote = comSessaoLote(token, sessao)
+    const a = lote.assinante
+    const itens = itensDoLote(lote)
+    const pendentes = itens.filter(pendenteNoLote)
+    if (!pendentes.length) throw new ErroNegocio(409, 'Não há contrato pendente da assinatura da empresa neste lote.')
+
+    const modelo = acharModelo(biblioteca, lote.modelo.chave)
+    const { contagem, criticas } = clausulasDoLote(itens)
+    const texto = textoDoModelo(modelo, biblioteca.indice, { chaves: new Set(contagem.keys()) })
+    const faltam = texto.clausulas.filter(cl => criticas.has(cl.chave) && !a.ciencias?.[cl.chave]).map(cl => cl.titulo)
+    if (faltam.length) throw new ErroNegocio(409, `Confirme a leitura das cláusulas em destaque: ${faltam.join('; ')}.`, { clausulas: faltam })
+    if (!a.leitura_completa_em) throw new ErroNegocio(409, 'Leia o modelo e a lista de contratos até o fim antes de assinar.')
+    if (concordo !== true) throw new ErroNegocio(400, 'Marque que você leu e concorda com os contratos.')
+    if (normalizarNome(nome_digitado) !== normalizarNome(a.nome)) throw new ErroNegocio(400, `Digite seu nome completo como foi cadastrado: ${a.nome}.`)
+
+    const em = agoraIso()
+    const nome = String(nome_digitado).trim()
+    const geoLimpa = limparGeo(geo)
+    const resumoExibido = Object.fromEntries(texto.clausulas.map(cl => [cl.chave, cl.resumo]))
+    const ator = (s) => `signatario:${s.id}`
+    const assinados = []
+
+    for (const { c, s } of pendentes) {
+      const criticasDoContrato = c.snapshot.clausulas.filter(cl => cl.critica)
+      repo.atualizar('signatarios', s.id, {
+        status: 'assinado', assinado_em: em, nome_digitado: nome,
+        identificado_em: a.identificado_em, leitura_completa_em: a.leitura_completa_em,
+        ciencias: Object.fromEntries(criticasDoContrato.map(cl => [cl.chave, { ...a.ciencias[cl.chave], via_lote: lote.id }])),
+        evidencias: { ip: ctx.ip || null, user_agent: ctx.user_agent || null, geo: geoLimpa, lote_id: lote.id },
+      })
+      // Os mesmos eventos da assinatura individual, para o dossiê de cada
+      // contrato ficar completo sozinho; o horário original vai nos dados.
+      trilha.registrar(c.id, 'otp.validado', { ator: ator(s), dados: { via_lote: lote.id, validado_em: a.identificado_em }, ip: a.ip_identificacao || null })
+      for (const cl of criticasDoContrato) {
+        trilha.registrar(c.id, 'clausula.ciencia', {
+          ator: ator(s),
+          dados: { clausula: cl.chave, numero: cl.numero, versao: cl.versao, via_lote: lote.id, ciente_em: a.ciencias[cl.chave].em, resumo_exibido: resumoExibido[cl.chave], tempo_leitura_ms_informado: a.ciencias[cl.chave].tempo_leitura_ms },
+        })
+      }
+      trilha.registrar(c.id, 'documento.lido_ate_o_fim', { ator: ator(s), dados: { via_lote: lote.id, lido_em: a.leitura_completa_em, forma: 'modelo com variáveis + tabela com os dados de cada contrato' } })
+      trilha.registrar(c.id, 'assinatura.aceita', {
+        ator: ator(s),
+        dados: { metodo: 'otp_email_lote', via_lote: lote.id, contratos_assinados_juntos: pendentes.length, nome_digitado: nome, ciencias: criticasDoContrato.length, geo: geoLimpa },
+        ...evidencia(ctx),
+      })
+      await posAssinatura(repo.obter('contratos', c.id), repo.obter('signatarios', s.id))
+      assinados.push(c.id)
+    }
+
+    repo.atualizar('lotes', lote.id, { assinante: { ...repo.obter('lotes', lote.id).assinante, status: 'assinado', assinado_em: em, nome_digitado: nome } })
+    trilha.registrar(`lote:${lote.id}`, 'assinatura.aceita', { ator: 'assinante_lote', dados: { contratos: assinados, nome_digitado: nome, geo: geoLimpa }, ...evidencia(ctx) })
+    return { assinados: assinados.length, assinado_em: em }
   }
 
   // ── Selo ──────────────────────────────────────────────────────────────────
@@ -516,6 +751,8 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     gerar, enviar, reenviar, cancelar, consultar, arquivo, dossie,
     abrir, solicitarCodigo, validarCodigo, conteudo, darCiencia, registrarLeitura, assinar, recusar, arquivoDoSignatario,
     verificar, conferirHash,
+    convidarAssinanteLote, abrirLote, solicitarCodigoLote, validarCodigoLote, conteudoLote,
+    darCienciaLote, registrarLeituraLote, assinarLote, itensDoLote, EM_ASSINATURA,
   }
 }
 
