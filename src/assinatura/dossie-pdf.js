@@ -2,6 +2,7 @@
 // processo. A versão de máquina é o JSON do mesmo dossiê (mesmos dados).
 
 import PDFDocument from 'pdfkit'
+import { COR, faixaSeguranca, registrarFontes, roseta, rotulo } from '../motor/estilo-pdf.js'
 import { dataHora } from '../motor/pdf.js'
 
 const M = 56
@@ -39,12 +40,18 @@ export function gerarDossiePdf(d) {
     doc.on('data', b => partes.push(b))
     doc.on('error', reject)
     doc.on('end', () => resolve(Buffer.concat(partes)))
+    registrarFontes(doc)
     const W = doc.page.width - M * 2
     const nomes = Object.fromEntries(d.signatarios.map(s => [`signatario:${s.id}`, s.nome]))
 
-    doc.font('Helvetica-Bold').fontSize(15).text('Dossiê de evidências de assinatura')
-    doc.font('Helvetica').fontSize(9).fillColor('#555').text(`Emitido em ${dataHora(d.emitido_em)} (horário de Brasília)`)
-    doc.moveDown()
+    roseta(doc, M + W - 34, M + 10, 46, { opacidade: 0.3 })
+    rotulo(doc, 'Dossiê de evidências', M, M - 12, { largura: W - 100 })
+    doc.font('titulo').fontSize(22).fillColor(COR.tinta).text(d.contrato.titulo, M, M + 2, { width: W - 100 })
+    doc.font('sans').fontSize(8.5).fillColor(COR.tinta2).text(`Emitido em ${dataHora(d.emitido_em)} (horário de Brasília)`, { width: W - 100 })
+    doc.y = Math.max(doc.y, M + 62) + 8
+    doc.save().lineWidth(0.6).strokeColor(COR.tinta).moveTo(M, doc.y).lineTo(M + W, doc.y).stroke()
+      .lineWidth(0.3).moveTo(M, doc.y + 2.5).lineTo(M + W, doc.y + 2.5).stroke().restore()
+    doc.y += 12
 
     secao(doc, 'Documento')
     campo(doc, 'Título', d.contrato.titulo)
@@ -68,8 +75,8 @@ export function gerarDossiePdf(d) {
 
     secao(doc, 'Signatários')
     for (const s of d.signatarios) {
-      doc.font('Helvetica-Bold').fontSize(10).fillColor('black').text(`${s.ordem}. ${s.nome}`)
-      doc.font('Helvetica').fontSize(8.5).fillColor('#333')
+      doc.font('serif-forte').fontSize(11).fillColor(COR.tinta).text(`${s.ordem}. ${s.nome}`, M, doc.y, { width: W })
+      doc.font('sans').fontSize(8.5).fillColor(COR.tinta2)
       ;[
         `${s.papel}${s.cpf ? ` · CPF ${s.cpf}` : ''} · ${s.email} · situação: ${s.status}`,
         `Identidade confirmada: ${dataHora(s.identificado_em)} · leitura até o fim: ${dataHora(s.leitura_completa_em)}`,
@@ -83,18 +90,18 @@ export function gerarDossiePdf(d) {
     }
 
     secao(doc, 'Trilha de eventos')
-    doc.font('Helvetica').fontSize(7.5).fillColor('#555')
+    doc.font('sans').fontSize(8).fillColor(COR.tinta2)
       .text('Cada evento guarda o hash do anterior. Alterar, remover ou reordenar um evento quebra a corrente a partir dele.', { width: W })
     doc.moveDown(0.4)
     for (const e of d.eventos) {
       if (doc.y > doc.page.height - M - 40) doc.addPage()
       const quem = e.ator === 'sistema' ? 'sistema' : (nomes[e.ator] || e.ator)
-      doc.font('Helvetica-Bold').fontSize(8).fillColor('black')
-        .text(`#${e.seq}  ${dataHora(e.em)}  ${ROTULOS[e.tipo] || e.tipo}  —  ${quem}`, { width: W })
+      doc.font('mono').fontSize(7.5).fillColor(COR.carimbo).text(`#${e.seq}  ${dataHora(e.em)}  `, M, doc.y, { width: W, continued: true })
+        .font('sans-forte').fontSize(8.5).fillColor(COR.tinta).text(`${ROTULOS[e.tipo] || e.tipo}  ·  ${quem}`)
       const extra = detalhe(e)
-      doc.font('Helvetica').fontSize(7).fillColor('#444')
+      doc.font('sans').fontSize(7.5).fillColor(COR.tinta2)
       if (extra) doc.text(extra, { width: W })
-      doc.fillColor('#888').text(`hash ${e.hash}${e.ip ? `  ·  IP ${e.ip}` : ''}`, { width: W })
+      doc.font('mono').fontSize(6.5).fillColor(COR.tinta3).text(`hash ${e.hash}${e.ip ? `  ·  IP ${e.ip}` : ''}`, { width: W })
       doc.moveDown(0.3)
     }
 
@@ -102,7 +109,8 @@ export function gerarDossiePdf(d) {
     for (let i = start; i < start + count; i++) {
       doc.switchToPage(i)
       doc.page.margins.bottom = 0
-      doc.font('Helvetica').fontSize(7).fillColor('#888')
+      faixaSeguranca(doc)
+      doc.font('mono').fontSize(6.5).fillColor(COR.tinta3)
         .text(`Dossiê · ${d.contrato.id} · página ${i + 1} de ${count}`, M, doc.page.height - M + 20, { width: W, align: 'center', lineBreak: false })
     }
     doc.end()
@@ -111,13 +119,15 @@ export function gerarDossiePdf(d) {
 
 function secao(doc, t) {
   if (doc.y > doc.page.height - M - 80) doc.addPage()
-  doc.moveDown(0.4).font('Helvetica-Bold').fontSize(11).fillColor('#1f3a5f').text(t.toUpperCase())
-  doc.moveDown(0.3)
+  doc.moveDown(0.6)
+  rotulo(doc, t, M, doc.y)
+  doc.moveDown(0.4)
 }
 
 function campo(doc, k, v) {
-  doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#333').text(`${k}: `, { continued: true })
-    .font('Helvetica').fillColor('black').text(String(v ?? '—'))
+  const mono = /SHA-256|Código|Conferência/.test(k)
+  doc.font('sans-forte').fontSize(8.5).fillColor(COR.tinta2).text(`${k}: `, M, doc.y, { continued: true })
+    .font(mono ? 'mono' : 'sans').fontSize(mono ? 8 : 8.5).fillColor(COR.tinta).text(String(v ?? '—'))
 }
 
 function detalhe(e) {
