@@ -131,8 +131,15 @@ function paginaDeAssinaturas(doc, largura, contrato, { signatarios, pdf_original
     const linhas = [
       `${s.papel_rotulo}${s.cpf ? `  ·  CPF ${s.cpf}` : ''}  ·  ${s.email}`,
       `Assinou em ${dataHora(s.assinado_em)} (horário de Brasília)  ·  IP ${s.ip || '—'}`,
-      `Autenticação: código de uso único por ${s.canal === 'email' ? 'e-mail' : s.canal}, validado em ${dataHora(s.identificado_em)}`,
-      `Ciência individual de ${s.ciencias} cláusula(s) em destaque  ·  Nome digitado na assinatura: "${s.nome_digitado}"`,
+      ...(s.certificado
+        ? [
+            `Assinatura digital com certificado ICP-Brasil de ${s.certificado.nome}, emitido por ${(s.certificado.emissor.match(/CN=([^,]+)/) || [])[1] || s.certificado.emissor}, série ${s.certificado.serial}`,
+            `Cadeia até ${s.certificado.cadeia.at(-1)}  ·  arquivo assinado guardado no dossiê (SHA-256 ${s.certificado.sha256.slice(0, 16)}…)  ·  ciência de ${s.ciencias} cláusula(s) em destaque`,
+          ]
+        : [
+            `Autenticação: código de uso único por ${s.canal === 'email' ? 'e-mail' : s.canal}, validado em ${dataHora(s.identificado_em)}`,
+            `Ciência individual de ${s.ciencias} cláusula(s) em destaque  ·  Nome digitado na assinatura: "${s.nome_digitado}"`,
+          ]),
     ]
     linhas.forEach(l => doc.text(l, MARGEM, doc.y, { width: largura }))
     doc.moveDown(0.8)

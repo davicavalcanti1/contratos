@@ -223,9 +223,46 @@ function telaAssinar() {
     ...estado.outros.map(o => [o.papel, `${o.nome}: ${rotuloStatus(o.status)}`]),
   ]
   $('#resumo-assinatura').innerHTML = linhas.map(([k, v]) => `<li><span>${esc(k)}</span><span>${esc(v)}</span></li>`).join('')
-  $('#nome-dica').textContent = `Do jeito que está no contrato: ${estado.signatario.nome}`
+  const icp = estado.signatario.metodo === 'icp'
+  $('#form-assinar').hidden = icp
+  $('#form-icp').hidden = !icp
   ir('assinar')
+  if (icp) {
+    $('#icp-nome').textContent = estado.signatario.nome
+    return
+  }
+  $('#nome-dica').textContent = `Do jeito que está no contrato: ${estado.signatario.nome}`
   $('#nome').focus()
+}
+
+// ── Assinatura com certificado ICP-Brasil ───────────────────────────────────
+let arquivoIcp = null
+function escolherIcp(arquivo) {
+  if (!arquivo) return
+  arquivoIcp = arquivo
+  $('#soltar-icp-texto').textContent = arquivo.name
+  $('#btn-enviar-icp').disabled = false
+  $('#erro-icp').hidden = true
+}
+
+async function enviarIcp() {
+  const b = $('#btn-enviar-icp')
+  b.disabled = true
+  b.textContent = 'Conferindo a assinatura…'
+  $('#erro-icp').hidden = true
+  try {
+    const r = await fetch(`${base}/icp`, { method: 'POST', headers: { 'x-sessao': sessao || '', 'content-type': 'application/pdf' }, body: arquivoIcp })
+    const corpo = await r.json()
+    if (!r.ok) throw new ErroApi(r.status, corpo)
+    estado = await comSessao('/conteudo')
+    telaFim()
+  } catch (e) {
+    mostrarErro($('#erro-icp'), e)
+    if (e.status === 401) tratarErro(e)
+  } finally {
+    b.disabled = !arquivoIcp
+    b.textContent = 'Enviar e assinar'
+  }
 }
 
 function rotuloStatus(s) {
@@ -331,6 +368,15 @@ $('#btn-voltar-ler').addEventListener('click', () => { ir('ler') })
 $('#form-assinar').addEventListener('submit', assinar)
 $('#btn-abrir-recusa').addEventListener('click', () => { $('#form-recusar').hidden = false; $('#motivo').focus() })
 $('#form-recusar').addEventListener('submit', recusar)
+$('#btn-baixar-icp').addEventListener('click', async () => {
+  try { await baixar(await comSessao('/arquivo?qual=original'), 'contrato-para-assinar.pdf') } catch (er) { tratarErro(er) }
+})
+$('#arquivo-icp').addEventListener('change', e => escolherIcp(e.target.files[0]))
+const zonaIcp = $('#soltar-icp')
+zonaIcp.addEventListener('dragover', e => { e.preventDefault(); zonaIcp.classList.add('sobre') })
+zonaIcp.addEventListener('dragleave', () => zonaIcp.classList.remove('sobre'))
+zonaIcp.addEventListener('drop', e => { e.preventDefault(); zonaIcp.classList.remove('sobre'); escolherIcp(e.dataTransfer.files[0]) })
+$('#btn-enviar-icp').addEventListener('click', enviarIcp)
 $('#fim').addEventListener('click', async e => {
   const b = e.target.closest('[data-baixar]')
   if (!b) return

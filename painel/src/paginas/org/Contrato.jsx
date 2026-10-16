@@ -14,6 +14,8 @@ const EVENTO = {
   'documento.selado': 'Selado', 'contrato.cancelado': 'Cancelado', 'contrato.expirado': 'Expirou',
   'aditivo.gerado': 'Termo aditivo gerado', 'distrato.gerado': 'Distrato gerado', 'contrato.aditado': 'Aditado (aditivo assinado)',
   'contrato.distratado': 'Distratado (distrato assinado)', 'contrato.encerrado': 'Encerrado no fim do prazo',
+  'distrato.assinado': 'Distrato assinado (vale até a data combinada)', 'documento.carimbado': 'Carimbo do tempo aplicado',
+  'carimbo.pendente': 'Carimbo do tempo pendente (ACT não respondeu)', 'icp.recusado': 'Assinatura com certificado recusada',
 }
 
 export function Contrato() {
@@ -74,7 +76,7 @@ export function Contrato() {
               <tbody>
                 {c.signatarios.map(s => (
                   <tr key={s.id}>
-                    <td>{s.nome}<br /><small>{s.email}, {s.papel}</small></td>
+                    <td>{s.nome}<br /><small>{s.email}, {s.papel}{s.metodo === 'icp' ? ', certificado ICP-Brasil' : ''}</small>{s.certificado && <><br /><small>certificado de {s.certificado.nome} · <button className="link-botao pequeno-link" onClick={() => acao.executar(() => baixar(`/org/contratos/${c.id}/assinaturas/${s.id}/arquivo`, 'assinatura-icp.pdf'))}>PDF assinado por ele</button></small></>}</td>
                     <td>{PESSOA[s.status] || s.status}{s.assinado_em && <><br /><small>{dataHora(s.assinado_em)}</small></>}{s.recusa_motivo && <><br /><small>"{s.recusa_motivo}"</small></>}</td>
                     <td>{podeEscrever && emAndamento && ['notificado', 'identificado'].includes(s.status) && <button className="link-botao" disabled={acao.ocupado} onClick={() => reenviar(s)}>Reenviar link</button>}</td>
                   </tr>
@@ -82,6 +84,7 @@ export function Contrato() {
               </tbody>
             </table>
           )}
+          <Carimbo c={c} baixarTsr={() => acao.executar(() => baixar(`/org/contratos/${c.id}/carimbo.tsr`, 'carimbo.tsr'))} />
           {c.codigo_verificacao && (
             <p className="selo-linha">Código de verificação <strong className="codigo-grande">{c.codigo_verificacao}</strong> <a href={`/v/${c.codigo_verificacao}`} target="_blank" rel="noopener noreferrer">Ver o selo</a></p>
           )}
@@ -100,5 +103,17 @@ export function Contrato() {
         </section>
       </div>
     </>
+  )
+}
+
+function Carimbo({ c, baixarTsr }) {
+  const ct = c.carimbo
+  if (!ct && !c.carimbo_pendente) return null
+  if (!ct) return <p className="nota">Carimbo do tempo pendente: a autoridade não respondeu. Tentamos de novo sozinhos.</p>
+  return (
+    <p className="selo-linha">
+      Carimbo do tempo: <strong>{ct.act}</strong>{ct.icp_brasil ? ' (ICP-Brasil)' : ' (fora da ICP-Brasil)'}, {dataHora(ct.gen_time)}.{' '}
+      <button className="link-botao" onClick={baixarTsr}>Baixar o carimbo (.tsr)</button>
+    </p>
   )
 }

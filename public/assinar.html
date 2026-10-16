@@ -78,6 +78,31 @@
           <div id="erro-assinar" class="aviso erro" role="alert" hidden></div>
           <button class="botao largo" type="submit" id="btn-assinar">Assinar contrato</button>
         </form>
+
+        <!-- Assinatura com certificado ICP-Brasil: são passos de verdade, em sequência -->
+        <div id="form-icp" hidden>
+          <p>Este contrato pede a sua assinatura com <strong>certificado digital ICP-Brasil</strong> (A1, A3 ou em nuvem).</p>
+          <ol class="passos-icp">
+            <li>
+              <strong>Baixe o contrato</strong>
+              <button class="botao secundario" type="button" id="btn-baixar-icp">Baixar o PDF para assinar</button>
+            </li>
+            <li>
+              <strong>Assine o PDF com o seu certificado</strong>
+              <small>No Adobe Acrobat ("Assinar com certificado digital") ou no assinador da sua certificadora. Não edite o arquivo nem use "imprimir para PDF": o sistema confere que é exatamente o contrato enviado.</small>
+            </li>
+            <li>
+              <strong>Envie o arquivo assinado</strong>
+              <label class="soltar" id="soltar-icp">
+                <input type="file" id="arquivo-icp" accept="application/pdf">
+                <span id="soltar-icp-texto">Escolha o PDF assinado</span>
+              </label>
+            </li>
+          </ol>
+          <div id="erro-icp" class="aviso erro" role="alert" hidden></div>
+          <button class="botao largo" type="button" id="btn-enviar-icp" disabled>Enviar e assinar</button>
+          <p class="nota-bula">Conferimos a assinatura, a cadeia até a raiz da ICP-Brasil e que o certificado é de <span id="icp-nome"></span>. A Assinatura gov.br não é ICP-Brasil.</p>
+        </div>
         <div class="acoes-secundarias">
           <button class="link-botao" id="btn-voltar-ler" type="button">Voltar ao texto</button>
           <button class="link-botao" id="btn-abrir-recusa" type="button">Não quero assinar</button>

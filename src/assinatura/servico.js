@@ -55,7 +55,9 @@ export const CONFIG_PADRAO = {
 // `aoEvento(organizacaoId, tipo, dados)`: chamado nos momentos que interessam a
 // quem integra (assinou, selou, recusou, expirou, cancelou). A plataforma liga
 // isto aos webhooks; o serviço não sabe que webhook existe.
-export function criarServico({ repo, biblioteca, notificar, config = {}, agora = () => new Date(), aoEvento = () => {} }) {
+// `carimbador`: ACT de carimbo do tempo (RFC 3161) — ver plugaveis/carimbo.js.
+// `icp`: verificador de PDF assinado com certificado — ver plugaveis/icp.js.
+export function criarServico({ repo, biblioteca, notificar, config = {}, agora = () => new Date(), aoEvento = () => {}, carimbador = null, icp = null }) {
   const cfg = { ...CONFIG_PADRAO, ...config }
   const trilha = criarTrilha(repo, agora)
   const agoraIso = () => agora().toISOString()
@@ -137,6 +139,8 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       nome: s.nome.trim(),
       email: s.email.trim().toLowerCase(),
       cpf: s.cpf ? TIPOS.cpf.formatar(s.cpf) : null,
+      // 'otp' (código por e-mail, padrão) ou 'icp' (certificado ICP-Brasil, exige CPF)
+      metodo: s.metodo === 'icp' ? 'icp' : 'otp',
       papel: s.papel || 'parte',
       canal: interno && s.canal === 'lote' ? 'lote' : 'email',
       lote_id: interno ? s.lote_id || null : null,
@@ -207,8 +211,11 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       distratado_em: c.distratado_em || null,
       encerrado_em: c.encerrado_em || null,
       distrato: c.distrato || null,
+      carimbo: c.carimbo ? publicoCarimbo(c.carimbo) : null,
+      carimbo_pendente: !!c.carimbo_pendente,
       signatarios: signatariosDe(c.id).map(s => ({
-        id: s.id, ordem: s.ordem, nome: s.nome, email: s.email, papel: s.papel, status: s.status,
+        id: s.id, ordem: s.ordem, nome: s.nome, email: s.email, papel: s.papel, status: s.status, metodo: s.metodo || 'otp',
+        certificado: s.evidencias?.certificado ? { nome: s.evidencias.certificado.nome, emissor: s.evidencias.certificado.emissor, serial: s.evidencias.certificado.serial } : null,
         assinado_em: s.assinado_em || null, recusado_em: s.recusado_em || null, recusa_motivo: s.recusa_motivo || null,
       })),
       eventos: trilha.listar(c.id).map(e => ({ seq: e.seq, tipo: e.tipo, em: e.em })),
@@ -259,7 +266,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
         pdf_original_sha256: c.pdf_original?.sha256 || null,
         pdf_final_sha256: c.pdf_final?.sha256 || null,
         trilha: trilha.verificar(c.id),
-        carimbo_do_tempo: null, // Fase 6: ACT ICP-Brasil sobre o hash final
+        carimbo_do_tempo: c.carimbo ? publicoCarimbo(c.carimbo) : c.carimbo_pendente ? { pendente: true, motivo: c.carimbo_pendente.motivo } : null,
       },
       signatarios: signatariosDe(c.id).map(s => ({
         id: s.id, ordem: s.ordem, nome: s.nome, email: s.email, cpf: s.cpf, papel: s.papel, canal: s.canal,
@@ -394,7 +401,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
         resumo: cl.resumo, critica: cl.critica, ciente_em: s.ciencias?.[cl.chave]?.em || null,
       })),
       signatario: {
-        nome: s.nome, papel: PAPEIS[s.papel], status: s.status,
+        nome: s.nome, papel: PAPEIS[s.papel], status: s.status, metodo: s.metodo || 'otp',
         leitura_completa_em: s.leitura_completa_em || null, assinado_em: s.assinado_em || null,
         sua_vez: c.ordem !== 'sequencial' || vezDe(c, s),
       },
@@ -433,14 +440,21 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     return { leitura_completa_em: em }
   }
 
-  async function assinar(token, sessao, { nome_digitado, concordo, geo } = {}, ctx = {}) {
-    const { s, c } = comSessao(token, sessao)
+  // O que vale para QUALQUER forma de assinar: em andamento, na vez, ciência
+  // em toda cláusula crítica e leitura até o fim. A bula vale também para
+  // quem assina com certificado.
+  function exigirProntoParaAssinar(c, s) {
     exigirEmAssinatura(c, s)
     if (c.ordem === 'sequencial' && !vezDe(c, s)) throw new ErroNegocio(409, 'Ainda não é a sua vez: outra pessoa assina antes.')
-
     const faltam = c.snapshot.clausulas.filter(cl => cl.critica && !s.ciencias?.[cl.chave]).map(cl => cl.numero)
     if (faltam.length) throw new ErroNegocio(409, `Confirme a leitura das cláusulas em destaque: ${faltam.join(', ')}.`, { clausulas: faltam })
     if (!s.leitura_completa_em) throw new ErroNegocio(409, 'Leia o contrato até o fim antes de assinar.')
+  }
+
+  async function assinar(token, sessao, { nome_digitado, concordo, geo } = {}, ctx = {}) {
+    const { s, c } = comSessao(token, sessao)
+    if (s.metodo === 'icp') throw new ErroNegocio(409, 'Este contrato pede a sua assinatura com certificado digital ICP-Brasil: envie o PDF assinado.')
+    exigirProntoParaAssinar(c, s)
     if (concordo !== true) throw new ErroNegocio(400, 'Marque que você leu e concorda com o contrato.')
     if (normalizarNome(nome_digitado) !== normalizarNome(s.nome)) {
       throw new ErroNegocio(400, `Digite seu nome completo como está no contrato: ${s.nome}.`)
@@ -461,6 +475,56 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     avisar(repo.obter('contratos', c.id), 'signatario.assinou', { signatario: signatarioPublico(repo.obter('signatarios', s.id)) })
     await posAssinatura(c, s)
     return { assinado_em: em, contrato_status: repo.obter('contratos', c.id).status }
+  }
+
+  // Assinatura qualificada: o signatário envia o PDF do contrato assinado com o
+  // próprio certificado ICP-Brasil. O arquivo assinado é guardado como prova;
+  // o contrato segue para o selo como os demais.
+  async function assinarComIcp(token, sessao, pdfAssinado, ctx = {}) {
+    const { s, c } = comSessao(token, sessao)
+    if (s.metodo !== 'icp') throw new ErroNegocio(409, 'Este signatário assina com código por e-mail, não com certificado.')
+    if (!icp) throw new ErroNegocio(503, 'A verificação de certificado ICP-Brasil não está ligada neste servidor.')
+    exigirProntoParaAssinar(c, s)
+    if (!pdfAssinado?.length) throw new ErroNegocio(400, 'Envie o PDF assinado.')
+
+    const original = repo.lerArquivo(c.pdf_original.arquivo)
+    const v = await icp.verificar(Buffer.from(pdfAssinado), { original })
+    const tentativa = { valida: v.valida, icp_brasil: !!v.icp_brasil, motivos: v.motivos, certificado: v.certificado ? { nome: v.certificado.nome, emissor: v.certificado.emissor, cpf_final: v.certificado.cpf?.slice(-2) || null } : null }
+    if (!v.valida) {
+      trilha.registrar(c.id, 'icp.recusado', { ator: `signatario:${s.id}`, dados: tentativa, ...evidencia(ctx) })
+      const gov = v.tipo_certificado === 'gov.br' ? ' Assinatura gov.br não é ICP-Brasil: este contrato pede certificado ICP-Brasil (A1, A3 ou em nuvem).' : ''
+      throw new ErroNegocio(422, `A assinatura enviada não foi aceita: ${v.motivos.join('; ')}.${gov}`, { motivos: v.motivos, tipo_certificado: v.tipo_certificado })
+    }
+    const cpfCert = v.certificado.cpf || v.certificado.cpf_responsavel
+    const cpfSig = String(s.cpf || '').replace(/\D/g, '')
+    if (!cpfCert || cpfCert !== cpfSig) {
+      trilha.registrar(c.id, 'icp.recusado', { ator: `signatario:${s.id}`, dados: { ...tentativa, motivo: 'CPF do certificado diferente do signatário' }, ...evidencia(ctx) })
+      throw new ErroNegocio(422, `O certificado é de outra pessoa (${v.certificado.nome}). Quem assina aqui é ${s.nome}, CPF ${mascararCpf(s.cpf)}.`)
+    }
+
+    const em = agoraIso()
+    const arquivo = repo.salvarArquivo(`${c.id}-icp-${s.id}.pdf`, Buffer.from(pdfAssinado))
+    const certificado = { ...v.certificado, cadeia: v.cadeia, assinado_em_declarado: v.assinado_em, revogacao: v.revogacao, arquivo, sha256: sha256(Buffer.from(pdfAssinado)) }
+    repo.atualizar('signatarios', s.id, {
+      status: 'assinado', assinado_em: em, nome_digitado: v.certificado.nome,
+      evidencias: { ip: ctx.ip || null, user_agent: ctx.user_agent || null, geo: null, certificado },
+    })
+    trilha.registrar(c.id, 'assinatura.aceita', {
+      ator: `signatario:${s.id}`,
+      dados: { metodo: 'icp_brasil', titular: v.certificado.nome, emissor: v.certificado.emissor, serial: v.certificado.serial, cadeia: v.cadeia, arquivo_sha256: certificado.sha256, ciencias: Object.keys(s.ciencias || {}).length },
+      ...evidencia(ctx),
+    })
+    avisar(repo.obter('contratos', c.id), 'signatario.assinou', { signatario: signatarioPublico(repo.obter('signatarios', s.id)), metodo: 'icp_brasil' })
+    await posAssinatura(c, s)
+    return { assinado_em: em, contrato_status: repo.obter('contratos', c.id).status, certificado: { nome: v.certificado.nome, emissor: v.certificado.emissor } }
+  }
+
+  function arquivoIcp(id, organizacaoId, signatarioId) {
+    contratoDaOrg(id, organizacaoId)
+    const s = repo.obter('signatarios', signatarioId)
+    const cert = s?.contrato_id === id ? s.evidencias?.certificado : null
+    if (!cert) throw new ErroNegocio(404, 'Este signatário não assinou com certificado.')
+    return { buffer: repo.lerArquivo(cert.arquivo), nome: `assinatura-icp-${s.nome.split(' ')[0].toLowerCase()}.pdf`, sha256: cert.sha256 }
   }
 
   // Depois de cada assinatura: sela se foi a última; senão avança a fila.
@@ -741,7 +805,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     const vistos = new Set()
     const signatarios = signatariosDe(o.id)
       .filter(s => !vistos.has(s.email) && vistos.add(s.email))
-      .map(s => ({ nome: s.nome, email: s.email, cpf: s.cpf, papel: s.papel }))
+      .map(s => ({ nome: s.nome, email: s.email, cpf: s.cpf, papel: s.papel, metodo: s.metodo }))
     await enviar(c.id, organizacaoId, { signatarios, ordem: o.ordem || 'paralela' })
     trilha.registrar(o.id, `${tipo}.gerado`, { ator: `organizacao:${organizacaoId}`, dados: { contrato_id: c.id, campos } })
     return consultar(c.id, organizacaoId)
@@ -810,6 +874,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       nome: s.nome, email: s.email, cpf: s.cpf, papel_rotulo: PAPEIS[s.papel], canal: s.canal,
       assinado_em: s.assinado_em, identificado_em: s.identificado_em, ip: s.evidencias?.ip,
       ciencias: Object.keys(s.ciencias || {}).length, nome_digitado: s.nome_digitado,
+      certificado: s.evidencias?.certificado || null,
     }))
     const { buffer, sha256: pdfSha } = await gerarPdf(c.snapshot, {
       selo: { codigo, url, qrPng },
@@ -822,6 +887,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     trilha.registrar(c.id, 'documento.selado', { dados: { codigo_verificacao: codigo, pdf_final_sha256: pdfSha, trilha_hash_ate_aqui: verif.hash_final } })
     avisar(repo.obter('contratos', c.id), 'contrato.assinado', { signatarios: signatariosDe(c.id).map(signatarioPublico) })
     if (c.origem) aplicarDerivado(repo.obter('contratos', c.id))
+    if (carimbador) emSegundoPlano(carimbarContrato(c.id))
 
     for (const s of signatariosDe(c.id)) {
       await notificar({
@@ -833,6 +899,47 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       })
     }
     return repo.obter('contratos', c.id)
+  }
+
+  // ── Carimbo do tempo ──────────────────────────────────────────────────────
+  // Pedido DEPOIS de selar e sem segurar a assinatura: ACT fora do ar deixa o
+  // contrato com "carimbo pendente", e carimbarPendentes() tenta de novo.
+  const emAndamento = new Set()
+  function emSegundoPlano(promessa) {
+    emAndamento.add(promessa)
+    promessa.catch(e => console.error('[carimbo]', e.message)).finally(() => emAndamento.delete(promessa))
+  }
+  const aguardarCarimbos = () => Promise.allSettled([...emAndamento])
+
+  async function carimbarContrato(id) {
+    const c = repo.obter('contratos', id)
+    if (!carimbador || !c?.pdf_final || c.carimbo) return c?.carimbo || null
+    try {
+      const r = await carimbador.carimbar(c.pdf_final.sha256)
+      const { token_base64, ...info } = r
+      const arquivo = repo.salvarArquivo(`${c.id}-carimbo.tsr`, Buffer.from(token_base64, 'base64'))
+      repo.atualizar('contratos', c.id, { carimbo: { ...info, arquivo, objeto: 'pdf_final' }, carimbo_pendente: null })
+      trilha.registrar(c.id, 'documento.carimbado', { dados: { act: info.act, icp_brasil: info.icp_brasil, gen_time: info.gen_time, serial: info.serial, hash: info.hash } })
+      return repo.obter('contratos', c.id).carimbo
+    } catch (e) {
+      const tentativas = (c.carimbo_pendente?.tentativas || 0) + 1
+      repo.atualizar('contratos', c.id, { carimbo_pendente: { motivo: e.message, tentativas, ultima_em: agoraIso() } })
+      if (tentativas === 1) trilha.registrar(c.id, 'carimbo.pendente', { dados: { motivo: e.message } })
+      return null
+    }
+  }
+
+  async function carimbarPendentes() {
+    if (!carimbador) return 0
+    const pendentes = repo.listar('contratos', c => c.pdf_final && !c.carimbo && ['assinado', 'encerrado', 'distratado'].includes(c.status))
+    for (const c of pendentes) await carimbarContrato(c.id)
+    return pendentes.length
+  }
+
+  function arquivoCarimbo(id, organizacaoId) {
+    const c = contratoDaOrg(id, organizacaoId)
+    if (!c.carimbo) throw new ErroNegocio(404, c.carimbo_pendente ? 'O carimbo do tempo ainda está pendente: a ACT não respondeu. Tentamos de novo sozinhos.' : 'Este contrato não tem carimbo do tempo.')
+    return { buffer: repo.lerArquivo(c.carimbo.arquivo), nome: `carimbo-${slug(c.titulo)}.tsr` }
   }
 
   // ── Verificação pública (página do QR) ────────────────────────────────────
@@ -861,12 +968,14 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       origem: original ? { tipo: c.origem.tipo, codigo: original.codigo_verificacao, titulo: original.titulo } : null,
       signatarios: signatariosDe(c.id).map(s => ({
         nome: mascararNome(s.nome), cpf: mascararCpf(s.cpf), papel: PAPEIS[s.papel], assinado_em: s.assinado_em,
+        com_certificado: !!s.evidencias?.certificado,
       })),
       integridade: {
         conteudo_sha256: c.conteudo_sha256,
         pdf_original_sha256: c.pdf_original.sha256,
         pdf_final_sha256: c.pdf_final.sha256,
         trilha_integra: verif.integra,
+        carimbo: c.carimbo ? publicoCarimbo(c.carimbo) : null,
         eventos: verif.eventos ?? null,
       },
     }
@@ -915,6 +1024,9 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       if (TIPOS.email.validar(s.email || '')) throw new ErroNegocio(400, `${onde}: e-mail inválido.`)
       if (DOMINIOS_SINTETICOS.some(r => r.test(s.email))) throw new ErroNegocio(400, `${onde}: "${s.email}" não é uma caixa de e-mail real.`)
       if (s.cpf && TIPOS.cpf.validar(s.cpf)) throw new ErroNegocio(400, `${onde}: CPF inválido.`)
+      if (s.metodo && !['otp', 'icp'].includes(s.metodo)) throw new ErroNegocio(400, `${onde}: método deve ser otp ou icp.`)
+      if (s.metodo === 'icp' && !s.cpf) throw new ErroNegocio(400, `${onde}: assinatura com certificado ICP-Brasil exige o CPF de quem assina (é com ele que o certificado é conferido).`)
+      if (s.metodo === 'icp' && !icp) throw new ErroNegocio(400, `${onde}: a verificação ICP-Brasil não está ligada neste servidor.`)
       if (s.papel && !PAPEIS[s.papel]) throw new ErroNegocio(400, `${onde}: papel deve ser ${Object.keys(PAPEIS).join(', ')}.`)
       const e = String(s.email).trim().toLowerCase()
       if (emails.has(e)) throw new ErroNegocio(400, `${onde}: e-mail repetido — cada signatário precisa do próprio.`)
@@ -925,8 +1037,9 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
   return {
     config: cfg, trilha,
     gerar, enviar, reenviar, cancelar, consultar, listarContratos, arquivo, dossie, gerarDerivado, derivadosDe, encerrarPorDistrato,
-    abrir, solicitarCodigo, validarCodigo, conteudo, darCiencia, registrarLeitura, assinar, recusar, arquivoDoSignatario,
+    abrir, solicitarCodigo, validarCodigo, conteudo, darCiencia, registrarLeitura, assinar, assinarComIcp, arquivoIcp, recusar, arquivoDoSignatario,
     verificar, conferirHash,
+    carimbarContrato, carimbarPendentes, aguardarCarimbos, arquivoCarimbo,
     convidarAssinanteLote, abrirLote, solicitarCodigoLote, validarCodigoLote, conteudoLote,
     darCienciaLote, registrarLeituraLote, assinarLote, itensDoLote, EM_ASSINATURA,
   }
@@ -969,3 +1082,7 @@ function resumoContrato(c) {
 
 const dataCurta = (iso) => (iso ? new Date(iso).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : '—')
 const slug = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)
+
+function publicoCarimbo(c) {
+  return { act: c.act, icp_brasil: c.icp_brasil, gen_time: c.gen_time, serial: c.serial, politica: c.politica, hash: c.hash, hash_algoritmo: c.hash_algoritmo, certificado_act: c.certificado_act, objeto: c.objeto }
+}

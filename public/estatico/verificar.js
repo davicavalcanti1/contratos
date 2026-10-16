@@ -47,7 +47,7 @@ const ESTADO = {
 
 function selo(v) {
   const integro = ['assinado', 'encerrado', 'distratado'].includes(v.status) && v.integridade.trilha_integra
-  const sig = v.signatarios.map(s => `<dt>${esc(s.papel)}</dt><dd>${esc(s.nome)}${s.cpf ? `, CPF ${esc(s.cpf)}` : ''}<br><small>assinou em ${esc(dataHora(s.assinado_em))}</small></dd>`).join('')
+  const sig = v.signatarios.map(s => `<dt>${esc(s.papel)}</dt><dd>${esc(s.nome)}${s.cpf ? `, CPF ${esc(s.cpf)}` : ''}<br><small>assinou ${s.com_certificado ? 'com certificado ICP-Brasil ' : ''}em ${esc(dataHora(s.assinado_em))}</small></dd>`).join('')
   return `
     <div class="cartao selo${integro ? '' : ' invalido'}">
       <div class="estado">
@@ -69,7 +69,7 @@ function selo(v) {
         <p class="hash">Conteúdo: ${esc(v.integridade.conteudo_sha256)}<br>
         PDF assinado: ${esc(v.integridade.pdf_final_sha256)}<br>
         PDF original: ${esc(v.integridade.pdf_original_sha256)}<br>
-        Histórico: ${v.integridade.eventos} eventos encadeados, ${v.integridade.trilha_integra ? 'íntegro' : 'com quebra'}</p>
+        Histórico: ${v.integridade.eventos} eventos encadeados, ${v.integridade.trilha_integra ? 'íntegro' : 'com quebra'}${v.integridade.carimbo ? `<br>Carimbo do tempo: ${esc(v.integridade.carimbo.act)}${v.integridade.carimbo.icp_brasil ? ' (ICP-Brasil)' : ' (fora da ICP-Brasil)'}, ${esc(dataHora(v.integridade.carimbo.gen_time))}, sobre o PDF assinado` : ''}</p>
       </details>
       <p class="nota-bula">Nomes e documentos aparecem incompletos para proteger os dados das pessoas. O texto do contrato só fica com quem assinou.</p>
     </div>`

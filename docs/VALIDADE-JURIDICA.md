@@ -24,8 +24,8 @@
 |---|---|---|
 | **Eletrônica com autenticação forte** (padrão, assinatura própria) | link pessoal + OTP no e-mail/WhatsApp/SMS + evidências (IP, dispositivo, horário, geolocalização se permitida) + ciência por cláusula | a imensa maioria: prestação de serviço, trabalho, locação, termo de LGPD |
 | **+ Biometria/documento** (opcional por modelo) | selfie + foto do documento, com prova de vida ❓ | valores altos, consumidor vulnerável, fraude recorrente |
-| **Qualificada (ICP-Brasil)** (plugável) | certificado A1/A3 do signatário | quem exige presunção legal plena: escritório, cartório, contrato com o poder público |
-| **gov.br** ❓ | assinador gov.br | o cidadão pode assinar o PDF no gov.br e anexar. Integração por API para empresa privada precisa de confirmação |
+| **Qualificada (ICP-Brasil)** (feito na Fase 6, por signatário) | o signatário assina o PDF com o próprio certificado A1/A3/nuvem e envia; o sistema confere a assinatura, que o arquivo é o contrato enviado, a cadeia até as raízes do ITI, a validade e o CPF. **Revogação não é consultada**, e o dossiê aponta o validar.iti.gov.br | quem exige presunção legal plena: escritório, cartório, contrato com o poder público |
+| **gov.br** | assinador gov.br | é assinatura **avançada**, não ICP-Brasil (o certificado não sobe até as raízes do ITI). Quando o contrato pede ICP-Brasil, o sistema reconhece o gov.br e explica a recusa. Aceitar gov.br como método próprio é decisão em aberto |
 
 **Classificação honesta:** a assinatura por OTP + evidências é tratada pelo
 mercado como **eletrônica simples robustecida**, e há discussão se ela chega a
@@ -41,9 +41,13 @@ Para cada contrato assinado, baixável pelo cliente a qualquer momento:
 2. **PDF final** com página de assinaturas, QR e código de verificação em cada página.
 3. **Trilha de eventos** encadeada por hash (ver DOMINIO §6), com horário do servidor.
 4. **Ciências** por cláusula crítica, com horário e tempo de leitura.
-5. **Carimbo do tempo** de uma **ACT credenciada na ICP-Brasil** sobre o hash
-   final ❓ (Fase 6). Sem ele, o horário é o do nosso servidor; com ele, é de
-   terceiro com fé legal.
+5. **Carimbo do tempo** RFC 3161 sobre o hash do PDF final (feito na Fase 6). O
+   token `.tsr` vai no dossiê e se confere com `openssl ts -verify`, sem o
+   nosso sistema. Só tem **fé legal** se a ACT for credenciada na ICP-Brasil
+   (`CARIMBO_ICP_BRASIL=1`, exige contrato com uma ACT). Com ACT de fora (como a
+   FreeTSA, usada em teste), é prova de terceiro, mas sem presunção legal, e o
+   dossiê diz qual é o caso.
+7. **PDF assinado com certificado**, byte a byte, para quem assinou com ICP-Brasil.
 6. **Manifesto em JSON** (máquina) + **relatório em PDF** (humano, para juntar
    num processo).
 

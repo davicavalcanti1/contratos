@@ -21,6 +21,15 @@ const ROTULOS = {
   'documento.selado': 'Documento selado',
   'contrato.cancelado': 'Cancelado',
   'contrato.expirado': 'Expirado',
+  'aditivo.gerado': 'Termo aditivo gerado',
+  'distrato.gerado': 'Distrato gerado',
+  'contrato.aditado': 'Aditado (aditivo assinado)',
+  'distrato.assinado': 'Distrato assinado (vale até a data combinada)',
+  'contrato.distratado': 'Distratado',
+  'contrato.encerrado': 'Encerrado no fim do prazo',
+  'documento.carimbado': 'Carimbo do tempo aplicado',
+  'carimbo.pendente': 'Carimbo do tempo pendente',
+  'icp.recusado': 'Assinatura com certificado recusada',
 }
 
 export function gerarDossiePdf(d) {
@@ -51,7 +60,11 @@ export function gerarDossiePdf(d) {
     campo(doc, 'Trilha de eventos', d.integridade.trilha.integra
       ? `íntegra — ${d.integridade.trilha.eventos} eventos encadeados; hash final ${d.integridade.trilha.hash_final}`
       : `QUEBRADA no evento ${d.integridade.trilha.quebra_em}: ${d.integridade.trilha.motivo}`)
-    campo(doc, 'Carimbo do tempo', d.integridade.carimbo_do_tempo ? 'ACT ICP-Brasil' : 'não aplicado — horários do servidor do provedor')
+    const ct = d.integridade.carimbo_do_tempo
+    campo(doc, 'Carimbo do tempo', ct?.gen_time
+      ? `${ct.act}${ct.icp_brasil ? ' (ACT credenciada na ICP-Brasil)' : ' (ACT fora da ICP-Brasil)'}, em ${dataHora(ct.gen_time)}, nº de série ${ct.serial}, sobre o SHA-256 do PDF assinado`
+      : ct?.pendente ? `pendente: ${ct.motivo}` : 'não aplicado — horários do servidor do provedor')
+    if (ct?.gen_time) campo(doc, 'Conferência independente', 'openssl ts -verify -data <PDF assinado> -in <carimbo.tsr> -CAfile <cadeia da ACT>')
 
     secao(doc, 'Signatários')
     for (const s of d.signatarios) {
@@ -60,8 +73,10 @@ export function gerarDossiePdf(d) {
       ;[
         `${s.papel}${s.cpf ? ` · CPF ${s.cpf}` : ''} · ${s.email} · situação: ${s.status}`,
         `Identidade confirmada: ${dataHora(s.identificado_em)} · leitura até o fim: ${dataHora(s.leitura_completa_em)}`,
-        `Ciências: ${Object.keys(s.ciencias || {}).length} cláusula(s) · assinou: ${dataHora(s.assinado_em)}${s.nome_digitado ? ` · nome digitado "${s.nome_digitado}"` : ''}`,
+        `Ciências: ${Object.keys(s.ciencias || {}).length} cláusula(s) · assinou: ${dataHora(s.assinado_em)}${s.nome_digitado && !s.evidencias?.certificado ? ` · nome digitado "${s.nome_digitado}"` : ''}`,
         s.evidencias ? `IP ${s.evidencias.ip || '—'} · ${s.evidencias.user_agent || '—'}${s.evidencias.geo ? ` · local ${s.evidencias.geo.lat}, ${s.evidencias.geo.lng} (±${s.evidencias.geo.precisao_m ?? '?'} m)` : ''}` : null,
+        s.evidencias?.certificado ? `Certificado ICP-Brasil: ${s.evidencias.certificado.nome}, série ${s.evidencias.certificado.serial}; cadeia ${s.evidencias.certificado.cadeia.join(' > ')}` : null,
+        s.evidencias?.certificado ? `PDF assinado com o certificado: SHA-256 ${s.evidencias.certificado.sha256}. Revogação ${s.evidencias.certificado.revogacao}` : null,
         s.recusa_motivo ? `Recusou em ${dataHora(s.recusado_em)}: "${s.recusa_motivo}"` : null,
       ].filter(Boolean).forEach(l => doc.text(l, { width: W }))
       doc.moveDown(0.6)
@@ -109,7 +124,12 @@ function detalhe(e) {
   const d = e.dados || {}
   switch (e.tipo) {
     case 'clausula.ciencia': return `Cláusula ${d.numero} (${d.clausula} v${d.versao}). Resumo exibido: "${d.resumo_exibido}"${d.tempo_leitura_ms_informado != null ? ` · tempo de leitura informado pelo navegador: ${Math.round(d.tempo_leitura_ms_informado / 1000)} s` : ''}`
-    case 'assinatura.aceita': return `Método: ${d.metodo} · nome digitado "${d.nome_digitado}" · ${d.ciencias} ciência(s)`
+    case 'assinatura.aceita': return d.metodo === 'icp_brasil'
+      ? `Certificado ICP-Brasil de ${d.titular}, série ${d.serial} · cadeia ${(d.cadeia || []).join(' > ')} · PDF assinado SHA-256 ${d.arquivo_sha256} · ${d.ciencias} ciência(s)`
+      : `Método: ${d.metodo}${d.via_lote ? ' (em lote)' : ''} · nome digitado "${d.nome_digitado}" · ${d.ciencias} ciência(s)`
+    case 'icp.recusado': return `Motivo: ${(d.motivos || [d.motivo]).filter(Boolean).join('; ')}`
+    case 'documento.carimbado': return `${d.act}${d.icp_brasil ? ' (ICP-Brasil)' : ' (fora da ICP-Brasil)'} · ${dataHora(d.gen_time)} · série ${d.serial}`
+    case 'carimbo.pendente': return `Motivo: ${d.motivo}`
     case 'assinatura.recusada': return `Motivo: "${d.motivo}"`
     case 'otp.enviado': case 'link.enviado': return `Destino: ${d.destino}`
     case 'contrato.gerado': return `Conteúdo ${d.conteudo_sha256} · PDF original ${d.pdf_original_sha256}`

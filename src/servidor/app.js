@@ -103,6 +103,14 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     r.post('/contratos/:id/signatarios/:sid/reenviar', h(async (req, res) => res.json(await servico.reenviar(req.params.id, org(req).id, req.params.sid))))
     r.post('/contratos/:id/cancelar', (req, res) => res.json(servico.cancelar(req.params.id, org(req).id, req.body?.motivo)))
     r.get('/contratos/:id/arquivo', (req, res) => enviarPdf(res, servico.arquivo(req.params.id, org(req).id, req.query.qual)))
+    r.get('/contratos/:id/assinaturas/:sid/arquivo', (req, res) => enviarPdf(res, servico.arquivoIcp(req.params.id, org(req).id, req.params.sid)))
+    // Token RFC 3161, para o perito: openssl ts -verify -data <pdf assinado> -in <este arquivo> -CAfile <cadeia da ACT>
+    r.get('/contratos/:id/carimbo.tsr', (req, res) => {
+      const { buffer, nome } = servico.arquivoCarimbo(req.params.id, org(req).id)
+      res.set('Content-Type', 'application/timestamp-reply')
+      res.set('Content-Disposition', `attachment; filename="${nome}"`)
+      res.send(buffer)
+    })
     r.get('/contratos/:id/dossie', h(async (req, res) => {
       const d = servico.dossie(req.params.id, org(req).id)
       if (req.query.formato === 'pdf') return enviarPdf(res, { buffer: await gerarDossiePdf(d), nome: `dossie-${d.contrato.id}.pdf` })
@@ -327,6 +335,8 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
   assinar.post('/assinar', h(async (req, res) => res.json(await servico.assinar(req.params.token, sess(req), req.body, ctx(req)))))
   assinar.post('/recusar', (req, res) => res.json(servico.recusar(req.params.token, sess(req), req.body, ctx(req))))
   assinar.get('/arquivo', (req, res) => enviarPdf(res, servico.arquivoDoSignatario(req.params.token, sess(req), req.query.qual)))
+  // Assinatura ICP-Brasil: o PDF do contrato, assinado com o certificado de quem assina.
+  assinar.post('/icp', express.raw({ type: () => true, limit: '20mb' }), h(async (req, res) => res.json(await servico.assinarComIcp(req.params.token, sess(req), req.body, ctx(req)))))
   app.use('/api/assinar/:token', assinar)
 
   const lote = express.Router({ mergeParams: true })

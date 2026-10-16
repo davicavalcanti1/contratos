@@ -18,6 +18,9 @@ import { lintModelo } from '../motor/linter.js'
 import { transporteCaixa } from '../notificacoes.js'
 import { criarPlataforma } from '../plataforma/plataforma.js'
 import { criarWebhooks } from '../plataforma/webhooks.js'
+import { X509Certificate } from 'node:crypto'
+import { carimbadorDoAmbiente } from '../plugaveis/carimbo.js'
+import { carregarRaizesOficiais, criarVerificadorIcp } from '../plugaveis/icp.js'
 import { criarAgenda } from '../vida/agenda.js'
 import { criarIndices } from '../vida/indices.js'
 import { criarApp } from './app.js'
@@ -37,7 +40,13 @@ const repo = criarRepo({ dir: process.env.DADOS_DIR || join(process.cwd(), 'dado
 const notificar = transporteCaixa(repo)
 const webhooks = criarWebhooks({ repo, producao })
 const plataforma = criarPlataforma({ repo, notificar, config: { baseUrl } })
-const servico = criarServico({ repo, biblioteca, notificar, config: { baseUrl }, aoEvento: webhooks.emitir })
+const carimbador = carimbadorDoAmbiente(process.env, { producao })
+// ICP-Brasil: as raízes oficiais do ITI (certs/icp-brasil). Fora de produção,
+// ICP_RAIZ_TESTE acrescenta uma raiz de teste — nunca vale em produção.
+const raizes = carregarRaizesOficiais()
+if (!producao && process.env.ICP_RAIZ_TESTE) raizes.push(new X509Certificate(readFileSync(process.env.ICP_RAIZ_TESTE)))
+const icp = criarVerificadorIcp({ raizes })
+const servico = criarServico({ repo, biblioteca, notificar, config: { baseUrl }, aoEvento: webhooks.emitir, carimbador, icp })
 const lotes = criarLotes({ repo, biblioteca, servico })
 const agenda = criarAgenda({ repo, servico, notificar, aoEvento: webhooks.emitir, config: { baseUrl } })
 const indices = criarIndices()
@@ -61,6 +70,8 @@ if (!producao) {
 
 webhooks.iniciar()
 agenda.iniciar() // roda agora e de hora em hora
+// Carimbo que ficou pendente (ACT fora do ar) é tentado de novo a cada 10 min.
+if (carimbador) setInterval(() => servico.carimbarPendentes().catch(e => console.error('[carimbo]', e)), 10 * 60e3).unref()
 const app = criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, dev: !producao, chaveDev: producao ? null : CHAVE_DEV })
 
 app.listen(porta, () => {
@@ -68,5 +79,7 @@ app.listen(porta, () => {
   if (!producao) {
     console.log(`  logins de teste (senha "${SENHA_DEV}"): dev@contratos.local (plataforma), admin@clinica-exemplo.com.br (empresa)`)
     console.log(`  caixa de saída e contrato avulso: ${baseUrl}/dev`)
+    console.log(`  carimbo do tempo: ${carimbador ? carimbador.nome : 'desligado'}`)
+    console.log(`  ICP-Brasil: ${raizes.length} raízes confiáveis${process.env.ICP_RAIZ_TESTE ? ' (inclui a raiz de TESTE)' : ''}`)
   }
 })

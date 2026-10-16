@@ -37,7 +37,9 @@ export function NovoContrato() {
   const [referencia, setReferencia] = useState('')
   const [ordem, setOrdem] = useState('paralela')
   const [prazo, setPrazo] = useState('')
-  const [pelaEmpresa, setPelaEmpresa] = useState({ nome: '', email: '' })
+  const [pelaEmpresa, setPelaEmpresa] = useState({ nome: '', email: '', metodo: 'otp', cpf: '' })
+  // Método de cada signatário da outra parte, pela posição (a lista vem do motor e é refeita a cada mudança).
+  const [metodos, setMetodos] = useState({})
   const [sigsEditados, setSigsEditados] = useState(null)
   const acao = useAcao()
 
@@ -81,7 +83,10 @@ export function NovoContrato() {
   const daOrganizacao = (conferencia?.faltando || []).filter(f => f.variavel.startsWith('organizacao.'))
   const sigsParte = sigsEditados ?? (conferencia?.signatarios || []).map(s => ({ ...s }))
   // A empresa só assina se tiver e-mail: o nome vem pré-preenchido do cadastro e sozinho não decide nada.
-  const signatarios = [...sigsParte, ...(pelaEmpresa.email.trim() ? [{ ...pelaEmpresa, papel: 'representante', daEmpresa: true }] : [])]
+  const signatarios = [
+    ...sigsParte.map((s, i) => ({ ...s, metodo: metodos[i]?.metodo || 'otp', cpf: metodos[i]?.cpf || s.cpf || undefined })),
+    ...(pelaEmpresa.email.trim() ? [{ ...pelaEmpresa, cpf: pelaEmpresa.cpf || undefined, papel: 'representante', daEmpresa: true }] : []),
+  ]
 
   const mudar = (k, v) => { setDados(d => definir(d, k, v)); setTocados(t => new Set(t).add(k)) }
   const mostrarProblema = (k) => (tentouEnviar || tocados.has(k)) && problemas.get(k)
@@ -144,6 +149,7 @@ export function NovoContrato() {
                 <small>{PAPEL[s.papel] || s.papel}, pela outra parte</small>
                 <input aria-label="Nome" value={s.nome} placeholder="Nome completo" onChange={e => { const n = structuredClone(sigsParte); n[i].nome = e.target.value; setSigsEditados(n) }} />
                 <input aria-label="E-mail" type="email" value={s.email} placeholder="E-mail" onChange={e => { const n = structuredClone(sigsParte); n[i].email = e.target.value; setSigsEditados(n) }} />
+                <Metodo valor={{ metodo: metodos[i]?.metodo || 'otp', cpf: metodos[i]?.cpf ?? s.cpf ?? '' }} onMudar={v => setMetodos(m => ({ ...m, [i]: v }))} />
               </div>
             ))}
             {sigsEditados && <button type="button" className="link-botao" onClick={() => setSigsEditados(null)}>Voltar a usar os dados do contrato</button>}
@@ -151,7 +157,7 @@ export function NovoContrato() {
               <small>Pela empresa (opcional)</small>
               <input aria-label="Nome de quem assina pela empresa" value={pelaEmpresa.nome} placeholder="Nome completo" onChange={e => setPelaEmpresa(p => ({ ...p, nome: e.target.value }))} />
               <input aria-label="E-mail de quem assina pela empresa" type="email" value={pelaEmpresa.email} placeholder="E-mail" onChange={e => setPelaEmpresa(p => ({ ...p, email: e.target.value }))} />
-              {!pelaEmpresa.email.trim() && <small>Sem e-mail, a empresa não assina este contrato.</small>}
+              {!pelaEmpresa.email.trim() ? <small>Sem e-mail, a empresa não assina este contrato.</small> : <Metodo valor={pelaEmpresa} onMudar={v => setPelaEmpresa(p => ({ ...p, ...v }))} />}
             </div>
             <Campo rotulo="Ordem">
               <select value={ordem} onChange={e => setOrdem(e.target.value)}>
@@ -201,5 +207,19 @@ function CampoVariavel({ v, valor, onMudar, problema }) {
       {entrada}
       {problema && <small className="erro-campo">{problema}</small>}
     </div>
+  )
+}
+
+// Como cada pessoa assina: código por e-mail (padrão) ou certificado ICP-Brasil,
+// que precisa do CPF — é com ele que o certificado é conferido.
+function Metodo({ valor, onMudar }) {
+  return (
+    <>
+      <select aria-label="Como assina" value={valor.metodo} onChange={e => onMudar({ ...valor, metodo: e.target.value })}>
+        <option value="otp">Assina com código por e-mail</option>
+        <option value="icp">Assina com certificado ICP-Brasil</option>
+      </select>
+      {valor.metodo === 'icp' && <input aria-label="CPF de quem assina com certificado" inputMode="numeric" placeholder="CPF (o do certificado)" value={valor.cpf || ''} onChange={e => onMudar({ ...valor, cpf: e.target.value })} />}
+    </>
   )
 }

@@ -3,7 +3,7 @@
 SaaS de contratos, multi-tenant e independente: modelos inteligentes, contrato
 gerado a partir dos dados da empresa e assinatura com validade jurídica.
 
-> **Fase atual: 5 — contrato vivo: vigência, agenda, reajuste, aditivo e distrato** (ainda sem banco e sem e-mail real).
+> **Fase atual: 6 — plugáveis: carimbo do tempo (RFC 3161) e assinatura com certificado ICP-Brasil.** As seis fases do plano estão feitas, ainda sem banco e sem e-mail real.
 > Origem: o módulo de contratos do ExameQR (`exam-qr-system`), generalizado.
 
 ## Rodar
@@ -12,7 +12,7 @@ gerado a partir dos dados da empresa e assinatura com validade jurídica.
 npm install
 npm run build             # compila o painel (React)
 npm start                 # http://localhost:3000/painel  (e-mails de teste em /dev)
-npm test                  # 94 testes: motor, assinatura, lote, plataforma, webhooks, vida, painel, HTTP
+npm test                  # 109 testes: motor, assinatura, lote, plataforma, webhooks, vida, carimbo, ICP-Brasil, painel, HTTP
 npm run lint:modelos      # linter jurídico em todos os modelos da biblioteca
 npm run exemplos          # gera saida/*.pdf a partir de exemplos/*.json
 ```
@@ -37,6 +37,8 @@ que falta e onde resolver**, em vez de mandar lacuna para assinatura.
 | `src/assinatura/` | serviço de assinatura (código, sessão, bula, selo), trilha encadeada, dossiê em PDF |
 | `src/lote/` | planilha (CSV/XLSX do Excel brasileiro), mapeamento de colunas, prévia, lote e progresso |
 | `src/vida/` | vigência, agenda (avisos e encerramento), índices de reajuste do Banco Central |
+| `src/plugaveis/` | carimbo do tempo RFC 3161 e verificação de PDF assinado com certificado ICP-Brasil |
+| `certs/icp-brasil/` | raízes oficiais do ITI (conferir as impressões digitais antes de produção) |
 | `src/plataforma/` | organizações, usuários, convites, sessão, chaves de API, planos, auditoria e webhooks |
 | `painel/` | painel em React + Vite (developer e organização), compilado para `public/painel` |
 | `src/servidor/` | HTTP: API da organização, rotas do signatário, verificação pública, `/dev` |
@@ -58,3 +60,4 @@ cláusula, mas **não passou por advogado**. Ver `docs/VALIDADE-JURIDICA.md` §6
 | [docs/LOTE.md](docs/LOTE.md) | Fase 3: planilha → colunas → conferência → envio, e a empresa assinando tudo de uma vez |
 | [docs/PLATAFORMA.md](docs/PLATAFORMA.md) | Fase 4: papéis, contas, planos, API, webhooks e painel |
 | [docs/VIDA.md](docs/VIDA.md) | Fase 5: vigência, agenda, reajuste pelo índice, aditivo e distrato |
+| [docs/PLUGAVEIS.md](docs/PLUGAVEIS.md) | Fase 6: carimbo do tempo, assinatura ICP-Brasil, e o ZapSign adiado |

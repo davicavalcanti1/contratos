@@ -18,7 +18,7 @@ export const CHAVE = 'chave-teste'
 export const SENHA = 'senha-forte-de-teste'
 export const ORG = JSON.parse(readFileSync('exemplos/_organizacao.json', 'utf8'))
 
-export async function subirServidor({ fetchWebhook, fetchIndices, agora } = {}) {
+export async function subirServidor({ fetchWebhook, fetchIndices, agora, carimbador = null, icp = null } = {}) {
   // A baseUrl vai nos links e só existe depois do listen: o servidor sobe
   // primeiro e o app entra em seguida.
   const servidor = createServer()
@@ -33,7 +33,7 @@ export async function subirServidor({ fetchWebhook, fetchIndices, agora } = {}) 
     fetchFn: fetchWebhook || (async (url, opts) => { recebidos.push({ url, ...opts }); return new Response('ok', { status: 200 }) }),
   })
   const plataforma = criarPlataforma({ repo, notificar, config: { baseUrl: base } })
-  const servico = criarServico({ repo, biblioteca, notificar, config: { baseUrl: base }, aoEvento: webhooks.emitir, ...(agora ? { agora } : {}) })
+  const servico = criarServico({ repo, biblioteca, notificar, config: { baseUrl: base }, aoEvento: webhooks.emitir, carimbador, icp, ...(agora ? { agora } : {}) })
   const lotes = criarLotes({ repo, biblioteca, servico })
   const agenda = criarAgenda({ repo, servico, notificar, aoEvento: webhooks.emitir, config: { baseUrl: base }, ...(agora ? { agora } : {}) })
   const indices = criarIndices({ fetchFn: fetchIndices || (async () => { throw new Error('sem rede no teste') }) })
