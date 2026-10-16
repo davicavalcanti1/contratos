@@ -1,7 +1,7 @@
 // Página do QR. Mostra se o código existe, quem assinou (mascarado) e deixa
 // conferir um PDF pelo hash, calculado no navegador.
 
-import { $, api, dataHora, esc, sha256Arquivo } from './comum.js'
+import { $, api, dataHora, esc, rosetaSvg, sha256Arquivo } from './comum.js'
 
 const codigoUrl = decodeURIComponent(location.pathname.match(/^\/v\/(.+)$/)?.[1] || '')
 
@@ -18,7 +18,7 @@ async function verificar(codigo) {
   } catch (e) {
     alvo.innerHTML = `
       <div class="cartao selo invalido">
-        <div class="estado"><div class="carimbo" aria-hidden="true">✕</div>
+        <div class="estado"><div class="carimbo" aria-hidden="true">${rosetaSvg()}<b>✕</b></div>
           <div><h2>Código não encontrado</h2><p>Nenhum contrato assinado tem o código <strong>${esc(codigo)}</strong>.</p></div></div>
         <p>Confira se digitou igual ao rodapé do documento. Se o código estiver certo e mesmo assim não aparecer, desconfie do documento.</p>
       </div>`
@@ -51,7 +51,7 @@ function selo(v) {
   return `
     <div class="cartao selo${integro ? '' : ' invalido'}">
       <div class="estado">
-        <div class="carimbo" aria-hidden="true">${integro ? '✓' : '!'}</div>
+        <div class="carimbo" aria-hidden="true">${rosetaSvg()}<b>${integro ? '✓' : '!'}</b></div>
         <div>
           <h2>${integro ? ESTADO[v.status] : 'Atenção: registro com problema'}</h2>
           <p class="codigo-grande">${esc(v.codigo)}</p>

@@ -1,51 +1,71 @@
-/* Tokens. A barra marinho é a MESMA do PDF: "cláusula em destaque" tem uma
-   só aparência em todo lugar. O marca-texto é a bula. */
+/* Identidade das telas: bula + linguagem simples.
+   - Da bula vêm os títulos em caixa-alta condensada (Archivo), o marca-texto
+     amarelo sobre o que importa e o texto técnico logo abaixo, completo.
+   - Da linguagem simples vem a hierarquia: o resumo é grande e vem primeiro,
+     em Lexend (fonte desenhada para fluência de leitura), sobre lavanda.
+   Os PDFs têm outra cara, de documento oficial (src/motor/estilo-pdf.js);
+   o código de verificação usa a mesma fonte de máquina nos dois. */
 :root {
-  --papel: #eef1ec;
+  --papel: #f4f3fa;
   --folha: #ffffff;
-  --tinta: #1c2321;
-  --tinta-2: #4a5552;
-  --tinta-3: #7a8582;
-  --linha: #d5dbd6;
-  --marinho: #1f3a5f;
-  --marinho-claro: #e3e9f1;
-  --marca: #ffe98a;
-  --ok: #2e7d4f;
-  --ok-claro: #e2f1e8;
-  --erro: #a3271f;
+  --tinta: #1f1b3a;
+  --tinta-2: #55516f;
+  --tinta-3: #7c7896;
+  --linha: #e2e0ef;
+  --acao: #5b3fd1;
+  --acao-forte: #4a30b8;
+  --acao-claro: #ece8fc;
+  --marca: #ffdf3d;
+  --marca-tinta: #1f1b3a;
+  --ok: #0f6b48;
+  --ok-claro: #d4f4e6;
+  --erro: #b3261e;
   --erro-claro: #fbe7e5;
+  --sans: "Lexend", "Segoe UI", system-ui, sans-serif;
+  --bula: "Archivo", "Arial Narrow", sans-serif;
   --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
-  --sans: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
-  --raio: 10px;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --raio: 999px;
+  --raio-cartao: 20px;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --papel: #141917; --folha: #1c2220; --tinta: #e7ece9; --tinta-2: #b4bdb9; --tinta-3: #87918d;
-    --linha: #2f3734; --marinho: #8fb0dc; --marinho-claro: #22303f; --marca: #6b5a12;
-    --ok: #6cc596; --ok-claro: #193326; --erro: #f08a80; --erro-claro: #3a1d1a;
+    --papel: #13112a; --folha: #1c1938; --tinta: #ecebf8; --tinta-2: #b8b4d4; --tinta-3: #8a86a8;
+    --linha: #302c52; --acao: #a796ff; --acao-forte: #c2b6ff; --acao-claro: #2a2452;
+    --ok: #74d9a8; --ok-claro: #163a2b; --erro: #f28b82; --erro-claro: #3b1c1a;
     color-scheme: dark;
   }
+}
+:root[data-theme="dark"] {
+  --papel: #13112a; --folha: #1c1938; --tinta: #ecebf8; --tinta-2: #b8b4d4; --tinta-3: #8a86a8;
+  --linha: #302c52; --acao: #a796ff; --acao-forte: #c2b6ff; --acao-claro: #2a2452;
+  --ok: #74d9a8; --ok-claro: #163a2b; --erro: #f28b82; --erro-claro: #3b1c1a;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; background: var(--papel); color: var(--tinta);
-  font: 17px/1.5 var(--sans);
+  font: 16px/1.55 var(--sans);
 }
-a { color: var(--marinho); }
-:focus-visible { outline: 3px solid var(--marinho); outline-offset: 2px; border-radius: 4px; }
+a { color: var(--acao); text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--acao); outline-offset: 2px; border-radius: 6px; }
 [hidden] { display: none !important; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+code, .codigo { font-family: var(--mono); }
+
+/* Título de bula: caixa-alta condensada. Só em títulos, nunca em rótulos. */
+.titulo-bula { font-family: var(--bula); font-weight: 800; font-stretch: 72%; text-transform: uppercase; letter-spacing: .005em; line-height: .98; }
 
 /* ── Estrutura ─────────────────────────────────────────────────────────── */
 .topo {
-  background: var(--folha); border-bottom: 1px solid var(--linha);
-  padding: 14px 16px;
+  background: var(--folha); border-bottom: 3px solid var(--tinta);
+  padding: 14px 16px 12px;
 }
 .topo .emissor { font-size: 14px; color: var(--tinta-2); margin: 0; }
-.topo h1 { font: 600 19px/1.3 var(--serif); margin: 2px 0 0; }
+.topo h1 { font: 800 26px/1 var(--bula); font-stretch: 72%; text-transform: uppercase; margin: 4px 0 0; text-wrap: balance; }
 .conteudo { max-width: 1040px; margin: 0 auto; padding: 20px 16px 140px; }
 .estreito { max-width: 520px; margin: 0 auto; }
 
@@ -53,72 +73,88 @@ a { color: var(--marinho); }
 .etapas { display: flex; gap: 6px; list-style: none; margin: 0 0 22px; padding: 0; counter-reset: e; }
 .etapas li {
   counter-increment: e; flex: 1; font-size: 13px; color: var(--tinta-3);
-  border-top: 3px solid var(--linha); padding-top: 6px;
+  border-top: 5px solid var(--linha); border-radius: 3px 3px 0 0; padding-top: 6px;
 }
 .etapas li::before { content: counter(e) ". "; }
-.etapas li[aria-current="step"] { color: var(--tinta); border-color: var(--marinho); font-weight: 700; }
+.etapas li[aria-current="step"] { color: var(--tinta); border-color: var(--acao); font-weight: 600; }
 .etapas li.feita { color: var(--ok); border-color: var(--ok); }
 
 /* ── Controles ─────────────────────────────────────────────────────────── */
 .botao {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  min-height: 48px; padding: 0 22px; border-radius: var(--raio);
-  border: 0; background: var(--marinho); color: #fff;
-  font: 700 16px var(--sans); cursor: pointer; text-decoration: none;
+  min-height: 50px; padding: 0 24px; border-radius: var(--raio);
+  border: 0; background: var(--acao); color: #fff;
+  font: 600 16px var(--sans); cursor: pointer; text-decoration: none;
+  transition: background-color .15s;
 }
+.botao:hover:not(:disabled) { background: var(--acao-forte); }
+/* No escuro a ação é lilás claro: o texto do botão cheio passa a ser escuro. */
+:root[data-theme="dark"] .botao:not(.secundario) { color: #13112a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .botao:not(.secundario) { color: #13112a; } }
 .botao:disabled { opacity: .45; cursor: not-allowed; }
-.botao.secundario { background: transparent; color: var(--marinho); border: 1.5px solid currentColor; }
+.botao.secundario { background: transparent; color: var(--acao); box-shadow: inset 0 0 0 1.5px currentColor; }
+.botao.secundario:hover:not(:disabled) { background: var(--acao-claro); }
 .botao.perigo { background: var(--erro); }
 .botao.largo { width: 100%; }
-.link-botao { background: none; border: 0; padding: 8px 0; color: var(--tinta-2); font: inherit; text-decoration: underline; cursor: pointer; }
+.link-botao { background: none; border: 0; padding: 8px 0; color: var(--tinta-2); font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .campo { display: block; margin: 0 0 16px; }
-.campo span { display: block; font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+.campo span { display: block; font-weight: 600; font-size: 15px; margin-bottom: 6px; }
 .campo input, .campo textarea, .campo select {
-  width: 100%; min-height: 48px; padding: 10px 12px; font: inherit; color: var(--tinta);
-  background: var(--folha); border: 1.5px solid var(--linha); border-radius: 8px;
+  width: 100%; min-height: 50px; padding: 10px 14px; font: inherit; color: var(--tinta);
+  background: var(--folha); border: 1.5px solid var(--linha); border-radius: 12px;
 }
+.campo input:focus, .campo textarea:focus, .campo select:focus { border-color: var(--acao); outline: none; box-shadow: 0 0 0 3px var(--acao-claro); }
 .campo textarea { min-height: 96px; resize: vertical; }
 .campo small { display: block; color: var(--tinta-3); font-size: 14px; margin-top: 4px; }
-.codigo-otp { font: 700 30px/1 var(--sans) !important; letter-spacing: .35em; text-align: center; }
+.codigo-otp { font: 500 30px/1 var(--mono) !important; letter-spacing: .3em; text-align: center; }
 .check { display: flex; gap: 12px; align-items: flex-start; margin: 0 0 16px; cursor: pointer; }
-.check input { width: 22px; height: 22px; margin-top: 2px; flex: none; accent-color: var(--marinho); }
+.check input { width: 22px; height: 22px; margin-top: 2px; flex: none; accent-color: var(--acao); }
 
-.aviso { border-radius: 8px; padding: 12px 14px; margin: 0 0 16px; font-size: 15px; }
+.aviso { border-radius: 14px; padding: 12px 16px; margin: 0 0 16px; font-size: 15px; }
 .aviso.erro { background: var(--erro-claro); color: var(--erro); }
 .aviso.ok { background: var(--ok-claro); color: var(--ok); }
-.aviso.info { background: var(--marinho-claro); color: var(--marinho); }
+.aviso.info { background: var(--acao-claro); color: var(--acao-forte); }
 
-.cartao { background: var(--folha); border: 1px solid var(--linha); border-radius: 14px; padding: 22px 20px; }
-.cartao h2 { font: 600 22px/1.25 var(--serif); margin: 0 0 8px; }
+.cartao { background: var(--folha); border-radius: var(--raio-cartao); padding: 24px 20px; }
+.cartao h2 { font: 600 22px/1.25 var(--sans); letter-spacing: -.01em; margin: 0 0 8px; text-wrap: balance; }
 .cartao p { margin: 0 0 16px; color: var(--tinta-2); }
+.cartao + .cartao, #resultado:not(:empty) + .cartao { margin-top: 16px; }
+.cartao details { margin: 0 0 12px; }
 
 /* ── Contrato com bula ─────────────────────────────────────────────────── */
-.documento { background: var(--folha); border: 1px solid var(--linha); border-radius: 14px; padding: 8px 18px 20px; }
-.documento .preambulo, .documento .fecho { font: 16px/1.65 var(--serif); color: var(--tinta-2); margin: 16px 0; }
+/* Cada cláusula é uma folha: título de bula, o resumo grande primeiro, e o
+   texto do contrato completo logo abaixo (a leitura até o fim é prova, então
+   o jurídico nunca fica escondido). */
+.documento { display: grid; gap: 14px; }
+.documento .preambulo, .documento .fecho { font: 16px/1.65 var(--serif); color: var(--tinta-2); margin: 4px 4px; }
 
-.clausula { padding: 18px 0; border-bottom: 1px solid var(--linha); }
-.clausula:last-of-type { border-bottom: 0; }
-.clausula h3 { font: 700 15px/1.35 var(--sans); margin: 0 0 8px; color: var(--tinta); }
-.clausula h3 .num { color: var(--tinta-3); font-weight: 400; margin-right: 6px; }
-.texto-juridico p { font: 16px/1.68 var(--serif); margin: 0 0 10px; hyphens: auto; }
-.texto-juridico p .pnum { color: var(--tinta-3); font-variant-numeric: tabular-nums; margin-right: 4px; }
+.clausula { background: var(--folha); border-radius: var(--raio-cartao); padding: 20px 18px 22px; }
+.clausula .cl-num { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: var(--tinta-3); margin: 0 0 6px; }
+.clausula h3 { font: 800 22px/1 var(--bula); font-stretch: 72%; text-transform: uppercase; margin: 0 0 14px; color: var(--tinta); text-wrap: balance; }
 
-/* A bula: resumo em linguagem simples, como trecho passado a marca-texto. */
-.bula { margin: 6px 0 0; font: 16px/1.5 var(--sans); }
-.bula .rotulo { display: block; font-size: 13px; color: var(--tinta-2); margin-bottom: 4px; }
+.bula { margin: 0 0 16px; font: 500 19px/1.45 var(--sans); letter-spacing: -.01em; color: var(--tinta); }
+.bula .rotulo { display: block; font: 400 13px var(--sans); letter-spacing: 0; color: var(--tinta-2); margin-bottom: 4px; }
 .bula mark {
-  background: linear-gradient(transparent 8%, var(--marca) 8%, var(--marca) 92%, transparent 92%);
-  color: var(--tinta); padding: 0 2px; -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  background: linear-gradient(transparent 10%, var(--marca) 10%, var(--marca) 90%, transparent 90%);
+  color: var(--marca-tinta); padding: 0 3px; -webkit-box-decoration-break: clone; box-decoration-break: clone;
 }
 
-/* Cláusula em destaque: a mesma barra do PDF. */
-.clausula.critica { border-left: 4px solid var(--marinho); padding-left: 14px; margin-left: -18px; }
+.texto-juridico { border-top: 1.5px dotted var(--linha); padding-top: 12px; }
+.texto-juridico p.rotulo { font: 400 13px var(--sans); color: var(--tinta-2); margin: 0 0 6px; }
+.texto-juridico p { font: 15.5px/1.68 var(--serif); margin: 0 0 10px; hyphens: auto; }
+.texto-juridico p .pnum { color: var(--tinta-3); font-variant-numeric: tabular-nums; margin-right: 4px; }
+.clausula:not(:has(.bula)) .texto-juridico { border-top: 0; padding-top: 0; }
+
+/* Em destaque: contorno de ação, selo no topo e texto jurídico em negrito,
+   como no PDF (CDC art. 54 §4º). */
+.clausula.critica { box-shadow: inset 0 0 0 2px var(--acao); }
 .clausula.critica .texto-juridico p { font-weight: 600; }
-.ciencia { margin-top: 14px; }
-.ciencia .botao { min-height: 44px; font-size: 15px; }
-.ciente { display: inline-flex; align-items: center; gap: 8px; color: var(--ok); font-weight: 700; font-size: 15px; }
+.destaque { display: inline-block; font: 600 12px var(--sans); color: var(--acao-forte); background: var(--acao-claro); border-radius: 999px; padding: 2px 10px; }
+.ciencia { margin-top: 16px; }
+.ciencia .botao { width: 100%; }
+.ciente { display: inline-flex; align-items: center; gap: 8px; color: var(--ok); background: var(--ok-claro); border-radius: 999px; padding: 8px 14px 8px 10px; font-weight: 600; font-size: 15px; }
 .ciente::before {
-  content: ""; width: 20px; height: 20px; border-radius: 50%; background: var(--ok);
+  content: ""; width: 20px; height: 20px; flex: none; border-radius: 50%; background: var(--ok);
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0a10 10 0 100 20 10 10 0 000-20zm-1.5 14.2L4.3 10l1.4-1.4 2.8 2.8 5.8-5.8 1.4 1.4-7.2 7.2z'/%3E%3C/svg%3E") center/contain no-repeat;
           mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0a10 10 0 100 20 10 10 0 000-20zm-1.5 14.2L4.3 10l1.4-1.4 2.8 2.8 5.8-5.8 1.4 1.4-7.2 7.2z'/%3E%3C/svg%3E") center/contain no-repeat;
 }
@@ -128,27 +164,32 @@ a { color: var(--marinho); }
 .nota-bula { font-size: 14px; color: var(--tinta-3); margin: 14px 0 0; }
 .fim-leitura { height: 1px; }
 
-/* Desktop: o resumo vira nota de margem, ao lado do texto que ele explica. */
+/* Desktop: a cláusula abre em duas colunas, resumo à esquerda e texto do
+   contrato à direita, como bula dobrada. */
 @media (min-width: 900px) {
-  .documento { padding: 12px 36px 28px; }
-  .clausula { display: grid; grid-template-columns: minmax(0, 1fr) 280px; column-gap: 36px; }
-  .clausula h3, .clausula .texto-juridico { grid-column: 1; }
-  .clausula .bula { grid-column: 2; grid-row: 1 / span 3; align-self: start; margin-top: 30px; padding-left: 16px; border-left: 1px dashed var(--linha); }
-  .clausula .ciencia { grid-column: 1; }
-  .clausula.critica { margin-left: -36px; padding-left: 32px; }
+  .clausula { display: grid; grid-template-columns: 300px minmax(0, 1fr); column-gap: 32px; padding: 26px 30px 28px; }
+  .clausula .cl-num, .clausula h3 { grid-column: 1 / -1; }
+  .clausula .bula { grid-column: 1; margin: 0; }
+  .clausula .texto-juridico { grid-column: 2; border-top: 0; border-left: 1.5px dotted var(--linha); padding: 0 0 0 28px; }
+  .clausula:not(:has(.bula)) .texto-juridico { grid-column: 1 / -1; border-left: 0; padding-left: 0; }
+  .clausula .ciencia { grid-column: 2; padding-left: 28px; }
+  .clausula .ciencia .botao { width: auto; }
 }
 
-/* Barra de progresso fixa embaixo: quantos destaques faltam. */
+/* Barra fixa embaixo: um segmento por cláusula em destaque. */
 .barra {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
   background: var(--folha); border-top: 1px solid var(--linha);
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
 }
 .barra .dentro { max-width: 1040px; margin: 0 auto; display: flex; gap: 14px; align-items: center; justify-content: space-between; }
-.barra .progresso { font-size: 15px; color: var(--tinta-2); }
+.barra .progresso { font-size: 14px; color: var(--tinta-2); }
+.barra .botao { white-space: nowrap; padding: 0 20px; flex: none; }
 .barra .progresso strong { color: var(--tinta); }
-.barra .trilho { height: 5px; background: var(--linha); border-radius: 3px; margin-top: 6px; overflow: hidden; width: 160px; }
-.barra .trilho i { display: block; height: 100%; background: var(--ok); width: 0; transition: width .3s; }
+.barra .trilho { display: flex; gap: 4px; margin-top: 8px; width: 170px; }
+.barra .trilho i { flex: 1; height: 6px; border-radius: 3px; background: var(--linha); transition: background-color .3s; }
+.barra .trilho i.feito { background: var(--acao); }
+.barra .trilho.completo i { background: var(--ok); }
 
 /* ── Assinatura ────────────────────────────────────────────────────────── */
 .resumo-assinatura { list-style: none; padding: 0; margin: 0 0 20px; }
@@ -156,39 +197,38 @@ a { color: var(--marinho); }
 .resumo-assinatura li span:last-child { color: var(--tinta-2); text-align: right; }
 
 /* ── Selo (verificação) ────────────────────────────────────────────────── */
+/* A roseta é a mesma do PDF: quem chega pelo QR reconhece o documento. */
 .selo { text-align: left; }
 .selo .estado { display: flex; gap: 16px; align-items: center; margin-bottom: 18px; }
-.selo .carimbo {
-  flex: none; width: 64px; height: 64px; border-radius: 50%;
-  border: 3px double var(--ok); color: var(--ok);
-  display: grid; place-items: center; font: 700 26px var(--serif); transform: rotate(-8deg);
-}
-.selo.invalido .carimbo { border-color: var(--erro); color: var(--erro); }
+.selo .carimbo { flex: none; width: 76px; height: 76px; position: relative; color: var(--ok); display: grid; place-items: center; }
+.selo .carimbo svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.selo .carimbo b { position: relative; width: 34px; height: 34px; border-radius: 50%; background: var(--folha); display: grid; place-items: center; font: 700 20px var(--sans); }
+.selo.invalido .carimbo { color: var(--erro); }
 .selo h2 { margin: 0; }
-.codigo-grande { font: 700 22px var(--sans); letter-spacing: .08em; }
+.codigo-grande { font: 500 21px var(--mono); letter-spacing: .04em; margin: 2px 0 0 !important; color: var(--tinta) !important; }
 .dados { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0 0 18px; font-size: 15px; }
 .dados dt { color: var(--tinta-3); }
-.dados dd { margin: 0; overflow-wrap: anywhere; }
-.hash { font-size: 13px; color: var(--tinta-2); overflow-wrap: anywhere; }
+.dados dd { margin: 0; overflow-wrap: break-word; min-width: 0; }
+.hash { font: 12.5px/1.6 var(--mono); color: var(--tinta-2); overflow-wrap: anywhere; }
 .soltar {
-  border: 2px dashed var(--linha); border-radius: 12px; padding: 22px 16px; text-align: center;
+  border: 2px dashed var(--linha); border-radius: 16px; padding: 22px 16px; text-align: center;
   color: var(--tinta-2); cursor: pointer; display: block;
 }
-.soltar.sobre { border-color: var(--marinho); background: var(--marinho-claro); }
+.soltar.sobre { border-color: var(--acao); background: var(--acao-claro); }
 .soltar input { display: none; }
 
 /* ── Painel de teste (/dev) ────────────────────────────────────────────── */
 .dev { display: grid; gap: 18px; }
 @media (min-width: 1000px) { .dev { grid-template-columns: 1fr 1fr; align-items: start; } }
-.dev .cartao h2 { font: 700 18px var(--sans); }
+.dev .cartao h2 { font: 600 18px var(--sans); }
 .tabela { width: 100%; border-collapse: collapse; font-size: 14px; }
-.tabela td, .tabela th { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--linha); vertical-align: top; }
-.tabela th { color: var(--tinta-3); font-weight: 400; }
-.status { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 13px; background: var(--marinho-claro); color: var(--marinho); }
+.tabela td, .tabela th { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--linha); vertical-align: top; }
+.tabela th { color: var(--tinta-3); font-weight: 400; font-size: 13px; }
+.status { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 13px; font-weight: 500; white-space: nowrap; background: var(--acao-claro); color: var(--acao-forte); }
 .status.assinado { background: var(--ok-claro); color: var(--ok); }
 .status.recusado, .status.cancelado, .status.expirado { background: var(--erro-claro); color: var(--erro); }
 .msg { border-bottom: 1px solid var(--linha); padding: 10px 0; font-size: 14px; }
-.msg .assunto { font-weight: 700; }
+.msg .assunto { font-weight: 600; }
 .msg pre { white-space: pre-wrap; font: 13px/1.45 var(--sans); color: var(--tinta-2); margin: 6px 0 0; }
 .signatario-linha { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
 .acoes { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
@@ -209,8 +249,8 @@ a { color: var(--marinho); }
 /* ── Lote ──────────────────────────────────────────────────────────────── */
 /* Campo do modelo: o que muda de contrato para contrato. Sublinhado
    pontilhado, como lacuna de formulário preenchida a lápis. */
-.var { font-family: var(--sans); font-size: .9em; color: var(--marinho); border-bottom: 1.5px dotted var(--marinho); padding: 0 1px; white-space: nowrap; }
-.condicao { font: 600 13px var(--sans); color: var(--tinta-2); background: var(--marinho-claro); border-radius: 4px; padding: 1px 6px; }
+.var { font-family: var(--sans); font-size: .88em; color: var(--acao-forte); border-bottom: 1.5px dotted var(--acao); padding: 0 1px; white-space: nowrap; }
+.condicao { font: 500 13px var(--sans); color: var(--acao-forte); background: var(--acao-claro); border-radius: 999px; padding: 1px 9px; }
 p.condicao { display: inline-block; margin: 0 0 8px; }
 .tabela-lote { margin-top: 18px; }
 .rolagem { overflow-x: auto; }
@@ -222,12 +262,12 @@ p.condicao { display: inline-block; margin: 0 0 8px; }
 .mapa { width: 100%; border-collapse: collapse; font-size: 15px; }
 .mapa td, .mapa th { padding: 8px 6px; border-bottom: 1px solid var(--linha); vertical-align: middle; text-align: left; }
 .mapa th { color: var(--tinta-3); font-weight: 400; font-size: 14px; }
-.mapa select, .mapa input { width: 100%; min-height: 40px; padding: 6px 8px; font: inherit; color: var(--tinta); background: var(--folha); border: 1.5px solid var(--linha); border-radius: 8px; }
+.mapa select, .mapa input { width: 100%; min-height: 42px; padding: 6px 10px; font: inherit; color: var(--tinta); background: var(--folha); border: 1.5px solid var(--linha); border-radius: 10px; }
 .mapa .amostra { color: var(--tinta-3); font-size: 14px; overflow-wrap: anywhere; }
 .mapa .obrig { color: var(--erro); }
-.totais { display: flex; flex-wrap: wrap; gap: 10px 26px; margin: 0 0 16px; }
+.totais { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 0 0 16px; }
 .totais div { font-size: 14px; color: var(--tinta-2); }
-.totais strong { display: block; font: 700 28px/1.1 var(--serif); color: var(--tinta); }
+.totais strong { display: block; font: 800 36px/1 var(--bula); font-stretch: 72%; color: var(--tinta); }
 .totais .ok strong { color: var(--ok); }
 .totais .mal strong { color: var(--erro); }
 .linha-problema td { background: var(--erro-claro); }

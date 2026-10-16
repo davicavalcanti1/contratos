@@ -58,3 +58,19 @@ export async function sha256Arquivo(arquivo) {
   const buf = await crypto.subtle.digest('SHA-256', await arquivo.arrayBuffer())
   return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('')
 }
+
+// Roseta de guilhoché, a mesma fórmula do selo no PDF (src/motor/estilo-pdf.js).
+export function rosetaSvg({ curvas = 7 } = {}) {
+  const raio = 48, c = 50, caminhos = []
+  for (let k = 0; k < curvas; k++) {
+    const R = raio * (0.62 + k * 0.04), r = raio * 0.18, d = raio * (0.2 + k * 0.018), s = raio / (R + r + d)
+    let p = ''
+    for (let t = 0; t <= Math.PI * 14 + 0.001; t += 0.05) {
+      const x = c + ((R + r) * Math.cos(t) - d * Math.cos(((R + r) / r) * t)) * s
+      const y = c + ((R + r) * Math.sin(t) - d * Math.sin(((R + r) / r) * t)) * s
+      p += `${p ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`
+    }
+    caminhos.push(`<path d="${p}" stroke-opacity="${(0.35 + (k % 3) * 0.15).toFixed(2)}"/>`)
+  }
+  return `<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width=".35" aria-hidden="true">${caminhos.join('')}</svg>`
+}

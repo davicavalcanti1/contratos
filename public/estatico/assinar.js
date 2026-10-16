@@ -130,9 +130,10 @@ function desenharDocumento() {
   for (const c of estado.clausulas) {
     partes.push(`
       <section class="clausula${c.critica ? ' critica' : ''}" data-chave="${esc(c.chave)}" aria-labelledby="cl-${esc(c.chave)}">
-        <h3 id="cl-${esc(c.chave)}"><span class="num">Cláusula ${c.numero}</span>${esc(c.titulo)}${c.critica ? '<span class="sr"> (em destaque)</span>' : ''}</h3>
-        <div class="texto-juridico">${c.paragrafos.map(p => `<p><span class="pnum">${esc(p.numero)}</span>${esc(p.texto)}</p>`).join('')}</div>
+        <p class="cl-num" aria-hidden="true">Cláusula ${c.numero}${c.critica ? ' <span class="destaque">Em destaque</span>' : ''}</p>
+        <h3 id="cl-${esc(c.chave)}"><span class="sr">Cláusula ${c.numero}: </span>${esc(c.titulo)}${c.critica ? '<span class="sr"> (em destaque)</span>' : ''}</h3>
         ${c.resumo ? `<p class="bula"><span class="rotulo">Em palavras simples</span><mark>${esc(c.resumo)}</mark></p>` : ''}
+        <div class="texto-juridico">${c.resumo ? '<p class="rotulo">Texto do contrato</p>' : ''}${c.paragrafos.map(p => `<p><span class="pnum">${esc(p.numero)}</span>${esc(p.texto)}</p>`).join('')}</div>
         ${c.critica ? `<div class="ciencia">${botaoCiencia(c)}</div>` : ''}
       </section>`)
   }
@@ -169,11 +170,13 @@ function atualizarProgresso() {
   const suaVez = estado.signatario.sua_vez
   let texto
   if (!suaVez) texto = 'Outra pessoa assina antes de você. Avisaremos por e-mail.'
-  else if (feitas < criticas.length) texto = `<strong>${feitas} de ${criticas.length}</strong> cláusulas em destaque confirmadas`
+  else if (feitas < criticas.length) texto = `<strong>${feitas} de ${criticas.length}</strong> destaques confirmados`
   else if (!leituraEnviada) texto = 'Role até o fim do contrato'
   else texto = '<strong>Tudo lido.</strong> Pode assinar.'
   $('#progresso').innerHTML = texto
-  $('#trilho').style.width = `${criticas.length ? (feitas / criticas.length) * 100 : 100}%`
+  const trilho = $('#trilho')
+  trilho.innerHTML = criticas.map(c => `<i${c.ciente_em ? ' class="feito"' : ''}></i>`).join('') || '<i class="feito"></i>'
+  trilho.classList.toggle('completo', pronto)
   $('#btn-ir-assinar').disabled = !(pronto && suaVez)
 }
 
