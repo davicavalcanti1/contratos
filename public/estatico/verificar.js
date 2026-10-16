@@ -26,19 +26,38 @@ async function verificar(codigo) {
   }
 }
 
+// O que aconteceu com o documento depois de assinado. Quem tem uma cópia
+// impressa na mão precisa saber se ela ainda vale.
+function historia(v) {
+  const br = (iso) => (iso ? iso.slice(0, 10).split('-').reverse().join('/') : '')
+  const linhas = []
+  if (v.origem) linhas.push(`Este é um ${v.origem.tipo === 'aditivo' ? 'termo aditivo' : 'distrato'} do contrato <a href="/v/${encodeURIComponent(v.origem.codigo)}">${esc(v.origem.codigo)}</a>.`)
+  if (v.vigencia) linhas.push(`Vigência: de ${br(v.vigencia.inicio)} ${v.vigencia.fim ? `a ${br(v.vigencia.fim)}` : 'por prazo indeterminado'}.`)
+  if (v.distrato) linhas.push(`${v.status === 'distratado' ? 'Encerrado' : 'Encerra'} em ${br(v.distrato.data_encerramento)} por distrato assinado em ${dataHora(v.distrato.assinado_em)}: <a href="/v/${encodeURIComponent(v.distrato.codigo)}">${esc(v.distrato.codigo)}</a>.`)
+  for (const d of v.derivados || []) linhas.push(`${d.tipo === 'aditivo' ? 'Aditado' : 'Distratado'} por documento assinado em ${dataHora(d.assinado_em)}: <a href="/v/${encodeURIComponent(d.codigo)}">${esc(d.codigo)}</a>.`)
+  if (v.encerrado_em) linhas.push(`Terminou no fim do prazo, em ${br(v.encerrado_em)}.`)
+  return linhas.length ? `<ul class="historia">${linhas.map(l => `<li>${l}</li>`).join('')}</ul>` : ''
+}
+
+const ESTADO = {
+  assinado: 'Contrato autêntico',
+  encerrado: 'Autêntico, e já encerrado',
+  distratado: 'Autêntico, e encerrado por distrato',
+}
+
 function selo(v) {
-  const integro = v.status === 'assinado' && v.integridade.trilha_integra
+  const integro = ['assinado', 'encerrado', 'distratado'].includes(v.status) && v.integridade.trilha_integra
   const sig = v.signatarios.map(s => `<dt>${esc(s.papel)}</dt><dd>${esc(s.nome)}${s.cpf ? `, CPF ${esc(s.cpf)}` : ''}<br><small>assinou em ${esc(dataHora(s.assinado_em))}</small></dd>`).join('')
   return `
     <div class="cartao selo${integro ? '' : ' invalido'}">
       <div class="estado">
         <div class="carimbo" aria-hidden="true">${integro ? '✓' : '!'}</div>
         <div>
-          <h2>${integro ? 'Contrato autêntico' : 'Atenção: registro com problema'}</h2>
+          <h2>${integro ? ESTADO[v.status] : 'Atenção: registro com problema'}</h2>
           <p class="codigo-grande">${esc(v.codigo)}</p>
         </div>
       </div>
-      ${integro ? '' : '<p class="aviso erro">O histórico deste contrato não confere. Não confie no documento antes de falar com quem o emitiu.</p>'}
+      ${integro ? historia(v) : '<p class="aviso erro">O histórico deste contrato não confere. Não confie no documento antes de falar com quem o emitiu.</p>'}
       <dl class="dados">
         <dt>Documento</dt><dd>${esc(v.titulo)}</dd>
         <dt>Emitido por</dt><dd>${esc(v.organizacao)}</dd>

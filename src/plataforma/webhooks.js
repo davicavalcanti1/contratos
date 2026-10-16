@@ -26,6 +26,11 @@ export const EVENTOS_WEBHOOK = {
   'contrato.recusado': 'Contrato recusado',
   'contrato.expirado': 'Prazo de assinatura vencido',
   'contrato.cancelado': 'Contrato cancelado',
+  'contrato.aditado': 'Termo aditivo assinado (prazo, valor ou objeto mudou)',
+  'contrato.distratado': 'Distrato assinado (contrato encerrado por acordo)',
+  'contrato.vencendo': 'Contrato vence em 30 ou 7 dias',
+  'contrato.reajuste_devido': 'Reajuste anual em 30 dias',
+  'contrato.encerrado': 'Contrato terminou no prazo',
 }
 export const ESPERAS_S = [60, 300, 1800, 7200, 21600]
 const TIMEOUT_MS = 10_000

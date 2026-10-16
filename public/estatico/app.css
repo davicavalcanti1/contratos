@@ -237,3 +237,9 @@ p.condicao { display: inline-block; margin: 0 0 8px; }
 /* Rótulos do modelo vêm em minúscula (também servem no meio de frases); em
    cabeçalho de tabela, a inicial sobe. */
 .tabela th::first-letter, .mapa td:first-child::first-letter { text-transform: uppercase; }
+
+/* Fim de vida: encerrado e distratado são estados finais e neutros (não erro). */
+.status.encerrado, .status.distratado { background: var(--linha); color: var(--tinta-2); }
+
+.historia { margin: 0 0 16px; padding-left: 18px; font-size: 15px; }
+.historia li { margin-bottom: 4px; }

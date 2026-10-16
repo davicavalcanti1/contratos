@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { api, baixar } from '../../api.js'
-import { Cabecalho, Carregando, Erro, PESSOA, Situacao, dataHora, useAcao, useDados } from '../../comum.jsx'
+import { Cabecalho, Carregando, Erro, PESSOA, Situacao, data, dataHora, useAcao, useDados } from '../../comum.jsx'
 import { useSessao } from '../../sessao.jsx'
+import { AcoesVida, Ligados, Vigencia } from './VidaContrato.jsx'
+import { useNavigate } from 'react-router-dom'
 
 const EVENTO = {
   'contrato.gerado': 'Contrato gerado', 'contrato.enviado': 'Enviado para assinatura', 'link.enviado': 'Link enviado',
@@ -10,6 +12,8 @@ const EVENTO = {
   'otp.validado': 'Identidade confirmada', 'clausula.ciencia': 'Ciência de cláusula em destaque',
   'documento.lido_ate_o_fim': 'Leu até o fim', 'assinatura.aceita': 'Assinou', 'assinatura.recusada': 'Recusou',
   'documento.selado': 'Selado', 'contrato.cancelado': 'Cancelado', 'contrato.expirado': 'Expirou',
+  'aditivo.gerado': 'Termo aditivo gerado', 'distrato.gerado': 'Distrato gerado', 'contrato.aditado': 'Aditado (aditivo assinado)',
+  'contrato.distratado': 'Distratado (distrato assinado)', 'contrato.encerrado': 'Encerrado no fim do prazo',
 }
 
 export function Contrato() {
@@ -18,6 +22,7 @@ export function Contrato() {
   const { dados: c, erro, carregando, recarregar } = useDados(() => api(`/org/contratos/${id}`), [id, org?.id])
   const acao = useAcao()
   const [aviso, setAviso] = useState(null)
+  const navegar = useNavigate()
 
   if (carregando && !c) return <Carregando />
   if (erro) return <Erro erro={erro} />
@@ -45,13 +50,22 @@ export function Contrato() {
         criado {dataHora(c.criado_em)}{c.expira_em && emAndamento && <>, vale até {dataHora(c.expira_em)}</>}
       </>}>
         <button className="botao secundario" onClick={() => acao.executar(() => baixar(`/org/contratos/${c.id}/arquivo?qual=original`, 'contrato.pdf'))}>PDF original</button>
-        {c.status === 'assinado' && <button className="botao" onClick={() => acao.executar(() => baixar(`/org/contratos/${c.id}/arquivo?qual=final`, 'contrato-assinado.pdf'))}>PDF assinado</button>}
+        {c.pdf_final_sha256 && <button className="botao" onClick={() => acao.executar(() => baixar(`/org/contratos/${c.id}/arquivo?qual=final`, 'contrato-assinado.pdf'))}>PDF assinado</button>}
         <button className="botao secundario" onClick={() => acao.executar(() => baixar(`/org/contratos/${c.id}/dossie?formato=pdf`, 'dossie.pdf'))}>Dossiê de provas</button>
       </Cabecalho>
       <Erro erro={acao.erro} onFechar={acao.limparErro} />
       {aviso && <p className="aviso ok">{aviso}</p>}
 
+      {c.status === 'distratado' && <p className="aviso info">Encerrado por distrato em {data(c.distrato?.data_encerramento)}, por acordo das partes.</p>}
+      {c.status === 'assinado' && c.distrato && <p className="aviso info">Distrato assinado: este contrato vale até {data(c.distrato.data_encerramento)} e termina nessa data.</p>}
+      {c.encerrado_em && <p className="aviso info">Encerrado no fim do prazo, em {dataHora(c.encerrado_em)}.</p>}
+
       <div className="duas-colunas">
+        <div>
+          <Vigencia c={c} />
+          <Ligados c={c} />
+          <div id="mudar">{podeEscrever && <AcoesVida c={c} onGerado={(d) => navegar(`/contratos/${d.id}`)} />}</div>
+        </div>
         <section className="cartao">
           <h2>Quem assina</h2>
           {c.signatarios.length === 0 ? <p>Este contrato ainda não foi enviado.</p> : (
@@ -72,9 +86,7 @@ export function Contrato() {
             <p className="selo-linha">Código de verificação <strong className="codigo-grande">{c.codigo_verificacao}</strong> <a href={`/v/${c.codigo_verificacao}`} target="_blank" rel="noopener noreferrer">Ver o selo</a></p>
           )}
           {podeCancelar && <button className="link-botao perigo" onClick={cancelar}>Cancelar este contrato</button>}
-        </section>
 
-        <section className="cartao">
           <h2>Histórico</h2>
           <ol className="linha-do-tempo">
             {c.eventos.slice().reverse().map(e => (

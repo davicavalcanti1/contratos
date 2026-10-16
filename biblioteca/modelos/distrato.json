@@ -1,0 +1,99 @@
+{
+  "chave": "distrato",
+  "versao": 1,
+  "titulo": "Distrato do {{original.titulo}}",
+  "descricao": "Encerra, de comum acordo, um contrato já assinado, com quitação. Gerado a partir do contrato original.",
+  "derivado": "distrato",
+  "preambulo": "Pelo presente instrumento, as partes do contrato identificado na cláusula seguinte celebram este Distrato, que se regerá pelas cláusulas abaixo.",
+  "fecho": "E, por estarem de acordo, as partes assinam este distrato eletronicamente, na forma da {{ref:col_assinatura}}, em {{sistema.data_geracao|extenso}}.",
+  "titulo_executivo": false,
+  "categorias_obrigatorias": [
+    "partes",
+    "objeto",
+    "quitacao",
+    "assinatura_eletronica"
+  ],
+  "variaveis": [
+    {
+      "chave": "original.titulo",
+      "rotulo": "título do contrato original",
+      "tipo": "texto",
+      "origem": "original"
+    },
+    {
+      "chave": "original.codigo",
+      "rotulo": "código de verificação do contrato original",
+      "tipo": "texto",
+      "origem": "original"
+    },
+    {
+      "chave": "original.assinado_em",
+      "rotulo": "data da assinatura do contrato original",
+      "tipo": "data",
+      "origem": "original"
+    },
+    {
+      "chave": "original.qualificacao",
+      "rotulo": "qualificação das partes no contrato original",
+      "tipo": "texto",
+      "origem": "original"
+    },
+    {
+      "chave": "distrato.data_encerramento",
+      "rotulo": "data de encerramento",
+      "tipo": "data",
+      "origem": "manual"
+    },
+    {
+      "chave": "distrato.quitacao",
+      "rotulo": "quitação",
+      "tipo": "enum",
+      "origem": "manual",
+      "opcoes": [
+        {
+          "valor": "total",
+          "texto": "quitação total"
+        },
+        {
+          "valor": "com_pendencias",
+          "texto": "quitação com pendências listadas"
+        }
+      ]
+    },
+    {
+      "chave": "distrato.pendencias",
+      "rotulo": "pendências que ficam em aberto",
+      "tipo": "texto",
+      "origem": "manual"
+    },
+    {
+      "chave": "distrato.dispensa_multa",
+      "rotulo": "dispensar a multa por encerramento antecipado",
+      "tipo": "booleano",
+      "origem": "manual",
+      "obrigatoria": false
+    }
+  ],
+  "blocos": [
+    {
+      "clausula": "derivado_partes",
+      "versao": 1
+    },
+    {
+      "clausula": "dis_objeto",
+      "versao": 1
+    },
+    {
+      "clausula": "dis_quitacao",
+      "versao": 1
+    },
+    {
+      "clausula": "dis_sobrevivencia",
+      "versao": 1
+    },
+    {
+      "clausula": "col_assinatura",
+      "versao": 1
+    }
+  ]
+}

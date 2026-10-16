@@ -12,6 +12,7 @@ const FILTROS = [
   ['recusado', 'Recusados'],
   ['expirado', 'Expirados'],
   ['cancelado', 'Cancelados'],
+  ['encerrado,distratado', 'Encerrados e distratados'],
   ['gerado', 'Gerados e não enviados'],
 ]
 

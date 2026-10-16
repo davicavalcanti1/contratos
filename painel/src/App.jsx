@@ -8,6 +8,7 @@ import { Conta } from './paginas/Conta.jsx'
 import { Chaves } from './paginas/org/Chaves.jsx'
 import { Contrato } from './paginas/org/Contrato.jsx'
 import { Contratos } from './paginas/org/Contratos.jsx'
+import { Agenda } from './paginas/org/Agenda.jsx'
 import { Empresa } from './paginas/org/Empresa.jsx'
 import { Lote } from './paginas/org/Lote.jsx'
 import { Lotes } from './paginas/org/Lotes.jsx'
@@ -64,6 +65,7 @@ function Moldura() {
               <p className="grupo-titulo">{org.nome}</p>
               <NavLink to="/inicio">Visão geral</NavLink>
               <NavLink to="/contratos">Contratos</NavLink>
+              <NavLink to="/agenda">Agenda</NavLink>
               <NavLink to="/lotes">Lotes</NavLink>
               {ehAdmin && <>
                 <NavLink to="/empresa">Dados da empresa</NavLink>
@@ -107,6 +109,7 @@ function Moldura() {
               <Route path="/contratos" element={<Contratos />} />
               <Route path="/contratos/novo" element={<NovoContrato />} />
               <Route path="/contratos/:id" element={<Contrato />} />
+              <Route path="/agenda" element={<Agenda />} />
               <Route path="/lotes" element={<Lotes />} />
               <Route path="/lotes/:id" element={<Lote />} />
             </>}

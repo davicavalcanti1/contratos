@@ -53,6 +53,7 @@ export function criarLotes({ repo, biblioteca, servico, agora = () => new Date()
   function sugerir(organizacaoId, planilhaId, modeloChave) {
     const p = planilhaDa(organizacaoId, planilhaId)
     const modelo = acharModelo(biblioteca, modeloChave)
+    if (modelo.derivado) throw new ErroNegocio(400, `"${modelo.titulo}" nasce de um contrato assinado; não sai de planilha.`)
     const salvo = repo.obter('mapeamentos', chaveMapeamento(organizacaoId, modelo.chave, p.colunas))
     return {
       modelo: { chave: modelo.chave, titulo: modelo.titulo },

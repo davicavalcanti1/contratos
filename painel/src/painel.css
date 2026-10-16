@@ -148,3 +148,10 @@ body { font-size: 16px; }
 
 /* Seções dentro do mesmo cartão: respiro antes de cada título que não abre o cartão. */
 .cartao h2:not(:first-child), .cartao form + h2 { margin-top: 26px; }
+
+/* Contrato vivo */
+.form-vida { border-top: 1px solid var(--linha); padding-top: 14px; margin-top: 8px; }
+.bloco-mudanca { border: 1px solid var(--linha); border-radius: 10px; padding: 12px 14px 4px; margin: 0 0 14px; }
+.bloco-mudanca > .check { margin-bottom: 12px; }
+.campo.compacto { margin: 0; }
+.campo.compacto select { min-height: 40px; }

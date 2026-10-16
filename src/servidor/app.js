@@ -19,6 +19,7 @@ import { signatariosDaLinha } from '../lote/mapear.js'
 import { camposNecessarios, montarContrato } from '../motor/montar.js'
 import { ErroNegocio } from '../assinatura/servico.js'
 import { EVENTOS_WEBHOOK } from '../plataforma/webhooks.js'
+import { periodoPadrao } from '../vida/indices.js'
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const PUBLICO = join(RAIZ, 'public')
@@ -26,7 +27,7 @@ const PAINEL = join(PUBLICO, 'painel')
 const COOKIE = 'cs_painel'
 const CSP = "default-src 'self'; img-src 'self' data: blob:; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
 
-export function criarApp({ servico, lotes, plataforma, webhooks, repo, biblioteca, dev = false, log = true, chaveDev = null }) {
+export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, dev = false, log = true, chaveDev = null }) {
   const app = express()
   app.disable('x-powered-by')
   // Atrás do proxy do EasyPanel: o IP real vem no X-Forwarded-For (é evidência
@@ -67,7 +68,8 @@ export function criarApp({ servico, lotes, plataforma, webhooks, repo, bibliotec
 
     r.get('/conta', (req, res) => res.json(plataforma.resumoOrganizacao(repo.obter('organizacoes', org(req).id))))
     r.get('/modelos', (req, res) => {
-      res.json(biblioteca.modelos.map(m => ({
+      // Aditivo e distrato não aparecem aqui: nascem de um contrato assinado (rota própria).
+      res.json(biblioteca.modelos.filter(m => !m.derivado).map(m => ({
         chave: m.chave, versao: m.versao, titulo: m.titulo, descricao: m.descricao,
         variaveis: m.variaveis.filter(v => v.origem !== 'organizacao').map(({ chave, rotulo, tipo, origem, opcoes, padrao, obrigatoria }) => ({ chave, rotulo, tipo, origem, opcoes, padrao, obrigatoria })),
         signatarios_da_parte: m.signatarios_da_parte || [],
@@ -105,6 +107,22 @@ export function criarApp({ servico, lotes, plataforma, webhooks, repo, bibliotec
       const d = servico.dossie(req.params.id, org(req).id)
       if (req.query.formato === 'pdf') return enviarPdf(res, { buffer: await gerarDossiePdf(d), nome: `dossie-${d.contrato.id}.pdf` })
       res.json(d)
+    }))
+
+    // Contrato vivo: aditivo e distrato nascem de um contrato assinado.
+    r.post('/contratos/:id/aditivo', h(async (req, res) => {
+      plataforma.checarLimite(org(req).id, 1)
+      res.status(201).json(await servico.gerarDerivado(req.params.id, org(req).id, dados(req), 'aditivo', req.body?.campos || req.body || {}))
+    }))
+    r.post('/contratos/:id/distrato', h(async (req, res) => {
+      plataforma.checarLimite(org(req).id, 1)
+      res.status(201).json(await servico.gerarDerivado(req.params.id, org(req).id, dados(req), 'distrato', req.body?.campos || req.body || {}))
+    }))
+    r.get('/agenda', (req, res) => res.json(agenda.proximos(org(req).id, Math.min(Number(req.query.dias) || 90, 365))))
+    // Acumulado do índice no período (ou no período padrão antes de uma data de reajuste).
+    r.get('/indices/:indice', h(async (req, res) => {
+      const p = req.query.para ? periodoPadrao(String(req.query.para)) : { de: String(req.query.de || ''), ate: String(req.query.ate || '') }
+      res.json(await indices.acumulado(req.params.indice, p.de, p.ate))
     }))
 
     const planilhaCrua = express.raw({ type: () => true, limit: '10mb' })

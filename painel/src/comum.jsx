@@ -45,12 +45,17 @@ export function dataHora(iso) {
 }
 export function data(iso) {
   if (!iso) return '—'
+  // Data pura (vigência, reajuste) é um dia do calendário, não um instante:
+  // passar por fuso a transforma em meia-noite UTC e "01/11" vira "31/10".
+  const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (m) return `${m[3]}/${m[2]}/${m[1]}`
   return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeZone: 'America/Sao_Paulo' }).format(new Date(iso))
 }
 
 export const SITUACAO = {
   gerado: 'gerado', enviado: 'aguardando', parcialmente_assinado: 'assinado em parte', assinado: 'assinado',
   recusado: 'recusado', expirado: 'expirado', cancelado: 'cancelado', nao_gerado: 'não gerado',
+  encerrado: 'encerrado', distratado: 'distratado',
 }
 export const PESSOA = { aguardando: 'aguardando a vez', notificado: 'não abriu', identificado: 'lendo', assinado: 'assinou', recusado: 'recusou' }
 

@@ -160,7 +160,7 @@ export function hashConteudo(contrato) {
   return createHash('sha256').update(JSON.stringify(resto)).digest('hex')
 }
 
-function aplicarPadroes(modelo, dados, agora) {
+export function aplicarPadroes(modelo, dados, agora) {
   const ctx = structuredClone(dados || {})
   ctx.sistema = { ...(ctx.sistema || {}), data_geracao: agora.toISOString().slice(0, 10) }
   for (const v of modelo.variaveis) {

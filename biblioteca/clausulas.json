@@ -369,5 +369,134 @@
     "resumo_simples": "Assinar por aqui vale o mesmo que assinar no papel.",
     "critica": true,
     "base_legal": "MP 2.200-2/2001 art. 10 §2º. Sem cláusula de foro: em matéria trabalhista a competência é fixada pela CLT (art. 651), e eleição de foro não vale"
+  },
+  {
+    "chave": "derivado_partes",
+    "versao": 1,
+    "categoria": "partes",
+    "titulo": "Das partes e do contrato original",
+    "paragrafos": [
+      "Este instrumento se refere ao {{original.titulo}}, assinado eletronicamente em {{original.assinado_em}}, com código de verificação {{original.codigo}}, doravante \"contrato original\".",
+      "As partes são as mesmas do contrato original, com a qualificação que dele consta: {{original.qualificacao}}"
+    ],
+    "resumo_simples": "Este documento muda (ou encerra) o contrato {{original.codigo}}, assinado em {{original.assinado_em}}, entre as mesmas partes.",
+    "base_legal": "CC art. 104"
+  },
+  {
+    "chave": "ad_alteracoes",
+    "versao": 1,
+    "categoria": "objeto",
+    "titulo": "Das alterações",
+    "paragrafos": [
+      "Por este termo, o contrato original fica alterado nos pontos abaixo, com efeitos a partir de {{aditivo.vigencia}}.",
+      {
+        "quando": {
+          "campo": "aditivo.prorroga",
+          "op": "verdadeiro"
+        },
+        "texto": "O prazo de vigência do contrato original fica prorrogado até {{aditivo.nova_data_fim}}."
+      },
+      {
+        "quando": {
+          "campo": "aditivo.altera_valor",
+          "op": "verdadeiro"
+        },
+        "texto": "O valor previsto no contrato original passa a ser de {{aditivo.novo_valor}}, por {{aditivo.motivo_valor}}."
+      },
+      {
+        "quando": {
+          "e": [
+            {
+              "campo": "aditivo.altera_valor",
+              "op": "verdadeiro"
+            },
+            {
+              "campo": "aditivo.indice_texto",
+              "op": "existe"
+            }
+          ]
+        },
+        "texto": "Índice e período aplicados: {{aditivo.indice_texto}}."
+      },
+      {
+        "quando": {
+          "campo": "aditivo.altera_objeto",
+          "op": "verdadeiro"
+        },
+        "texto": "O objeto do contrato original passa a ser a prestação dos seguintes serviços: {{aditivo.novo_objeto}}."
+      }
+    ],
+    "resumo_simples": "A partir de {{aditivo.vigencia}}, o contrato muda exatamente nos pontos listados nesta cláusula, e só neles.",
+    "critica": true,
+    "base_legal": "CC arts. 421 e 472"
+  },
+  {
+    "chave": "ad_ratificacao",
+    "versao": 1,
+    "categoria": "ratificacao",
+    "titulo": "Da ratificação",
+    "paragrafos": [
+      "Permanecem inalteradas e em pleno vigor as demais cláusulas e condições do contrato original, que as partes ratificam.",
+      "Este termo passa a integrar o contrato original para todos os efeitos."
+    ],
+    "resumo_simples": "Tudo o que não foi mudado aqui continua valendo como estava."
+  },
+  {
+    "chave": "dis_objeto",
+    "versao": 1,
+    "categoria": "objeto",
+    "titulo": "Do encerramento",
+    "paragrafos": [
+      "As partes resolvem, de comum acordo, extinguir o contrato original a partir de {{distrato.data_encerramento}}, nos termos do art. 472 do Código Civil.",
+      "Até essa data, as obrigações do contrato original seguem sendo cumpridas normalmente."
+    ],
+    "resumo_simples": "O contrato acaba em {{distrato.data_encerramento}}, por acordo das duas partes. Até lá, tudo continua como estava.",
+    "critica": true,
+    "base_legal": "CC art. 472"
+  },
+  {
+    "chave": "dis_quitacao",
+    "versao": 1,
+    "categoria": "quitacao",
+    "titulo": "Da quitação",
+    "paragrafos": [
+      {
+        "quando": {
+          "campo": "distrato.quitacao",
+          "op": "eq",
+          "valor": "total"
+        },
+        "texto": "Pagos os valores devidos até a data de encerramento, as partes dão-se mútua, plena, geral e irrevogável quitação quanto ao contrato original, para nada mais reclamarem uma da outra a esse título."
+      },
+      {
+        "quando": {
+          "campo": "distrato.quitacao",
+          "op": "eq",
+          "valor": "com_pendencias"
+        },
+        "texto": "As partes dão-se quitação quanto ao contrato original, ressalvadas as seguintes pendências, que permanecem exigíveis: {{distrato.pendencias}}."
+      },
+      {
+        "quando": {
+          "campo": "distrato.dispensa_multa",
+          "op": "verdadeiro"
+        },
+        "texto": "Fica dispensada a multa por extinção antecipada eventualmente prevista no contrato original."
+      }
+    ],
+    "resumo_simples": "Acertadas as contas até o encerramento, ninguém cobra mais nada do outro por esse contrato, a não ser o que estiver listado aqui como pendência.",
+    "critica": true,
+    "base_legal": "CC arts. 319 a 324"
+  },
+  {
+    "chave": "dis_sobrevivencia",
+    "versao": 1,
+    "categoria": "sobrevivencia",
+    "titulo": "Das obrigações que continuam",
+    "paragrafos": [
+      "Permanecem em vigor, pelo prazo nelas previsto, as obrigações do contrato original que por sua natureza sobrevivem à extinção, em especial as de confidencialidade e de proteção de dados pessoais."
+    ],
+    "resumo_simples": "Sigilo e proteção de dados continuam valendo mesmo depois do fim do contrato.",
+    "base_legal": "Lei 13.709/2018 art. 16"
   }
 ]

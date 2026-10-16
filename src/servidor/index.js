@@ -18,6 +18,8 @@ import { lintModelo } from '../motor/linter.js'
 import { transporteCaixa } from '../notificacoes.js'
 import { criarPlataforma } from '../plataforma/plataforma.js'
 import { criarWebhooks } from '../plataforma/webhooks.js'
+import { criarAgenda } from '../vida/agenda.js'
+import { criarIndices } from '../vida/indices.js'
 import { criarApp } from './app.js'
 
 const producao = process.env.NODE_ENV === 'production'
@@ -37,6 +39,8 @@ const webhooks = criarWebhooks({ repo, producao })
 const plataforma = criarPlataforma({ repo, notificar, config: { baseUrl } })
 const servico = criarServico({ repo, biblioteca, notificar, config: { baseUrl }, aoEvento: webhooks.emitir })
 const lotes = criarLotes({ repo, biblioteca, servico })
+const agenda = criarAgenda({ repo, servico, notificar, aoEvento: webhooks.emitir, config: { baseUrl } })
+const indices = criarIndices()
 
 if (process.env.ORGANIZACOES_ARQUIVO) await plataforma.importarOrganizacoes(JSON.parse(readFileSync(process.env.ORGANIZACOES_ARQUIVO, 'utf8')))
 
@@ -56,7 +60,8 @@ if (!producao) {
 }
 
 webhooks.iniciar()
-const app = criarApp({ servico, lotes, plataforma, webhooks, repo, biblioteca, dev: !producao, chaveDev: producao ? null : CHAVE_DEV })
+agenda.iniciar() // roda agora e de hora em hora
+const app = criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, dev: !producao, chaveDev: producao ? null : CHAVE_DEV })
 
 app.listen(porta, () => {
   console.log(`contratos-saas em ${baseUrl}/painel`)

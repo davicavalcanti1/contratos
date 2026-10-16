@@ -3,7 +3,7 @@
 SaaS de contratos, multi-tenant e independente: modelos inteligentes, contrato
 gerado a partir dos dados da empresa e assinatura com validade jurídica.
 
-> **Fase atual: 4 — plataforma: painel, organizações, API e webhooks** (ainda sem banco e sem e-mail real).
+> **Fase atual: 5 — contrato vivo: vigência, agenda, reajuste, aditivo e distrato** (ainda sem banco e sem e-mail real).
 > Origem: o módulo de contratos do ExameQR (`exam-qr-system`), generalizado.
 
 ## Rodar
@@ -12,7 +12,7 @@ gerado a partir dos dados da empresa e assinatura com validade jurídica.
 npm install
 npm run build             # compila o painel (React)
 npm start                 # http://localhost:3000/painel  (e-mails de teste em /dev)
-npm test                  # 81 testes: motor, assinatura, lote, plataforma, webhooks, painel, HTTP
+npm test                  # 94 testes: motor, assinatura, lote, plataforma, webhooks, vida, painel, HTTP
 npm run lint:modelos      # linter jurídico em todos os modelos da biblioteca
 npm run exemplos          # gera saida/*.pdf a partir de exemplos/*.json
 ```
@@ -28,7 +28,7 @@ que falta e onde resolver**, em vez de mandar lacuna para assinatura.
 | Caminho | O quê |
 |---|---|
 | `biblioteca/clausulas.json` | cláusulas versionadas, com resumo simples (bula), marca de crítica e base legal |
-| `biblioteca/modelos/` | modelos = blocos de cláusula + regras + variáveis tipadas. `prestacao_servicos` cobre PF, PJ e MEI; `termo_confidencialidade_colaborador` é para a empresa inteira |
+| `biblioteca/modelos/` | modelos = blocos de cláusula + regras + variáveis tipadas. `prestacao_servicos` cobre PF, PJ e MEI; `termo_confidencialidade_colaborador` é para a empresa inteira; `termo_aditivo` e `distrato` nascem de um contrato assinado |
 | `src/motor/tipos.js` | tipos de variável: CPF/CNPJ com dígito, moeda com extenso, data, endereço, enum… |
 | `src/motor/regras.js` | regras declarativas (`eq`, `in`, `gte`, `e`/`ou`/`nao`) |
 | `src/motor/montar.js` | modelo + dados → contrato numerado, com `faltando`/`invalidos` e hash do conteúdo |
@@ -36,6 +36,7 @@ que falta e onde resolver**, em vez de mandar lacuna para assinatura.
 | `src/motor/pdf.js` | PDF com cláusula crítica em destaque (CDC 54 §4º); na via final, QR + código em cada página e página de assinaturas |
 | `src/assinatura/` | serviço de assinatura (código, sessão, bula, selo), trilha encadeada, dossiê em PDF |
 | `src/lote/` | planilha (CSV/XLSX do Excel brasileiro), mapeamento de colunas, prévia, lote e progresso |
+| `src/vida/` | vigência, agenda (avisos e encerramento), índices de reajuste do Banco Central |
 | `src/plataforma/` | organizações, usuários, convites, sessão, chaves de API, planos, auditoria e webhooks |
 | `painel/` | painel em React + Vite (developer e organização), compilado para `public/painel` |
 | `src/servidor/` | HTTP: API da organização, rotas do signatário, verificação pública, `/dev` |
@@ -56,3 +57,4 @@ cláusula, mas **não passou por advogado**. Ver `docs/VALIDADE-JURIDICA.md` §6
 | [docs/ASSINATURA.md](docs/ASSINATURA.md) | Fase 2: fluxo do signatário, selo, dossiê, API, segurança e o que ainda é provisório |
 | [docs/LOTE.md](docs/LOTE.md) | Fase 3: planilha → colunas → conferência → envio, e a empresa assinando tudo de uma vez |
 | [docs/PLATAFORMA.md](docs/PLATAFORMA.md) | Fase 4: papéis, contas, planos, API, webhooks e painel |
+| [docs/VIDA.md](docs/VIDA.md) | Fase 5: vigência, agenda, reajuste pelo índice, aditivo e distrato |

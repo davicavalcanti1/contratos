@@ -332,5 +332,33 @@
     "contratado.tipo",
     "contrato.valor",
     "contrato.data_inicio"
-  ]
+  ],
+  "vida": {
+    "inicio": "contrato.data_inicio",
+    "prazo": {
+      "campo": "contrato.prazo_tipo",
+      "determinado": "determinado"
+    },
+    "duracao_meses": "contrato.duracao_meses",
+    "aviso_previo_dias": "contrato.aviso_previo_dias",
+    "valor": "contrato.valor",
+    "indice": "contrato.indice_reajuste",
+    "reajuste": {
+      "a_cada_meses": 12,
+      "quando": {
+        "ou": [
+          {
+            "campo": "contrato.prazo_tipo",
+            "op": "eq",
+            "valor": "indeterminado"
+          },
+          {
+            "campo": "contrato.duracao_meses",
+            "op": "gte",
+            "valor": 12
+          }
+        ]
+      }
+    }
+  }
 }

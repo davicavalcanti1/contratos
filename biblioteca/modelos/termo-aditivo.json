@@ -1,0 +1,128 @@
+{
+  "chave": "termo_aditivo",
+  "versao": 1,
+  "titulo": "Termo Aditivo ao {{original.titulo}}",
+  "descricao": "Prorroga o prazo, altera o valor ou altera o objeto de um contrato já assinado. Gerado a partir do contrato original.",
+  "derivado": "aditivo",
+  "preambulo": "Pelo presente instrumento, as partes do contrato identificado na cláusula seguinte celebram este Termo Aditivo, que se regerá pelas cláusulas abaixo.",
+  "fecho": "E, por estarem de acordo, as partes assinam este termo eletronicamente, na forma da {{ref:col_assinatura}}, em {{sistema.data_geracao|extenso}}.",
+  "titulo_executivo": false,
+  "categorias_obrigatorias": [
+    "partes",
+    "objeto",
+    "ratificacao",
+    "assinatura_eletronica"
+  ],
+  "variaveis": [
+    {
+      "chave": "original.titulo",
+      "rotulo": "título do contrato original",
+      "tipo": "texto",
+      "origem": "original"
+    },
+    {
+      "chave": "original.codigo",
+      "rotulo": "código de verificação do contrato original",
+      "tipo": "texto",
+      "origem": "original"
+    },
+    {
+      "chave": "original.assinado_em",
+      "rotulo": "data da assinatura do contrato original",
+      "tipo": "data",
+      "origem": "original"
+    },
+    {
+      "chave": "original.qualificacao",
+      "rotulo": "qualificação das partes no contrato original",
+      "tipo": "texto",
+      "origem": "original"
+    },
+    {
+      "chave": "aditivo.vigencia",
+      "rotulo": "a partir de quando as mudanças valem",
+      "tipo": "data",
+      "origem": "manual"
+    },
+    {
+      "chave": "aditivo.prorroga",
+      "rotulo": "prorrogar o prazo",
+      "tipo": "booleano",
+      "origem": "manual",
+      "obrigatoria": false
+    },
+    {
+      "chave": "aditivo.nova_data_fim",
+      "rotulo": "nova data de término",
+      "tipo": "data",
+      "origem": "manual"
+    },
+    {
+      "chave": "aditivo.altera_valor",
+      "rotulo": "alterar o valor",
+      "tipo": "booleano",
+      "origem": "manual",
+      "obrigatoria": false
+    },
+    {
+      "chave": "aditivo.novo_valor",
+      "rotulo": "novo valor",
+      "tipo": "moeda",
+      "origem": "manual"
+    },
+    {
+      "chave": "aditivo.motivo_valor",
+      "rotulo": "motivo da mudança de valor",
+      "tipo": "enum",
+      "origem": "manual",
+      "opcoes": [
+        {
+          "valor": "reajuste_indice",
+          "texto": "reajuste pela variação do índice previsto no contrato"
+        },
+        {
+          "valor": "negociacao",
+          "texto": "acordo entre as partes"
+        }
+      ]
+    },
+    {
+      "chave": "aditivo.indice_texto",
+      "rotulo": "índice aplicado",
+      "tipo": "texto",
+      "origem": "manual",
+      "obrigatoria": false
+    },
+    {
+      "chave": "aditivo.altera_objeto",
+      "rotulo": "alterar o objeto",
+      "tipo": "booleano",
+      "origem": "manual",
+      "obrigatoria": false
+    },
+    {
+      "chave": "aditivo.novo_objeto",
+      "rotulo": "nova descrição dos serviços",
+      "tipo": "texto",
+      "origem": "manual"
+    }
+  ],
+  "blocos": [
+    {
+      "clausula": "derivado_partes",
+      "versao": 1
+    },
+    {
+      "clausula": "ad_alteracoes",
+      "versao": 1
+    },
+    {
+      "clausula": "ad_ratificacao",
+      "versao": 1
+    },
+    {
+      "clausula": "col_assinatura",
+      "versao": 1
+    }
+  ]
+}

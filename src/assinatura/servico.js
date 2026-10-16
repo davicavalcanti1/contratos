@@ -11,10 +11,11 @@
 
 import QRCode from 'qrcode'
 import { acharModelo } from '../biblioteca.js'
-import { montarContrato } from '../motor/montar.js'
+import { aplicarPadroes, montarContrato } from '../motor/montar.js'
 import { gerarPdf } from '../motor/pdf.js'
 import { textoDoModelo } from '../motor/texto-modelo.js'
-import { TIPOS } from '../motor/tipos.js'
+import { TIPOS, lerNumero } from '../motor/tipos.js'
+import { calcularVida, hojeBr, resumoVida } from '../vida/vida.js'
 import { criarTrilha } from './trilha.js'
 import {
   hashOtp, iguais, mascararCpf, mascararEmail, mascararNome, normalizarCodigo,
@@ -76,11 +77,15 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
 
   // ── Organização: gerar, enviar, consultar ─────────────────────────────────
 
-  async function gerar({ organizacaoId, organizacao, modelo: chave, dados, referencia, lote_id }) {
+  async function gerar({ organizacaoId, organizacao, modelo: chave, dados, referencia, lote_id, origem }) {
     const ref = referencia == null ? null : String(referencia).trim().slice(0, 120) || null
     const modelo = acharModelo(biblioteca, chave)
+    if (modelo.derivado && !origem) throw new ErroNegocio(400, `"${modelo.titulo}" é gerado a partir de um contrato assinado, não sozinho.`)
     const r = montarContrato({ modelo, biblioteca: biblioteca.indice, dados: { ...dados, organizacao }, agora: agora() })
     if (!r.ok) throw new ErroNegocio(422, 'O contrato tem lacunas e não pode ser gerado.', { faltando: r.faltando, invalidos: r.invalidos })
+    // A vigência sai dos dados com os padrões do modelo aplicados (aviso prévio
+    // de 30 dias, índice IPCA…), igual ao que foi escrito no texto.
+    const vida = calcularVida(modelo, aplicarPadroes(modelo, dados || {}, agora()))
 
     const { buffer, sha256: pdfSha } = await gerarPdf(r.contrato)
     const c = repo.inserir('contratos', {
@@ -95,6 +100,11 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       // parceiro no ExameQR). Volta em toda consulta e webhook.
       referencia: ref,
       lote_id: lote_id || null,
+      // Os dados preenchidos ficam com o contrato: o aditivo, o distrato e o
+      // reajuste partem deles. Não é dado novo — já está escrito no snapshot.
+      dados: dados || {},
+      vida,
+      origem: origem || null, // { contrato_id, tipo: 'aditivo' | 'distrato' }
       criado_em: agoraIso(),
     })
     const arquivo = repo.salvarArquivo(`${c.id}-original.pdf`, buffer)
@@ -187,8 +197,16 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
 
   function consultar(id, organizacaoId) {
     const c = contratoDaOrg(id, organizacaoId)
+    const original = c.origem ? repo.obter('contratos', c.origem.contrato_id) : null
     return {
       ...resumoContrato(c),
+      vida: resumoVida(c.vida, hojeBr(agora())),
+      dados: c.dados || {},
+      origem: original ? { contrato_id: original.id, tipo: c.origem.tipo, titulo: original.titulo, codigo_verificacao: original.codigo_verificacao } : null,
+      derivados: derivadosDe(c.id).map(d => ({ id: d.id, tipo: d.origem.tipo, titulo: d.titulo, status: d.status, criado_em: d.criado_em, assinado_em: d.assinado_em || null, codigo_verificacao: d.codigo_verificacao || null })),
+      distratado_em: c.distratado_em || null,
+      encerrado_em: c.encerrado_em || null,
+      distrato: c.distrato || null,
       signatarios: signatariosDe(c.id).map(s => ({
         id: s.id, ordem: s.ordem, nome: s.nome, email: s.email, papel: s.papel, status: s.status,
         assinado_em: s.assinado_em || null, recusado_em: s.recusado_em || null, recusa_motivo: s.recusa_motivo || null,
@@ -679,6 +697,103 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     return { assinados: assinados.length, assinado_em: em }
   }
 
+  // ── Contrato vivo: aditivo e distrato ─────────────────────────────────────
+  // São contratos novos, ligados ao original. O original nunca é editado: o
+  // texto assinado é prova. O que muda é a VIGÊNCIA registrada dele (fim,
+  // valor) e o status — e só depois que o aditivo ou distrato for assinado.
+
+  const derivadosDe = (id) => repo.listar('contratos', x => x.origem?.contrato_id === id).sort((a, b) => a.criado_em.localeCompare(b.criado_em))
+
+  async function gerarDerivado(originalId, organizacaoId, organizacao, tipo, campos = {}) {
+    const o = contratoDaOrg(originalId, organizacaoId)
+    if (o.status !== 'assinado') throw new ErroNegocio(409, `Só um contrato assinado e em vigor recebe ${tipo === 'distrato' ? 'distrato' : 'aditivo'} (este está "${o.status}").`)
+    if (!['aditivo', 'distrato'].includes(tipo)) throw new ErroNegocio(400, 'Tipo deve ser aditivo ou distrato.')
+    if (o.distrato) throw new ErroNegocio(409, `Este contrato já tem distrato assinado e termina em ${o.distrato.data_encerramento.split('-').reverse().join('/')}.`)
+    const pendente = derivadosDe(o.id).find(d => EM_ASSINATURA.has(d.status) || d.status === 'gerado')
+    if (pendente) throw new ErroNegocio(409, `Já há um ${pendente.origem.tipo} deste contrato aguardando assinatura. Conclua ou cancele antes de gerar outro.`)
+
+    if (tipo === 'aditivo') {
+      if (!campos.prorroga && !campos.altera_valor && !campos.altera_objeto) throw new ErroNegocio(400, 'Escolha ao menos uma mudança: prazo, valor ou objeto.')
+      if (campos.prorroga && o.vida?.fim && String(campos.nova_data_fim || '') <= o.vida.fim) {
+        throw new ErroNegocio(400, `A nova data de término precisa ser depois do término atual (${o.vida.fim.split('-').reverse().join('/')}).`)
+      }
+    }
+
+    // A qualificação das partes é copiada LITERALMENTE do contrato assinado:
+    // o aditivo não requalifica ninguém, refere-se a quem já assinou.
+    const partes = o.snapshot.clausulas.find(cl => cl.categoria === 'partes')
+    const dados = {
+      original: {
+        titulo: o.titulo,
+        codigo: o.codigo_verificacao,
+        assinado_em: o.assinado_em.slice(0, 10),
+        qualificacao: partes ? partes.paragrafos.map(p => p.texto).join(' ') : '',
+      },
+      [tipo]: campos,
+    }
+    const c = await gerar({
+      organizacaoId, organizacao,
+      modelo: tipo === 'aditivo' ? 'termo_aditivo' : 'distrato',
+      dados, referencia: o.referencia, origem: { contrato_id: o.id, tipo },
+    })
+    // Mesmos signatários do original, todos por e-mail (inclusive quem assinou
+    // o original pelo lote: um aditivo é individual).
+    const vistos = new Set()
+    const signatarios = signatariosDe(o.id)
+      .filter(s => !vistos.has(s.email) && vistos.add(s.email))
+      .map(s => ({ nome: s.nome, email: s.email, cpf: s.cpf, papel: s.papel }))
+    await enviar(c.id, organizacaoId, { signatarios, ordem: o.ordem || 'paralela' })
+    trilha.registrar(o.id, `${tipo}.gerado`, { ator: `organizacao:${organizacaoId}`, dados: { contrato_id: c.id, campos } })
+    return consultar(c.id, organizacaoId)
+  }
+
+  function encerrarPorDistrato(id, distrato) {
+    repo.atualizar('contratos', id, { status: 'distratado', distratado_em: `${distrato.data_encerramento}T23:59:59-03:00`, distrato })
+    trilha.registrar(id, 'contrato.distratado', { dados: distrato })
+    avisar(repo.obter('contratos', id), 'contrato.distratado', { distrato })
+  }
+
+  function aplicarDerivado(d) {
+    const o = repo.obter('contratos', d.origem.contrato_id)
+    if (!o) return
+    const campos = d.dados?.[d.origem.tipo] || {}
+    const ref = { contrato_id: d.id, codigo_verificacao: d.codigo_verificacao, assinado_em: d.assinado_em }
+
+    if (d.origem.tipo === 'distrato') {
+      // O distrato extingue o contrato NA DATA combinada, não na assinatura:
+      // até lá ele vale ("as obrigações seguem sendo cumpridas"). Data futura =
+      // o término passa a ser ela, e a agenda marca "distratado" quando chegar.
+      const fim = String(campos.data_encerramento)
+      const distrato = { ...ref, data_encerramento: fim }
+      trilha.registrar(o.id, 'distrato.assinado', { dados: distrato })
+      if (fim <= hojeBr(agora())) {
+        encerrarPorDistrato(o.id, distrato)
+      } else {
+        const vida = o.vida ? { ...structuredClone(o.vida), fim, prazo: 'determinado', fim_antes_do_distrato: o.vida.fim } : null
+        repo.atualizar('contratos', o.id, { distrato, vida })
+      }
+      return
+    }
+
+    const vida = o.vida ? structuredClone(o.vida) : null
+    const mudancas = []
+    if (vida && campos.prorroga && campos.nova_data_fim) {
+      mudancas.push({ campo: 'fim', de: vida.fim, para: campos.nova_data_fim })
+      vida.fim = String(campos.nova_data_fim)
+      vida.prazo = 'determinado'
+    }
+    if (vida && campos.altera_valor && campos.novo_valor !== undefined) {
+      const novo = lerNumero(campos.novo_valor)
+      mudancas.push({ campo: 'valor', de: vida.valor, para: novo, motivo: campos.motivo_valor || null, indice: campos.indice_texto || null })
+      vida.valor = novo
+    }
+    if (campos.altera_objeto) mudancas.push({ campo: 'objeto', para: campos.novo_objeto })
+    if (vida) vida.historico = [...(vida.historico || []), { ...ref, vigencia: campos.vigencia || null, mudancas }]
+    repo.atualizar('contratos', o.id, { vida, aditivos: [...(o.aditivos || []), { ...ref, mudancas }] })
+    trilha.registrar(o.id, 'contrato.aditado', { dados: { ...ref, mudancas } })
+    avisar(repo.obter('contratos', o.id), 'contrato.aditado', { aditivo: ref, mudancas })
+  }
+
   // ── Selo ──────────────────────────────────────────────────────────────────
 
   async function selar(contratoId) {
@@ -706,6 +821,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     const verif = trilha.verificar(c.id)
     trilha.registrar(c.id, 'documento.selado', { dados: { codigo_verificacao: codigo, pdf_final_sha256: pdfSha, trilha_hash_ate_aqui: verif.hash_final } })
     avisar(repo.obter('contratos', c.id), 'contrato.assinado', { signatarios: signatariosDe(c.id).map(signatarioPublico) })
+    if (c.origem) aplicarDerivado(repo.obter('contratos', c.id))
 
     for (const s of signatariosDe(c.id)) {
       await notificar({
@@ -726,6 +842,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     const c = repo.listar('contratos', x => x.codigo_verificacao === codigo)[0]
     if (!c) return null
     const verif = trilha.verificar(c.id)
+    const original = c.origem ? repo.obter('contratos', c.origem.contrato_id) : null
     return {
       codigo,
       status: c.status,
@@ -734,6 +851,14 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       modelo: c.modelo,
       criado_em: c.criado_em,
       assinado_em: c.assinado_em,
+      // A história do documento: quem tem um contrato impresso na mão precisa
+      // saber se ele foi aditado, distratado ou já acabou.
+      encerrado_em: c.encerrado_em || null,
+      distratado_em: c.distratado_em || null,
+      distrato: c.distrato ? { codigo: c.distrato.codigo_verificacao, assinado_em: c.distrato.assinado_em, data_encerramento: c.distrato.data_encerramento } : null,
+      vigencia: c.vida ? { inicio: c.vida.inicio, fim: c.vida.fim } : null,
+      derivados: derivadosDe(c.id).filter(d => d.status === 'assinado' && d.origem.tipo === 'aditivo').map(d => ({ tipo: d.origem.tipo, codigo: d.codigo_verificacao, assinado_em: d.assinado_em })),
+      origem: original ? { tipo: c.origem.tipo, codigo: original.codigo_verificacao, titulo: original.titulo } : null,
       signatarios: signatariosDe(c.id).map(s => ({
         nome: mascararNome(s.nome), cpf: mascararCpf(s.cpf), papel: PAPEIS[s.papel], assinado_em: s.assinado_em,
       })),
@@ -799,7 +924,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
 
   return {
     config: cfg, trilha,
-    gerar, enviar, reenviar, cancelar, consultar, listarContratos, arquivo, dossie,
+    gerar, enviar, reenviar, cancelar, consultar, listarContratos, arquivo, dossie, gerarDerivado, derivadosDe, encerrarPorDistrato,
     abrir, solicitarCodigo, validarCodigo, conteudo, darCiencia, registrarLeitura, assinar, recusar, arquivoDoSignatario,
     verificar, conferirHash,
     convidarAssinanteLote, abrirLote, solicitarCodigoLote, validarCodigoLote, conteudoLote,
