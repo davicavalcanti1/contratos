@@ -68,6 +68,9 @@ export function lintModelo(modelo, biblioteca) {
     }
 
     if (c.critica && !c.resumo_simples) grave('cláusula crítica sem resumo em linguagem simples — a "bula" exige', onde)
+    // A bula é lida por TODOS os signatários: "você" fala com um lado só e
+    // diz a coisa errada para o outro.
+    if (/\bvoc[eê]s?\b/i.test(c.resumo_simples || '')) aviso('resumo fala com "você" — todos os signatários leem a mesma bula; nomeie a parte ("quem presta o serviço")', onde)
     if (c.resumo_simples) {
       const tamTexto = paragrafosDe(c).reduce((s, p) => s + p.texto.length, 0)
       if (c.resumo_simples.length > tamTexto) aviso('resumo mais longo que o texto da cláusula — resumo deve simplificar', onde)

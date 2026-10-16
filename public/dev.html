@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%231f3a5f%27/%3E%3Crect x=%279%27 y=%2711%27 width=%2714%27 height=%276%27 fill=%27%23ffe98a%27/%3E%3C/svg%3E">
+  <title>Painel de teste</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+  <link rel="stylesheet" href="/estatico/app.css">
+  <script type="module" src="/estatico/dev.js"></script>
+</head>
+<body>
+  <header class="topo">
+    <p class="emissor" id="org">Painel de teste, só existe fora de produção</p>
+    <h1>Gerar, enviar e acompanhar contratos</h1>
+  </header>
+  <main class="conteudo largo">
+    <div class="dev">
+      <div class="coluna">
+        <form class="cartao" id="form-enviar">
+          <h2>Novo contrato</h2>
+          <label class="campo">
+            <span>Dados de exemplo</span>
+            <select id="exemplo"></select>
+            <small>Cada arquivo de <code>exemplos/</code> vira uma opção. O de erros mostra o bloqueio por lacuna.</small>
+          </label>
+          <p><strong>Quem assina</strong></p>
+          <div id="signatarios"></div>
+          <button type="button" class="link-botao" id="add-sig">Adicionar signatário</button>
+          <label class="campo">
+            <span>Ordem</span>
+            <select id="ordem">
+              <option value="paralela">Todos ao mesmo tempo</option>
+              <option value="sequencial">Um de cada vez, na ordem acima</option>
+            </select>
+          </label>
+          <div id="erro-enviar" class="aviso erro" role="alert" hidden></div>
+          <button class="botao largo">Gerar e enviar para assinatura</button>
+        </form>
+
+        <section class="cartao">
+          <h2>Contratos</h2>
+          <table class="tabela">
+            <thead><tr><th>Contrato</th><th>Situação</th><th>Arquivos</th></tr></thead>
+            <tbody id="contratos"></tbody>
+          </table>
+        </section>
+      </div>
+
+      <section class="cartao">
+        <h2>Caixa de saída</h2>
+        <p>O que seria enviado por e-mail. Abra o link de assinatura numa aba anônima (ou no celular) para ver como o signatário vê.</p>
+        <div id="caixa"></div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

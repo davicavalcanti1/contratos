@@ -1,0 +1,90 @@
+// Página do QR. Mostra se o código existe, quem assinou (mascarado) e deixa
+// conferir um PDF pelo hash, calculado no navegador.
+
+import { $, api, dataHora, esc, sha256Arquivo } from './comum.js'
+
+const codigoUrl = decodeURIComponent(location.pathname.match(/^\/v\/(.+)$/)?.[1] || '')
+
+async function verificar(codigo) {
+  const alvo = $('#resultado')
+  alvo.innerHTML = '<p class="aviso info">Consultando…</p>'
+  $('#conferir').hidden = true
+  try {
+    const v = await api(`/api/verificar/${encodeURIComponent(codigo)}`)
+    alvo.innerHTML = selo(v)
+    document.title = `Verificado: ${v.titulo}`
+    $('#conferir').hidden = false
+    $('#conferir').dataset.codigo = v.codigo
+  } catch (e) {
+    alvo.innerHTML = `
+      <div class="cartao selo invalido">
+        <div class="estado"><div class="carimbo" aria-hidden="true">✕</div>
+          <div><h2>Código não encontrado</h2><p>Nenhum contrato assinado tem o código <strong>${esc(codigo)}</strong>.</p></div></div>
+        <p>Confira se digitou igual ao rodapé do documento. Se o código estiver certo e mesmo assim não aparecer, desconfie do documento.</p>
+      </div>`
+    $('#form-busca').hidden = false
+  }
+}
+
+function selo(v) {
+  const integro = v.status === 'assinado' && v.integridade.trilha_integra
+  const sig = v.signatarios.map(s => `<dt>${esc(s.papel)}</dt><dd>${esc(s.nome)}${s.cpf ? `, CPF ${esc(s.cpf)}` : ''}<br><small>assinou em ${esc(dataHora(s.assinado_em))}</small></dd>`).join('')
+  return `
+    <div class="cartao selo${integro ? '' : ' invalido'}">
+      <div class="estado">
+        <div class="carimbo" aria-hidden="true">${integro ? '✓' : '!'}</div>
+        <div>
+          <h2>${integro ? 'Contrato autêntico' : 'Atenção: registro com problema'}</h2>
+          <p class="codigo-grande">${esc(v.codigo)}</p>
+        </div>
+      </div>
+      ${integro ? '' : '<p class="aviso erro">O histórico deste contrato não confere. Não confie no documento antes de falar com quem o emitiu.</p>'}
+      <dl class="dados">
+        <dt>Documento</dt><dd>${esc(v.titulo)}</dd>
+        <dt>Emitido por</dt><dd>${esc(v.organizacao)}</dd>
+        <dt>Concluído em</dt><dd>${esc(dataHora(v.assinado_em))}</dd>
+        ${sig}
+      </dl>
+      <details>
+        <summary>Códigos de integridade</summary>
+        <p class="hash">Conteúdo: ${esc(v.integridade.conteudo_sha256)}<br>
+        PDF assinado: ${esc(v.integridade.pdf_final_sha256)}<br>
+        PDF original: ${esc(v.integridade.pdf_original_sha256)}<br>
+        Histórico: ${v.integridade.eventos} eventos encadeados, ${v.integridade.trilha_integra ? 'íntegro' : 'com quebra'}</p>
+      </details>
+      <p class="nota-bula">Nomes e documentos aparecem incompletos para proteger os dados das pessoas. O texto do contrato só fica com quem assinou.</p>
+    </div>`
+}
+
+async function conferirArquivo(arquivo) {
+  const saida = $('#resultado-arquivo')
+  if (!arquivo) return
+  $('#soltar-texto').textContent = arquivo.name
+  saida.innerHTML = '<p class="aviso info">Calculando…</p>'
+  try {
+    const sha256 = await sha256Arquivo(arquivo)
+    const { confere } = await api(`/api/verificar/${encodeURIComponent($('#conferir').dataset.codigo)}/conferir`, { metodo: 'POST', corpo: { sha256 } })
+    saida.innerHTML = {
+      final: '<p class="aviso ok">Idêntico à via assinada. Nenhum byte foi alterado.</p>',
+      original: '<p class="aviso ok">Idêntico ao texto que foi enviado para assinatura (a via antes das assinaturas).</p>',
+    }[confere] || '<p class="aviso erro">Este arquivo NÃO é igual ao contrato registrado. Pode ter sido alterado, ou é outro documento.</p>'
+  } catch (e) {
+    saida.innerHTML = `<p class="aviso erro">${esc(e.message)}</p>`
+  }
+}
+
+$('#form-busca').addEventListener('submit', e => {
+  e.preventDefault()
+  const c = $('#codigo').value.trim()
+  history.replaceState(null, '', `/v/${encodeURIComponent(c)}`)
+  $('#form-busca').hidden = true
+  verificar(c)
+})
+$('#arquivo').addEventListener('change', e => conferirArquivo(e.target.files[0]))
+const zona = $('#soltar')
+zona.addEventListener('dragover', e => { e.preventDefault(); zona.classList.add('sobre') })
+zona.addEventListener('dragleave', () => zona.classList.remove('sobre'))
+zona.addEventListener('drop', e => { e.preventDefault(); zona.classList.remove('sobre'); conferirArquivo(e.dataTransfer.files[0]) })
+
+if (codigoUrl) verificar(codigoUrl)
+else $('#form-busca').hidden = false

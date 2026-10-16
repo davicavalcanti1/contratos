@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%231f3a5f%27/%3E%3Crect x=%279%27 y=%2711%27 width=%2714%27 height=%276%27 fill=%27%23ffe98a%27/%3E%3C/svg%3E">
+  <title>Assinar contrato</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap">
+  <link rel="stylesheet" href="/estatico/app.css">
+  <script type="module" src="/estatico/assinar.js"></script>
+</head>
+<body>
+  <header class="topo">
+    <p class="emissor" id="emissor">Carregando…</p>
+    <h1 id="titulo"></h1>
+  </header>
+
+  <main class="conteudo">
+    <ol class="etapas" id="etapas" hidden>
+      <li data-etapa="identificar">Identificação</li>
+      <li data-etapa="ler">Leitura</li>
+      <li data-etapa="assinar">Assinatura</li>
+    </ol>
+
+    <div id="erro-geral" class="aviso erro" role="alert" hidden></div>
+
+    <!-- 1. Identificação por código -->
+    <section id="tela-identificar" class="estreito" hidden>
+      <div class="cartao">
+        <h2 id="saudacao"></h2>
+        <p id="explica-identificar"></p>
+        <div id="pedir-codigo">
+          <button class="botao largo" id="btn-pedir">Enviar código</button>
+        </div>
+        <form id="form-codigo" hidden>
+          <label class="campo">
+            <span>Código de 6 dígitos</span>
+            <input id="codigo" class="codigo-otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required>
+            <small id="codigo-destino"></small>
+          </label>
+          <div id="erro-codigo" class="aviso erro" role="alert" hidden></div>
+          <button class="botao largo" type="submit">Confirmar código</button>
+          <button class="link-botao" type="button" id="btn-reenviar">Enviar outro código</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 2. Leitura com bula -->
+    <section id="tela-ler" hidden>
+      <article class="documento" id="documento" aria-label="Texto do contrato"></article>
+      <p class="nota-bula">Os trechos destacados em amarelo explicam cada cláusula em palavras simples. Eles ajudam a entender, mas o que vale é o texto completo do contrato.</p>
+      <div class="fim-leitura" id="fim-leitura"></div>
+    </section>
+
+    <!-- 3. Assinar -->
+    <section id="tela-assinar" class="estreito" hidden>
+      <div class="cartao">
+        <h2>Assinar o contrato</h2>
+        <ul class="resumo-assinatura" id="resumo-assinatura"></ul>
+        <form id="form-assinar">
+          <label class="campo">
+            <span>Digite seu nome completo</span>
+            <input id="nome" autocomplete="name" required>
+            <small id="nome-dica"></small>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="concordo" required>
+            <span>Li o contrato inteiro, entendi as cláusulas em destaque e concordo com ele.</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="geo">
+            <span>Registrar minha localização junto da assinatura (opcional).</span>
+          </label>
+          <div id="erro-assinar" class="aviso erro" role="alert" hidden></div>
+          <button class="botao largo" type="submit" id="btn-assinar">Assinar contrato</button>
+        </form>
+        <div class="acoes-secundarias">
+          <button class="link-botao" id="btn-voltar-ler" type="button">Voltar ao texto</button>
+          <button class="link-botao" id="btn-abrir-recusa" type="button">Não quero assinar</button>
+        </div>
+        <form id="form-recusar" hidden>
+          <label class="campo">
+            <span>Por que você está recusando?</span>
+            <textarea id="motivo" required minlength="3"></textarea>
+            <small>Quem enviou o contrato vai ver este motivo.</small>
+          </label>
+          <div id="erro-recusar" class="aviso erro" role="alert" hidden></div>
+          <button class="botao perigo largo" type="submit">Recusar contrato</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Fim -->
+    <section id="tela-fim" class="estreito" hidden>
+      <div class="cartao" id="fim"></div>
+    </section>
+  </main>
+
+  <nav class="barra" id="barra" hidden aria-label="Progresso da leitura">
+    <div class="dentro">
+      <div>
+        <div class="progresso" id="progresso" aria-live="polite"></div>
+        <div class="trilho" aria-hidden="true"><i id="trilho"></i></div>
+      </div>
+      <button class="botao" id="btn-ir-assinar" disabled>Ir para assinatura</button>
+    </div>
+  </nav>
+</body>
+</html>

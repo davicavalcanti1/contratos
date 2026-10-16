@@ -1,0 +1,207 @@
+/* Tokens. A barra marinho é a MESMA do PDF: "cláusula em destaque" tem uma
+   só aparência em todo lugar. O marca-texto é a bula. */
+:root {
+  --papel: #eef1ec;
+  --folha: #ffffff;
+  --tinta: #1c2321;
+  --tinta-2: #4a5552;
+  --tinta-3: #7a8582;
+  --linha: #d5dbd6;
+  --marinho: #1f3a5f;
+  --marinho-claro: #e3e9f1;
+  --marca: #ffe98a;
+  --ok: #2e7d4f;
+  --ok-claro: #e2f1e8;
+  --erro: #a3271f;
+  --erro-claro: #fbe7e5;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --raio: 10px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --papel: #141917; --folha: #1c2220; --tinta: #e7ece9; --tinta-2: #b4bdb9; --tinta-3: #87918d;
+    --linha: #2f3734; --marinho: #8fb0dc; --marinho-claro: #22303f; --marca: #6b5a12;
+    --ok: #6cc596; --ok-claro: #193326; --erro: #f08a80; --erro-claro: #3a1d1a;
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--papel); color: var(--tinta);
+  font: 17px/1.5 var(--sans);
+}
+a { color: var(--marinho); }
+:focus-visible { outline: 3px solid var(--marinho); outline-offset: 2px; border-radius: 4px; }
+[hidden] { display: none !important; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ── Estrutura ─────────────────────────────────────────────────────────── */
+.topo {
+  background: var(--folha); border-bottom: 1px solid var(--linha);
+  padding: 14px 16px;
+}
+.topo .emissor { font-size: 14px; color: var(--tinta-2); margin: 0; }
+.topo h1 { font: 600 19px/1.3 var(--serif); margin: 2px 0 0; }
+.conteudo { max-width: 1040px; margin: 0 auto; padding: 20px 16px 140px; }
+.estreito { max-width: 520px; margin: 0 auto; }
+
+/* Etapas: é uma sequência de verdade, então é numerada. */
+.etapas { display: flex; gap: 6px; list-style: none; margin: 0 0 22px; padding: 0; counter-reset: e; }
+.etapas li {
+  counter-increment: e; flex: 1; font-size: 13px; color: var(--tinta-3);
+  border-top: 3px solid var(--linha); padding-top: 6px;
+}
+.etapas li::before { content: counter(e) ". "; }
+.etapas li[aria-current="step"] { color: var(--tinta); border-color: var(--marinho); font-weight: 700; }
+.etapas li.feita { color: var(--ok); border-color: var(--ok); }
+
+/* ── Controles ─────────────────────────────────────────────────────────── */
+.botao {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 0 22px; border-radius: var(--raio);
+  border: 0; background: var(--marinho); color: #fff;
+  font: 700 16px var(--sans); cursor: pointer; text-decoration: none;
+}
+.botao:disabled { opacity: .45; cursor: not-allowed; }
+.botao.secundario { background: transparent; color: var(--marinho); border: 1.5px solid currentColor; }
+.botao.perigo { background: var(--erro); }
+.botao.largo { width: 100%; }
+.link-botao { background: none; border: 0; padding: 8px 0; color: var(--tinta-2); font: inherit; text-decoration: underline; cursor: pointer; }
+.campo { display: block; margin: 0 0 16px; }
+.campo span { display: block; font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+.campo input, .campo textarea, .campo select {
+  width: 100%; min-height: 48px; padding: 10px 12px; font: inherit; color: var(--tinta);
+  background: var(--folha); border: 1.5px solid var(--linha); border-radius: 8px;
+}
+.campo textarea { min-height: 96px; resize: vertical; }
+.campo small { display: block; color: var(--tinta-3); font-size: 14px; margin-top: 4px; }
+.codigo-otp { font: 700 30px/1 var(--sans) !important; letter-spacing: .35em; text-align: center; }
+.check { display: flex; gap: 12px; align-items: flex-start; margin: 0 0 16px; cursor: pointer; }
+.check input { width: 22px; height: 22px; margin-top: 2px; flex: none; accent-color: var(--marinho); }
+
+.aviso { border-radius: 8px; padding: 12px 14px; margin: 0 0 16px; font-size: 15px; }
+.aviso.erro { background: var(--erro-claro); color: var(--erro); }
+.aviso.ok { background: var(--ok-claro); color: var(--ok); }
+.aviso.info { background: var(--marinho-claro); color: var(--marinho); }
+
+.cartao { background: var(--folha); border: 1px solid var(--linha); border-radius: 14px; padding: 22px 20px; }
+.cartao h2 { font: 600 22px/1.25 var(--serif); margin: 0 0 8px; }
+.cartao p { margin: 0 0 16px; color: var(--tinta-2); }
+
+/* ── Contrato com bula ─────────────────────────────────────────────────── */
+.documento { background: var(--folha); border: 1px solid var(--linha); border-radius: 14px; padding: 8px 18px 20px; }
+.documento .preambulo, .documento .fecho { font: 16px/1.65 var(--serif); color: var(--tinta-2); margin: 16px 0; }
+
+.clausula { padding: 18px 0; border-bottom: 1px solid var(--linha); }
+.clausula:last-of-type { border-bottom: 0; }
+.clausula h3 { font: 700 15px/1.35 var(--sans); margin: 0 0 8px; color: var(--tinta); }
+.clausula h3 .num { color: var(--tinta-3); font-weight: 400; margin-right: 6px; }
+.texto-juridico p { font: 16px/1.68 var(--serif); margin: 0 0 10px; hyphens: auto; }
+.texto-juridico p .pnum { color: var(--tinta-3); font-variant-numeric: tabular-nums; margin-right: 4px; }
+
+/* A bula: resumo em linguagem simples, como trecho passado a marca-texto. */
+.bula { margin: 6px 0 0; font: 16px/1.5 var(--sans); }
+.bula .rotulo { display: block; font-size: 13px; color: var(--tinta-2); margin-bottom: 4px; }
+.bula mark {
+  background: linear-gradient(transparent 8%, var(--marca) 8%, var(--marca) 92%, transparent 92%);
+  color: var(--tinta); padding: 0 2px; -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+
+/* Cláusula em destaque: a mesma barra do PDF. */
+.clausula.critica { border-left: 4px solid var(--marinho); padding-left: 14px; margin-left: -18px; }
+.clausula.critica .texto-juridico p { font-weight: 600; }
+.ciencia { margin-top: 14px; }
+.ciencia .botao { min-height: 44px; font-size: 15px; }
+.ciente { display: inline-flex; align-items: center; gap: 8px; color: var(--ok); font-weight: 700; font-size: 15px; }
+.ciente::before {
+  content: ""; width: 20px; height: 20px; border-radius: 50%; background: var(--ok);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0a10 10 0 100 20 10 10 0 000-20zm-1.5 14.2L4.3 10l1.4-1.4 2.8 2.8 5.8-5.8 1.4 1.4-7.2 7.2z'/%3E%3C/svg%3E") center/contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0a10 10 0 100 20 10 10 0 000-20zm-1.5 14.2L4.3 10l1.4-1.4 2.8 2.8 5.8-5.8 1.4 1.4-7.2 7.2z'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+.ciente-anima { animation: ciente .35s ease-out; }
+@keyframes ciente { from { transform: scale(.85); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.nota-bula { font-size: 14px; color: var(--tinta-3); margin: 14px 0 0; }
+.fim-leitura { height: 1px; }
+
+/* Desktop: o resumo vira nota de margem, ao lado do texto que ele explica. */
+@media (min-width: 900px) {
+  .documento { padding: 12px 36px 28px; }
+  .clausula { display: grid; grid-template-columns: minmax(0, 1fr) 280px; column-gap: 36px; }
+  .clausula h3, .clausula .texto-juridico { grid-column: 1; }
+  .clausula .bula { grid-column: 2; grid-row: 1 / span 3; align-self: start; margin-top: 30px; padding-left: 16px; border-left: 1px dashed var(--linha); }
+  .clausula .ciencia { grid-column: 1; }
+  .clausula.critica { margin-left: -36px; padding-left: 32px; }
+}
+
+/* Barra de progresso fixa embaixo: quantos destaques faltam. */
+.barra {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+  background: var(--folha); border-top: 1px solid var(--linha);
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+}
+.barra .dentro { max-width: 1040px; margin: 0 auto; display: flex; gap: 14px; align-items: center; justify-content: space-between; }
+.barra .progresso { font-size: 15px; color: var(--tinta-2); }
+.barra .progresso strong { color: var(--tinta); }
+.barra .trilho { height: 5px; background: var(--linha); border-radius: 3px; margin-top: 6px; overflow: hidden; width: 160px; }
+.barra .trilho i { display: block; height: 100%; background: var(--ok); width: 0; transition: width .3s; }
+
+/* ── Assinatura ────────────────────────────────────────────────────────── */
+.resumo-assinatura { list-style: none; padding: 0; margin: 0 0 20px; }
+.resumo-assinatura li { padding: 10px 0; border-bottom: 1px solid var(--linha); display: flex; justify-content: space-between; gap: 12px; font-size: 15px; }
+.resumo-assinatura li span:last-child { color: var(--tinta-2); text-align: right; }
+
+/* ── Selo (verificação) ────────────────────────────────────────────────── */
+.selo { text-align: left; }
+.selo .estado { display: flex; gap: 16px; align-items: center; margin-bottom: 18px; }
+.selo .carimbo {
+  flex: none; width: 64px; height: 64px; border-radius: 50%;
+  border: 3px double var(--ok); color: var(--ok);
+  display: grid; place-items: center; font: 700 26px var(--serif); transform: rotate(-8deg);
+}
+.selo.invalido .carimbo { border-color: var(--erro); color: var(--erro); }
+.selo h2 { margin: 0; }
+.codigo-grande { font: 700 22px var(--sans); letter-spacing: .08em; }
+.dados { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0 0 18px; font-size: 15px; }
+.dados dt { color: var(--tinta-3); }
+.dados dd { margin: 0; overflow-wrap: anywhere; }
+.hash { font-size: 13px; color: var(--tinta-2); overflow-wrap: anywhere; }
+.soltar {
+  border: 2px dashed var(--linha); border-radius: 12px; padding: 22px 16px; text-align: center;
+  color: var(--tinta-2); cursor: pointer; display: block;
+}
+.soltar.sobre { border-color: var(--marinho); background: var(--marinho-claro); }
+.soltar input { display: none; }
+
+/* ── Painel de teste (/dev) ────────────────────────────────────────────── */
+.dev { display: grid; gap: 18px; }
+@media (min-width: 1000px) { .dev { grid-template-columns: 1fr 1fr; align-items: start; } }
+.dev .cartao h2 { font: 700 18px var(--sans); }
+.tabela { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tabela td, .tabela th { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--linha); vertical-align: top; }
+.tabela th { color: var(--tinta-3); font-weight: 400; }
+.status { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 13px; background: var(--marinho-claro); color: var(--marinho); }
+.status.assinado { background: var(--ok-claro); color: var(--ok); }
+.status.recusado, .status.cancelado, .status.expirado { background: var(--erro-claro); color: var(--erro); }
+.msg { border-bottom: 1px solid var(--linha); padding: 10px 0; font-size: 14px; }
+.msg .assunto { font-weight: 700; }
+.msg pre { white-space: pre-wrap; font: 13px/1.45 var(--sans); color: var(--tinta-2); margin: 6px 0 0; }
+.signatario-linha { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.acoes { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* Ações secundárias da tela de assinatura: uma por linha, alvo de toque grande. */
+.acoes-secundarias { display: flex; flex-direction: column; align-items: flex-start; margin-top: 8px; }
+.acoes-secundarias .link-botao { padding: 10px 0; }
+
+/* Painel: usa a largura toda no desktop (a tela de assinatura fica estreita
+   de propósito, por causa da leitura). */
+.conteudo.largo { max-width: none; padding-left: 24px; padding-right: 24px; }
+.dev .coluna { display: grid; gap: 18px; }
