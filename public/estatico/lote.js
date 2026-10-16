@@ -108,10 +108,10 @@ function desenharModelo() {
     const cond = [c.condicao && `Só quando ${c.condicao}`, parcial && `entra em ${c.contratos} de ${total} contratos`].filter(Boolean).join(', ')
     partes.push(`
       <section class="clausula${c.critica ? ' critica' : ''}" data-chave="${esc(c.chave)}">
+        ${c.critica || cond ? `<p class="cl-num">${c.critica ? '<span class="destaque">Em destaque</span>' : ''}${cond ? `<span class="condicao">${esc(cond)}</span>` : ''}</p>` : ''}
         <h3>${esc(c.titulo)}</h3>
-        ${cond ? `<p class="condicao">${esc(cond)}</p>` : ''}
-        <div class="texto-juridico">${c.paragrafos.map(p => `<p>${p.condicao ? `<span class="condicao">Só quando ${esc(p.condicao)}:</span> ` : ''}${comCampos(p.texto)}</p>`).join('')}</div>
         ${c.resumo ? `<p class="bula"><span class="rotulo">Em palavras simples</span><mark>${comCampos(c.resumo)}</mark></p>` : ''}
+        <div class="texto-juridico">${c.resumo ? '<p class="rotulo">Texto do modelo</p>' : ''}${c.paragrafos.map(p => `<p>${p.condicao ? `<span class="condicao">Só quando ${esc(p.condicao)}:</span> ` : ''}${comCampos(p.texto)}</p>`).join('')}</div>
         ${c.critica ? `<div class="ciencia">${botao(c)}</div>` : ''}
       </section>`)
   }
@@ -158,11 +158,13 @@ function progresso() {
   const crit = estado.clausulas.filter(c => c.critica)
   const feitas = crit.filter(c => c.ciente_em).length
   let t
-  if (feitas < crit.length) t = `<strong>${feitas} de ${crit.length}</strong> cláusulas em destaque confirmadas`
+  if (feitas < crit.length) t = `<strong>${feitas} de ${crit.length}</strong> destaques confirmados`
   else if (!leituraEnviada) t = 'Role até o fim da tabela de contratos'
   else t = `<strong>Tudo lido.</strong> Pode assinar ${plural(estado.pendentes, 'contrato', 'contratos')}.`
   $('#progresso').innerHTML = t
-  $('#trilho').style.width = `${crit.length ? (feitas / crit.length) * 100 : 100}%`
+  const trilho = $('#trilho')
+  trilho.innerHTML = crit.map(c => `<i${c.ciente_em ? ' class="feito"' : ''}></i>`).join('') || '<i class="feito"></i>'
+  trilho.classList.toggle('completo', feitas === crit.length && leituraEnviada)
   $('#btn-ir-assinar').disabled = !(feitas === crit.length && leituraEnviada)
 }
 

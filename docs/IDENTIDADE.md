@@ -9,8 +9,8 @@ linguagem simples, e o PDF fica com a fé pública. O produto ainda não tem nom
 
 | | |
 |---|---|
-| Da **bula** | títulos em caixa-alta condensada (Archivo, `font-stretch: 72%`); marca-texto amarelo `#FFDF3D` sobre o resumo; texto técnico logo abaixo, completo; seções do site como perguntas ("Para que serve?", "Contraindicações") |
-| Da **linguagem simples** | o resumo vem **primeiro** e grande (Lexend 19px); fundo lavanda `#F4F3FA`, ação violeta `#5B3FD1`, ok em menta `#D4F4E6`; botões em pílula; progresso em segmentos, um por cláusula em destaque |
+| Da **bula** | títulos em caixa-alta condensada (Archivo, `font-stretch: 72%`); marca-texto amarelo `#FFE04A` sobre o resumo; texto técnico logo abaixo, completo; seções do site como perguntas ("Para que serve?", "Contraindicações") |
+| Da **linguagem simples** | o resumo vem **primeiro** e grande (Lexend 19px); cores claras: fundo branco-gelo `#F5F8FA`, ação azul-céu `#1F6AA5` (fundo claro `#E2F0FB`), ok em menta `#DAF5E7`. Sem roxo (pedido do Davi, 16/out); botões em pílula; progresso em segmentos, um por cláusula em destaque |
 | Texto do contrato | Source Serif 4. Nunca escondido: a leitura até o fim é prova |
 | Códigos e hashes | IBM Plex Mono, a mesma fonte do PDF |
 

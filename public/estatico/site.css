@@ -80,7 +80,7 @@
 
 /* Contraindicações: a parte honesta da bula, em fundo amarelo. */
 .contra { background: var(--marca); color: var(--marca-tinta); border-top-color: var(--marca-tinta); padding-left: 20px; padding-right: 20px; border-radius: 0 0 var(--raio-cartao) var(--raio-cartao); margin-bottom: 56px; }
-.contra .lista-bula li { border-bottom-color: rgba(31, 27, 58, .25); font-size: 18px; }
+.contra .lista-bula li { border-bottom-color: rgba(27, 38, 51, .25); font-size: 18px; }
 .contra .lista-bula li::before { background: var(--marca-tinta); box-shadow: none; }
 @media (min-width: 900px) { .contra { padding-left: 32px; padding-right: 32px; } .contra .lista-bula { max-width: 46em; } }
 
@@ -90,3 +90,7 @@
 
 .site-rodape { display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: center; border-top: 1px solid var(--linha); padding-top: 22px; padding-bottom: 40px; font-size: 14px; color: var(--tinta-3); }
 .site-rodape span { font: 800 18px var(--bula); font-stretch: 72%; text-transform: uppercase; color: var(--tinta); margin-right: auto; }
+
+/* O campo do código e o botão com a mesma altura. */
+.conferir-form .codigo-otp { font-size: 22px !important; min-height: 54px; }
+.conferir-form .botao { min-height: 54px; }

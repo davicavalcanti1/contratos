@@ -47,7 +47,7 @@ const ESTADO = {
 
 function selo(v) {
   const integro = ['assinado', 'encerrado', 'distratado'].includes(v.status) && v.integridade.trilha_integra
-  const sig = v.signatarios.map(s => `<dt>${esc(s.papel)}</dt><dd>${esc(s.nome)}${s.cpf ? `, CPF ${esc(s.cpf)}` : ''}<br><small>assinou ${s.com_certificado ? 'com certificado ICP-Brasil ' : ''}em ${esc(dataHora(s.assinado_em))}</small></dd>`).join('')
+  const sig = v.signatarios.map(s => `<dt>${esc(s.papel)}</dt><dd>${esc(s.nome)}${s.cpf ? `, <span class="sem-quebra">CPF ${esc(s.cpf)}</span>` : ''}<br><small>assinou ${s.com_certificado ? 'com certificado ICP-Brasil ' : ''}em ${esc(dataHora(s.assinado_em))}</small></dd>`).join('')
   return `
     <div class="cartao selo${integro ? '' : ' invalido'}">
       <div class="estado">

@@ -2,23 +2,24 @@
    - Da bula vêm os títulos em caixa-alta condensada (Archivo), o marca-texto
      amarelo sobre o que importa e o texto técnico logo abaixo, completo.
    - Da linguagem simples vem a hierarquia: o resumo é grande e vem primeiro,
-     em Lexend (fonte desenhada para fluência de leitura), sobre lavanda.
+     em Lexend (fonte desenhada para fluência de leitura), em cores claras:
+     branco-gelo, azul-céu e menta.
    Os PDFs têm outra cara, de documento oficial (src/motor/estilo-pdf.js);
    o código de verificação usa a mesma fonte de máquina nos dois. */
 :root {
-  --papel: #f4f3fa;
+  --papel: #f5f8fa;
   --folha: #ffffff;
-  --tinta: #1f1b3a;
-  --tinta-2: #55516f;
-  --tinta-3: #7c7896;
-  --linha: #e2e0ef;
-  --acao: #5b3fd1;
-  --acao-forte: #4a30b8;
-  --acao-claro: #ece8fc;
-  --marca: #ffdf3d;
-  --marca-tinta: #1f1b3a;
-  --ok: #0f6b48;
-  --ok-claro: #d4f4e6;
+  --tinta: #1b2633;
+  --tinta-2: #4f5b68;
+  --tinta-3: #77828e;
+  --linha: #e0e7ed;
+  --acao: #1f6aa5;
+  --acao-forte: #17578a;
+  --acao-claro: #e2f0fb;
+  --marca: #ffe04a;
+  --marca-tinta: #1b2633;
+  --ok: #17734a;
+  --ok-claro: #daf5e7;
   --erro: #b3261e;
   --erro-claro: #fbe7e5;
   --sans: "Lexend", "Segoe UI", system-ui, sans-serif;
@@ -31,15 +32,15 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --papel: #13112a; --folha: #1c1938; --tinta: #ecebf8; --tinta-2: #b8b4d4; --tinta-3: #8a86a8;
-    --linha: #302c52; --acao: #a796ff; --acao-forte: #c2b6ff; --acao-claro: #2a2452;
+    --papel: #11171e; --folha: #19212b; --tinta: #e9eef3; --tinta-2: #b3bec9; --tinta-3: #85919d;
+    --linha: #2b3642; --acao: #7cc0f5; --acao-forte: #a6d5fa; --acao-claro: #1c3346;
     --ok: #74d9a8; --ok-claro: #163a2b; --erro: #f28b82; --erro-claro: #3b1c1a;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --papel: #13112a; --folha: #1c1938; --tinta: #ecebf8; --tinta-2: #b8b4d4; --tinta-3: #8a86a8;
-  --linha: #302c52; --acao: #a796ff; --acao-forte: #c2b6ff; --acao-claro: #2a2452;
+  --papel: #11171e; --folha: #19212b; --tinta: #e9eef3; --tinta-2: #b3bec9; --tinta-3: #85919d;
+  --linha: #2b3642; --acao: #7cc0f5; --acao-forte: #a6d5fa; --acao-claro: #1c3346;
   --ok: #74d9a8; --ok-claro: #163a2b; --erro: #f28b82; --erro-claro: #3b1c1a;
   color-scheme: dark;
 }
@@ -89,8 +90,8 @@ code, .codigo { font-family: var(--mono); }
 }
 .botao:hover:not(:disabled) { background: var(--acao-forte); }
 /* No escuro a ação é lilás claro: o texto do botão cheio passa a ser escuro. */
-:root[data-theme="dark"] .botao:not(.secundario) { color: #13112a; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .botao:not(.secundario) { color: #13112a; } }
+:root[data-theme="dark"] .botao:not(.secundario) { color: #11171e; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .botao:not(.secundario) { color: #11171e; } }
 .botao:disabled { opacity: .45; cursor: not-allowed; }
 .botao.secundario { background: transparent; color: var(--acao); box-shadow: inset 0 0 0 1.5px currentColor; }
 .botao.secundario:hover:not(:disabled) { background: var(--acao-claro); }
@@ -118,8 +119,11 @@ code, .codigo { font-family: var(--mono); }
 .cartao { background: var(--folha); border-radius: var(--raio-cartao); padding: 24px 20px; }
 .cartao h2 { font: 600 22px/1.25 var(--sans); letter-spacing: -.01em; margin: 0 0 8px; text-wrap: balance; }
 .cartao p { margin: 0 0 16px; color: var(--tinta-2); }
-.cartao + .cartao, #resultado:not(:empty) + .cartao { margin-top: 16px; }
-.cartao details { margin: 0 0 12px; }
+.estreito > .cartao + .cartao, #resultado:not(:empty) + .cartao { margin-top: 16px; }
+.cartao details { margin: 4px 0 16px; }
+.cartao details summary { cursor: pointer; font-weight: 600; padding: 4px 0; }
+.cartao details[open] summary { margin-bottom: 6px; }
+.sem-quebra { white-space: nowrap; }
 
 /* ── Contrato com bula ─────────────────────────────────────────────────── */
 /* Cada cláusula é uma folha: título de bula, o resumo grande primeiro, e o
@@ -184,7 +188,13 @@ code, .codigo { font-family: var(--mono); }
 }
 .barra .dentro { max-width: 1040px; margin: 0 auto; display: flex; gap: 14px; align-items: center; justify-content: space-between; }
 .barra .progresso { font-size: 14px; color: var(--tinta-2); }
+.barra .dentro > div { min-width: 0; }
 .barra .botao { white-space: nowrap; padding: 0 20px; flex: none; }
+@media (max-width: 420px) {
+  .barra .progresso { font-size: 13px; }
+  .barra .trilho { width: 120px; }
+  .barra .botao { min-height: 46px; padding: 0 16px; font-size: 15px; }
+}
 .barra .progresso strong { color: var(--tinta); }
 .barra .trilho { display: flex; gap: 4px; margin-top: 8px; width: 170px; }
 .barra .trilho i { flex: 1; height: 6px; border-radius: 3px; background: var(--linha); transition: background-color .3s; }
@@ -194,7 +204,8 @@ code, .codigo { font-family: var(--mono); }
 /* ── Assinatura ────────────────────────────────────────────────────────── */
 .resumo-assinatura { list-style: none; padding: 0; margin: 0 0 20px; }
 .resumo-assinatura li { padding: 10px 0; border-bottom: 1px solid var(--linha); display: flex; justify-content: space-between; gap: 12px; font-size: 15px; }
-.resumo-assinatura li span:last-child { color: var(--tinta-2); text-align: right; }
+.resumo-assinatura li span:first-child { color: var(--tinta-2); white-space: nowrap; }
+.resumo-assinatura li span:last-child { text-align: right; min-width: 0; }
 
 /* ── Selo (verificação) ────────────────────────────────────────────────── */
 /* A roseta é a mesma do PDF: quem chega pelo QR reconhece o documento. */
@@ -223,7 +234,7 @@ code, .codigo { font-family: var(--mono); }
 .dev .cartao h2 { font: 600 18px var(--sans); }
 .tabela { width: 100%; border-collapse: collapse; font-size: 14px; }
 .tabela td, .tabela th { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--linha); vertical-align: top; }
-.tabela th { color: var(--tinta-3); font-weight: 400; font-size: 13px; }
+.tabela th { color: var(--tinta-3); font-weight: 400; font-size: 13px; white-space: nowrap; }
 .status { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 13px; font-weight: 500; white-space: nowrap; background: var(--acao-claro); color: var(--acao-forte); }
 .status.assinado { background: var(--ok-claro); color: var(--ok); }
 .status.recusado, .status.cancelado, .status.expirado { background: var(--erro-claro); color: var(--erro); }
@@ -249,7 +260,7 @@ code, .codigo { font-family: var(--mono); }
 /* ── Lote ──────────────────────────────────────────────────────────────── */
 /* Campo do modelo: o que muda de contrato para contrato. Sublinhado
    pontilhado, como lacuna de formulário preenchida a lápis. */
-.var { font-family: var(--sans); font-size: .88em; color: var(--acao-forte); border-bottom: 1.5px dotted var(--acao); padding: 0 1px; white-space: nowrap; }
+.var { font-family: var(--sans); font-size: .88em; color: var(--acao-forte); border-bottom: 1.5px dotted var(--acao); padding: 0 1px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .condicao { font: 500 13px var(--sans); color: var(--acao-forte); background: var(--acao-claro); border-radius: 999px; padding: 1px 9px; }
 p.condicao { display: inline-block; margin: 0 0 8px; }
 .tabela-lote { margin-top: 18px; }
@@ -289,3 +300,7 @@ p.condicao { display: inline-block; margin: 0 0 8px; }
 .passos-icp li { margin-bottom: 18px; }
 .passos-icp li > strong { display: block; margin-bottom: 8px; }
 .passos-icp small { display: block; color: var(--tinta-2); font-size: 15px; }
+
+/* O último elemento do cartão não soma margem ao respiro de baixo. */
+.cartao > :last-child { margin-bottom: 0; }
+.selo .historia { list-style: none; padding: 0; }
