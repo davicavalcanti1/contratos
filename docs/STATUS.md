@@ -1,6 +1,6 @@
 # Status do projeto
 
-> Atualizado em 17/out/2026, de manhã. Este arquivo é o ponto de retomada:
+> Atualizado em 17/out/2026, fim do dia. Este arquivo é o ponto de retomada:
 > o que está pronto, o que foi decidido e o que vem a seguir.
 
 ## Onde estamos
@@ -20,10 +20,38 @@ página por página**, com foco em funcionalidade e design, nesta ordem:
 | 7 | Lotes, lote e assinatura em lote | ✅ pronto | `a1cf1fb` |
 | 8 | Agenda | ✅ pronto | `62f2835` |
 | 9 | Empresa, usuários, chaves e webhooks | ✅ pronto | `51ed8ee` |
-| 10 | Plataforma: organizações, saúde, auditoria | ✅ pronto | este commit |
-| 11 | `/dev` | ⏭ próxima | |
+| 10 | Plataforma: organizações, saúde, auditoria | ✅ pronto | `68a4ca5` |
+| 11 | Plataforma: biblioteca (modelos e cláusulas no banco) | ✅ pronto | `735ed7c` |
+| 12 | `/dev` | ⏭ depois (issue #10) | |
 
-116 testes passando (`npm test`).
+123 testes passando (`npm test`).
+
+### Leitura de prontidão (17/out, fim do dia)
+
+**Protótipo funcional completo, pré-piloto.** Tudo que o produto promete
+funciona de ponta a ponta na máquina local; ninguém de fora consegue usar
+ainda. Dá para levar à IMAGO **como demonstração no notebook** agora mesmo
+(e colher as respostas da issue #1). **Não** dá para assinar contrato de
+verdade lá ainda.
+
+| Item | Hoje | Bloqueia o piloto? |
+|---|---|---|
+| E-mail para o signatário | só caixa interna (`/dev`) | Sim (#5) |
+| Hospedagem e domínio | localhost | Sim (#6) |
+| Modo produção testado fora da máquina | não | Sim (#6) |
+| Modelo médico PJ | só o genérico | Sim (#2, depende de #1) |
+| Revisão por advogado | nenhuma | Sim (#11) |
+| Termo de uso e privacidade | não existe | Sim (#12) |
+| Carimbo do tempo e raízes ICP | configuráveis, desligados | Não |
+| Cobrança e planos | não existe | Não (piloto gratuito) |
+
+Trabalho técnico para fechar os "sim": uma a duas semanas. O jurídico depende
+de achar o advogado responsável. O que pode andar sem o Davi: transporte
+Resend (#5) e modo produção (#6), deixando tudo pronto para ligar as chaves.
+
+Validade: a assinatura é eletrônica avançada (Lei 14.063/2020 e MP 2.200-2),
+válida para contrato privado entre as partes. Para o contrato PJ da clínica
+basta; não precisa de certificado ICP-Brasil do médico.
 
 ## Decisões de design (16/out/2026)
 
@@ -72,7 +100,9 @@ página por página**, com foco em funcionalidade e design, nesta ordem:
 > As pendências viraram **issues no GitHub** em 17/out (ver `gh issue list`):
 > #1 averiguação na IMAGO (ponto de partida), #2-#4 kit saúde v1, #5 e-mail
 > Resend, #6 hospedagem/domínio/produção, #7 piloto, #8 nome, #9 consentimento
-> (segunda onda), #10 página /dev. O que está abaixo é o contexto.
+> (segunda onda), #10 página /dev, #11 papéis revisor/aprovador com OAB no
+> dossiê, #12 termo de uso e privacidade. O que está abaixo é o contexto.
+> A equipe (quem faz o quê, por fase) está em [ATUACAO.md](ATUACAO.md), seção 9.
 
 - **Nome do produto.** "Contratos" é provisório. Sugestões levantadas: Ciente
   (recomendada), Bulla, Clausa, Nítido. Davi pediu para pensar depois. Onde

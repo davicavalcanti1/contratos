@@ -191,7 +191,52 @@ entendendo o que assinou. Tudo isso a partir da planilha que o seu RH já tem."
 - Um médico ou gestor de clínica para ler o modelo v1 antes do advogado.
 - Nomes de 2 ou 3 clínicas da rede do ExameQR para o piloto gratuito.
 
-## 8. Decisões pedidas ao Davi
+## 8. Equipe: quem faz o quê, por fase
+
+Decidido em 17/out: começar com poucos modelos válidos e crescer a biblioteca
+com uma **equipe de revisores** (estagiários e recém-formados em direito), para
+tirar esse peso do Davi e gerar trabalho. Uma restrição muda o desenho: no
+Brasil, quem **aprova** modelo de contrato para terceiros precisa ser
+**advogado inscrito na OAB**. Estagiário redige e revisa; o carimbo final é do
+advogado responsável técnico, cujo nome e OAB entram no dossiê de cada modelo
+(issue #11). Sem isso é exercício irregular da advocacia e ninguém responde se
+um modelo falhar.
+
+**Fase 0, até o piloto na IMAGO**
+
+- Davi: produto, desenvolvimento e vendas.
+- Advogado(a) responsável técnico, PJ, poucas horas por semana. Perfil
+  trabalhista com experiência em saúde. Aprova e publica.
+- Contador externo: para a empresa do Davi e para dúvidas de enquadramento
+  PJ/MEI que aparecem nos modelos.
+
+**Fase 1, depois do piloto**
+
+- Dois ou três revisores de direito (estágio pela Lei 11.788 ou PJ, contrato
+  feito no próprio sistema). Redigem rascunhos, escrevem a bula, rodam o
+  linter. Não publicam.
+- Uma pessoa de implantação e suporte com perfil administrativo de clínica
+  (não de tecnologia): sabe como o RH da clínica funciona e é quem atende.
+
+**Fase 2, com clientes pagando**
+
+- Redator de linguagem simples (a bula é o produto); pode nascer de um revisor.
+- Encarregado de dados LGPD (obrigatório, crítico em saúde); pode ser o
+  advogado ou serviço externo.
+- Teste de segurança externo anual.
+- Vendas por parceria: contador e consultor de convênios, que já entram nas
+  clínicas.
+
+**Mais à frente**, o Davi enxerga uma empresa virtual com rede de empregados,
+setor de vendas e administrativo. O sistema já tem a base (papéis, convites,
+trilha, biblioteca central); o que não existe no código é o lado
+administrativo: cobrança, planos, notas.
+
+**O que isso pede do sistema:** papéis `revisor` e `aprovador` com OAB
+registrado na publicação (#11) e termo de uso dizendo que o modelo é ponto de
+partida, não consultoria para o caso concreto (#12).
+
+## 9. Decisões pedidas ao Davi
 
 - Confirmar o recorte: PMEs que contratam PJ/colaboradores, começando por saúde.
 - Nome do produto, para domínio e e-mail.
