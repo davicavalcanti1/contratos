@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
+  <meta name="description" content="Confira se um contrato é autêntico pelo código de verificação do rodapé, e compare o PDF que você recebeu com o original, sem enviar o arquivo.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%279%27 fill=%27%231f6aa5%27/%3E%3Crect x=%277%27 y=%2713%27 width=%2718%27 height=%277%27 rx=%271%27 fill=%27%23ffe04a%27/%3E%3C/svg%3E">
   <title>Verificar contrato</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,33 +13,59 @@
   <link rel="stylesheet" href="/estatico/app.css">
   <script type="module" src="/estatico/verificar.js"></script>
 </head>
-<body>
+<body class="verificacao">
   <header class="topo">
-    <p class="emissor">Verificação de autenticidade</p>
-    <h1>Este contrato é verdadeiro?</h1>
+    <div class="dentro">
+      <div>
+        <p class="emissor">Verificação pública de autenticidade</p>
+        <h1 id="titulo-pagina">Este contrato é verdadeiro?</h1>
+      </div>
+      <p class="topo-acoes"><a class="marca-link" href="/"><span class="marca-icone" aria-hidden="true"></span>Contratos</a></p>
+    </div>
   </header>
-  <main class="conteudo estreito">
-    <form id="form-busca" class="cartao" hidden>
+
+  <main class="conteudo verificar">
+    <!-- Busca pelo código -->
+    <form id="form-busca" class="cartao busca-codigo" hidden>
       <h2>Digite o código de verificação</h2>
-      <p>Ele aparece no rodapé de cada página do contrato assinado, ao lado do QR.</p>
+      <p>Ele está no rodapé de cada página do contrato assinado, ao lado do QR. Ou aponte a câmera do celular para o QR: ele traz você direto para cá.</p>
       <label class="campo">
         <span class="sr">Código de verificação</span>
-        <input id="codigo" class="codigo-otp" autocomplete="off" autocapitalize="characters" placeholder="XXXX-XXXX-XXXX" required>
+        <input id="codigo" class="codigo-otp" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX" maxlength="14" required>
       </label>
       <button class="botao largo">Verificar</button>
     </form>
 
-    <div id="resultado"></div>
+    <div id="resultado" class="resultado"></div>
 
-    <section id="conferir" class="cartao" hidden>
-      <h2>Confira o arquivo que você recebeu</h2>
-      <p>Escolha o PDF. Ele é comparado aqui no seu navegador, sem ser enviado para lugar nenhum: só o código de integridade dele sai do seu aparelho.</p>
-      <label class="soltar" id="soltar">
-        <input type="file" id="arquivo" accept="application/pdf">
-        <span id="soltar-texto">Escolha ou arraste o PDF aqui</span>
-      </label>
-      <div id="resultado-arquivo" role="status"></div>
-    </section>
+    <div class="colunas-selo" id="colunas" hidden>
+      <!-- Conferir o arquivo -->
+      <section id="conferir" class="cartao">
+        <h2>Confira o arquivo que você recebeu</h2>
+        <p>Escolha o PDF. Ele é comparado aqui, no seu navegador, sem ser enviado para lugar nenhum: só o código de integridade dele sai do seu aparelho.</p>
+        <label class="soltar" id="soltar">
+          <input type="file" id="arquivo" accept="application/pdf">
+          <span id="soltar-texto">Escolha ou arraste o PDF aqui</span>
+        </label>
+        <div id="resultado-arquivo" role="status"></div>
+      </section>
+
+      <!-- O que o selo garante -->
+      <section class="cartao garantias">
+        <h2>O que este selo garante</h2>
+        <ul class="lista-garantias">
+          <li><b>Que o documento existe e foi assinado por todos</b>, com data e hora de cada assinatura.</li>
+          <li><b>Que o PDF não mudou:</b> o código de integridade (SHA-256) da via assinada fica registrado. Um byte diferente, e a conferência falha.</li>
+          <li><b>Que o histórico é íntegro:</b> cada evento carrega o hash do anterior; mexer em um quebra a corrente.</li>
+          <li id="garantia-carimbo" hidden><b>Que ele existia naquela data:</b> um carimbo do tempo de terceiro foi aplicado sobre o PDF assinado.</li>
+        </ul>
+        <p class="nota-bula">O selo não mostra o texto do contrato: ele fica só com quem assinou. Nomes e documentos aparecem incompletos para proteger as pessoas.</p>
+      </section>
+    </div>
   </main>
+
+  <footer class="rodape-publico">
+    <p>Recebeu um link suspeito? Digite você mesmo o código em <strong id="endereco-site"></strong> em vez de clicar no link. <a href="/#validade">Saiba como a verificação funciona</a>.</p>
+  </footer>
 </body>
 </html>
