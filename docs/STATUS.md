@@ -18,9 +18,9 @@ página por página**, com foco em funcionalidade e design, nesta ordem:
 | 5 | Tela pública de assinatura (`assinar.html`) | ✅ pronto | `ec2041b` |
 | 6 | Selo de verificação (`verificar.html`) | ✅ pronto | `385b536` |
 | 7 | Lotes, lote e assinatura em lote | ✅ pronto | `a1cf1fb` |
-| 8 | Agenda | ✅ pronto | este commit |
-| 9 | Empresa, usuários, chaves e webhooks | ⏭ próxima | |
-| 10 | Plataforma: organizações, saúde, auditoria | | |
+| 8 | Agenda | ✅ pronto | `62f2835` |
+| 9 | Empresa, usuários, chaves e webhooks | ✅ pronto | este commit |
+| 10 | Plataforma: organizações, saúde, auditoria | ⏭ próxima | |
 | 11 | `/dev` | | |
 
 116 testes passando (`npm test`).

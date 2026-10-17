@@ -575,3 +575,69 @@ button.numero:hover { border-color: var(--acao); }
 .lista-encerrados li > div:first-child { display: grid; gap: 1px; min-width: 0; }
 .lista-encerrados a { text-decoration: none; font-weight: 600; color: var(--tinta); }
 .lista-encerrados small { color: var(--tinta-3); font-size: 13px; }
+
+/* ── Administração: empresa, usuários, chaves, webhooks ──────────────── */
+.form-rodape { padding: 16px 0 14px; border-top: 1px solid var(--borda); }
+.form-rodape .aviso { margin-bottom: 12px; }
+.previa-qualificacao { font: 14.5px/1.65 var(--serif); color: var(--tinta-2); margin: 0 0 10px; }
+.previa-qualificacao strong { color: var(--tinta); font-family: var(--sans); font-size: 13px; }
+.dados-conta { margin-top: 14px; }
+.cartao > .nota + .dados-lista { margin-top: 14px; }
+
+.pessoa.pendente .avatar { background: var(--superficie); color: var(--tinta-3); border: 1.5px dashed var(--borda); }
+.pessoa.inativo { opacity: .7; }
+.pessoa.inativo .avatar { background: var(--superficie); color: var(--tinta-3); }
+.select-papel { min-height: 34px; padding: 4px 28px 4px 10px; font: 500 13.5px var(--sans); border: 1px solid var(--borda); border-radius: 999px; background: var(--folha); color: var(--tinta); }
+.confirmar { font-size: 13px; color: var(--tinta-2); display: inline-flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; justify-content: flex-end; }
+.confirmar .link-botao { padding: 0; font-size: 13px; }
+.detalhes-inativos summary { cursor: pointer; font-weight: 600; font-size: 14.5px; color: var(--tinta-2); }
+.detalhes-inativos[open] summary { margin-bottom: 8px; }
+.opcoes-papel { display: grid; gap: 8px; }
+.opcoes-papel legend { margin-bottom: 8px; }
+.opcao-cartao { display: grid; grid-template-columns: 18px 1fr; gap: 12px; align-items: start; padding: 10px 14px; border: 1px solid var(--borda); border-radius: 12px; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.opcao-cartao:hover { border-color: var(--acao); }
+.opcao-cartao.marcada { border-color: var(--acao); box-shadow: inset 0 0 0 1px var(--acao); }
+.opcao-cartao input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--acao); }
+.opcao-cartao span { display: grid; gap: 1px; font-size: 14px; }
+.opcao-cartao strong { font-weight: 600; }
+.opcao-cartao small { color: var(--tinta-3); font-size: 13px; }
+.cartao form .botao.largo, form.cartao .botao.largo { margin-top: 8px; }
+
+.lista-chaves, .lista-webhooks, .lista-entregas { list-style: none; margin: 0; padding: 0; }
+.lista-chaves li, .lista-webhooks li, .lista-entregas li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 14px; align-items: start; padding: 12px 0; border-top: 1px solid var(--borda); }
+.lista-chaves li:first-child, .lista-webhooks li:first-child, .lista-entregas li:first-child { border-top: 0; padding-top: 4px; }
+.lista-chaves li.inativo, .lista-webhooks li.inativo { opacity: .65; }
+.chave-texto, .webhook-texto, .entrega-texto { display: grid; gap: 2px; min-width: 0; font-size: 13.5px; color: var(--tinta-3); }
+.chave-texto strong, .webhook-texto strong, .entrega-texto strong { font-size: 14.5px; color: var(--tinta); font-weight: 600; }
+.chave-texto code { font-size: 12.5px; color: var(--tinta-2); }
+.webhook-texto .url { overflow-wrap: anywhere; }
+.eventos-pilulas { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.eventos-pilulas code { font-size: 11.5px; padding: 2px 8px; border-radius: 999px; background: var(--superficie); border: 1px solid var(--borda); color: var(--tinta-2); }
+.entrega-resposta { font-family: var(--mono); font-size: 12px; overflow-wrap: anywhere; }
+.pessoa-estado .acoes-linha { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: flex-end; }
+.pessoa-estado .acoes-linha .link-botao { margin: 0; }
+.codigo-exemplo { background: var(--superficie); border: 1px solid var(--borda); border-radius: 12px; padding: 14px; overflow-x: auto; font: 12.5px/1.55 var(--mono); margin: 0 0 14px; color: var(--tinta); }
+.cartao .passos-inicio.compacto { grid-template-columns: 1fr; gap: 10px; }
+.cartao .passos-inicio.compacto li { border: 0; padding: 0; display: grid; grid-template-columns: 26px 1fr; gap: 2px 12px; font-size: 14px; }
+.cartao .passos-inicio.compacto li::before { grid-row: 1 / span 2; margin: 0; width: 26px; height: 26px; font-size: 12.5px; }
+.cartao .passos-inicio.compacto li code { font-size: 12.5px; }
+.grupo-eventos { display: grid; gap: 6px; margin-bottom: 8px; }
+.grupo-eventos-titulo { margin: 4px 0 2px; font: 600 12px/1 var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--tinta-3); }
+.compacto-check { margin: 0; align-items: center; font-size: 14px; }
+.compacto-check input { width: 18px; height: 18px; margin: 0; }
+.compacto-check span { display: grid; gap: 0; }
+.compacto-check small code { font-size: 11.5px; color: var(--tinta-3); }
+@media (max-width: 560px) {
+  .lista-chaves li, .lista-webhooks li, .lista-entregas li { grid-template-columns: 1fr; }
+  .lista-chaves .pessoa-estado, .lista-webhooks .pessoa-estado, .lista-entregas .pessoa-estado { justify-items: start; text-align: left; }
+  .pessoa-estado .acoes-linha, .confirmar { justify-content: flex-start; }
+}
+
+/* O bloco de código nunca alarga a coluna: rola dentro do cartão. */
+.duas-colunas .coluna, .duas-colunas > .cartao, .duas-colunas > form { min-width: 0; }
+.codigo-exemplo { max-width: 100%; white-space: pre; }
+.cartao { min-width: 0; }
+
+/* Dica do campo e grupo de opções não colam. */
+.cartao form .campos + .opcoes-papel, form.cartao .campos + .opcoes-papel { margin-top: 14px; }
+.cartao .botao.largo + .nota, form.cartao .botao.largo + .nota { margin-top: 12px; }
