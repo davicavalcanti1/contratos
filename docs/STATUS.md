@@ -17,9 +17,9 @@ página por página**, com foco em funcionalidade e design, nesta ordem:
 | 4 | Detalhe do contrato | ✅ pronto | `cabd125` |
 | 5 | Tela pública de assinatura (`assinar.html`) | ✅ pronto | `ec2041b` |
 | 6 | Selo de verificação (`verificar.html`) | ✅ pronto | `385b536` |
-| 7 | Lotes, lote e assinatura em lote | ✅ pronto | este commit |
-| 8 | Agenda | ⏭ próxima | |
-| 9 | Empresa, usuários, chaves e webhooks | | |
+| 7 | Lotes, lote e assinatura em lote | ✅ pronto | `a1cf1fb` |
+| 8 | Agenda | ✅ pronto | este commit |
+| 9 | Empresa, usuários, chaves e webhooks | ⏭ próxima | |
 | 10 | Plataforma: organizações, saúde, auditoria | | |
 | 11 | `/dev` | | |
 
@@ -68,7 +68,10 @@ página por página**, com foco em funcionalidade e design, nesta ordem:
   servidor; não está no repo nem em nota). Testado de ponta a ponta: registros
   e PDFs chegam, o servidor reinicia e recarrega tudo, a chave anon não lê
   nada. Vale para uma instância; com mais de uma, converter os serviços para
-  ler do Postgres a cada pedido.
+  ler do Postgres a cada pedido. Os arquivos de teste do bucket foram apagados
+  em 17/out; os ~100 registros de teste da tabela ficaram (o conector não pôde
+  apagar em massa): limpar com `delete from public.registros;` no SQL Editor
+  antes de usar de verdade.
 - E-mail real ainda não existe (tudo cai na caixa do `/dev`).
 - Biblioteca de cláusulas sem revisão de advogado; raízes ICP-Brasil com
   impressões digitais a conferir antes de produção; ZapSign adiado.

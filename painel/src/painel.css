@@ -539,3 +539,39 @@ mark.lacuna { background: var(--marca); color: var(--marca-tinta); border-radius
 .resumo-envio-lista.horizontal li { font-size: 13px; }
 .barra-acao-botoes { display: flex; align-items: center; gap: 16px; margin-left: auto; }
 .barra-acao-botoes .link-botao { padding: 0; font-size: 14px; }
+
+/* ── Agenda ──────────────────────────────────────────────────────────── */
+.pagina-topo .chips { margin: 0; }
+@media (min-width: 701px) { .agenda-numeros { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 720px; } }
+button.numero { font: inherit; text-align: left; cursor: pointer; }
+button.numero:hover { border-color: var(--acao); }
+.numero.ativo { border-color: var(--acao); box-shadow: inset 0 0 0 1px var(--acao); }
+.agenda-mes + .agenda-mes { margin-top: 10px; }
+.agenda-mes h3 { margin: 10px 0 4px; font: 600 12.5px var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--tinta-3); }
+.agenda-itens { list-style: none; margin: 0; padding: 0; }
+.agenda-itens li { display: grid; grid-template-columns: 58px minmax(0, 1fr) auto; gap: 4px 14px; align-items: center; padding: 12px 0; border-top: 1px solid var(--borda); }
+.agenda-itens li:first-child { border-top: 0; }
+.agenda-itens time { display: grid; justify-items: center; gap: 2px; padding: 6px 0; border-radius: 10px; background: var(--superficie); }
+.agenda-itens time b { font: 600 20px/1 var(--sans); color: var(--tinta); }
+.agenda-itens time span { font-size: 11px; color: var(--tinta-3); white-space: nowrap; }
+.agenda-itens li.urgente time { background: var(--erro-claro); }
+.agenda-itens li.urgente time b, .agenda-itens li.urgente time span { color: var(--erro); }
+.agenda-texto { display: grid; gap: 2px; min-width: 0; font-size: 14.5px; }
+.agenda-texto .status { justify-self: start; }
+.agenda-texto a { font-weight: 600; text-decoration: none; color: var(--tinta); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.agenda-texto a:hover { text-decoration: underline; }
+.agenda-texto small { color: var(--tinta-3); font-size: 13px; }
+.agenda-acao { display: grid; justify-items: end; gap: 4px; text-align: right; }
+.agenda-acao small { color: var(--tinta-3); font-size: 13px; }
+.agenda-acao .botao { text-decoration: none; }
+@media (max-width: 560px) { .agenda-itens li { grid-template-columns: 58px minmax(0, 1fr); } .agenda-acao { grid-column: 2; justify-items: start; text-align: left; } }
+.lista-avisos { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 10px; font-size: 14px; color: var(--tinta-2); }
+.lista-avisos li { padding-left: 22px; position: relative; }
+.lista-avisos li::before { content: ""; position: absolute; left: 0; top: 7px; width: 8px; height: 8px; border-radius: 50%; background: var(--acao); }
+.lista-avisos b { color: var(--tinta); font-weight: 600; }
+.lista-encerrados { list-style: none; margin: 0; padding: 0; }
+.lista-encerrados li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--borda); font-size: 14.5px; }
+.lista-encerrados li:first-child { border-top: 0; }
+.lista-encerrados li > div:first-child { display: grid; gap: 1px; min-width: 0; }
+.lista-encerrados a { text-decoration: none; font-weight: 600; color: var(--tinta); }
+.lista-encerrados small { color: var(--tinta-3); font-size: 13px; }

@@ -144,7 +144,7 @@ export function VisaoGeral() {
                         <time dateTime={x.data}>{data(x.data)}</time>
                         <div>
                           <Link to={`/contratos/${x.id}`}>{x.titulo}</Link>
-                          <span>{x.tipo === 'vencimento' ? `vence em ${plural(x.dias, 'dia', 'dias')}` : `reajuste pelo ${x.indice}`}{x.partes?.length ? ` · ${x.partes.join(', ')}` : ''}</span>
+                          <span>{x.tipo === 'vencimento' ? `vence em ${plural(x.dias, 'dia', 'dias')}` : `reajuste pelo ${x.indice}`}{x.partes ? ` · ${x.partes}` : ''}</span>
                         </div>
                       </li>
                     ))}
