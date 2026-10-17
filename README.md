@@ -69,6 +69,7 @@ cláusula, mas **não passou por advogado**. Ver `docs/VALIDADE-JURIDICA.md` §6
 |---|---|
 | [docs/STATUS.md](docs/STATUS.md) | **Onde paramos**: telas refeitas, decisões, pendências e como retomar |
 | [docs/VISION.md](docs/VISION.md) | Que dor resolve, para quem e o que fica de fora |
+| [docs/ATUACAO.md](docs/ATUACAO.md) | Para quem vender, com que oferta e por que canal; o que falta no produto para isso |
 | [docs/DIFERENCIAIS.md](docs/DIFERENCIAIS.md) | O que faz ele não ser "mais um DocuSign". **Decisões em aberto** |
 | [docs/ARQUITETURA.md](docs/ARQUITETURA.md) | Hierarquia, papéis, serviços internos, API e integrações |
 | [docs/DOMINIO.md](docs/DOMINIO.md) | Entidades, motor de modelos, ciclo de vida do contrato |
