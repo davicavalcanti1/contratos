@@ -17,6 +17,7 @@ const TELAS = ['identificar', 'ler', 'assinar', 'fim']
 function ir(tela) {
   for (const t of TELAS) $(`#tela-${t}`).hidden = t !== tela
   $('#barra').hidden = tela !== 'ler'
+  $('#topo-acoes').hidden = tela !== 'ler'
   $('#etapas').hidden = tela === 'fim'
   const idx = TELAS.indexOf(tela)
   for (const li of $('#etapas').children) {
@@ -31,6 +32,7 @@ function ir(tela) {
 // «rótulo» vira um campo visível: é o que muda de contrato para contrato.
 const comCampos = (t) => esc(t).replace(/«([^»]+)»/g, '<span class="var">$1</span>')
 const plural = (n, s, p) => `${n} ${n === 1 ? s : p}`
+const cap = (s) => String(s ?? '').replace(/^./, c => c.toUpperCase())
 
 async function iniciar() {
   let info
@@ -38,7 +40,7 @@ async function iniciar() {
     $('#emissor').textContent = 'Assinatura em lote'
     return fim('Este link não funciona', e.message)
   }
-  $('#emissor').textContent = `${info.organizacao}, ${info.lote}`
+  $('#emissor').textContent = `${info.organizacao} · ${info.lote}`
   $('#titulo').textContent = info.modelo
   document.title = `Assinar em lote: ${info.lote}`
   if (sessao) {
@@ -47,8 +49,9 @@ async function iniciar() {
   }
   $('#saudacao').textContent = `Olá, ${info.assinante.nome.split(' ')[0]}`
   $('#explica').textContent = info.pendentes
-    ? `${plural(info.pendentes, 'contrato aguarda', 'contratos aguardam')} a assinatura da empresa. Você lê o modelo uma vez, confere os dados de cada pessoa e assina todos juntos. Antes, vamos confirmar que é você com um código enviado para ${info.assinante.email}.`
+    ? `${plural(info.pendentes, 'contrato aguarda', 'contratos aguardam')} a assinatura da empresa. Você assina todos de uma vez, em poucos minutos:`
     : `Não há contrato pendente da assinatura da empresa neste lote. Confirme o código enviado para ${info.assinante.email} para ver a situação de cada um.`
+  $('#passos-assinatura').hidden = !info.pendentes
   ir('identificar')
 }
 
@@ -125,20 +128,30 @@ function botao(c) {
 }
 
 const SIT = { assinado: 'assinou', identificado: 'está lendo', notificado: 'ainda não abriu', recusado: 'recusou', aguardando: 'aguardando' }
+const PILULA = { assinado: 'assinado', recusado: 'recusado' }
 function desenharTabela() {
   const pend = estado.contratos.filter(c => ['enviado', 'parcialmente_assinado'].includes(c.contrato_status) && c.assinatura_empresa !== 'assinado')
   $('#titulo-tabela').textContent = `Os ${plural(estado.contratos.length, 'contrato', 'contratos')} deste lote`
+  $('#nota-tabela').textContent = pend.length === estado.contratos.length ? 'Você vai assinar todos agora.' : `Você vai assinar ${plural(pend.length, 'deles agora', 'deles agora')}; os outros já estão assinados pela empresa ou não estão mais em assinatura.`
   const cols = estado.colunas || []
+  const situacaoEmpresa = (c) => c.assinatura_empresa === 'assinado' ? '<span class="status assinado">Já assinada</span>' : pend.includes(c) ? '<span class="status enviado">Vai assinar agora</span>' : `<span class="status ${esc(PILULA[c.contrato_status] || 'encerrado')}">${esc(cap(c.contrato_status))}</span>`
   $('#tabela').innerHTML = `
-    <thead><tr><th>Linha</th>${cols.map(c => `<th>${esc(c)}</th>`).join('')}<th>A pessoa</th><th>Empresa</th></tr></thead>
+    <thead><tr><th>Linha</th>${cols.map(c => `<th>${esc(cap(c))}</th>`).join('')}<th>A pessoa</th><th>Empresa</th></tr></thead>
     <tbody>${estado.contratos.map(c => `
       <tr${pend.includes(c) ? '' : ' class="fora"'}>
-        <td>${c.linha}</td>
+        <td><small>${c.linha}</small></td>
         ${cols.map(col => `<td>${esc(c.resumo.find(r => r.rotulo === col)?.valor || '')}</td>`).join('')}
-        <td>${c.outros.map(o => esc(SIT[o.status] || o.status)).join(', ')}</td>
-        <td>${c.assinatura_empresa === 'assinado' ? 'já assinada' : pend.includes(c) ? 'vai assinar agora' : esc(c.contrato_status)}</td>
+        <td>${c.outros.map(o => esc(cap(SIT[o.status] || o.status))).join(', ')}</td>
+        <td>${situacaoEmpresa(c)}</td>
       </tr>`).join('')}
     </tbody>`
+  // No celular, a mesma tabela em cartões.
+  $('#lista-lote').innerHTML = estado.contratos.map(c => `
+    <li${pend.includes(c) ? '' : ' class="fora"'}>
+      <div class="lote-m-topo"><strong>${esc(c.resumo[0]?.valor || `Linha ${c.linha}`)}</strong>${situacaoEmpresa(c)}</div>
+      <span>linha ${c.linha}${c.resumo.slice(1).map(r => ` · ${esc(r.valor)}`).join('')}</span>
+      <span>a pessoa: ${c.outros.map(o => esc(SIT[o.status] || o.status)).join(', ')}</span>
+    </li>`).join('')
 }
 
 async function ciencia(b) {
@@ -157,15 +170,20 @@ async function ciencia(b) {
 function progresso() {
   const crit = estado.clausulas.filter(c => c.critica)
   const feitas = crit.filter(c => c.ciente_em).length
+  const pronto = feitas === crit.length && leituraEnviada
   let t
   if (feitas < crit.length) t = `<strong>${feitas} de ${crit.length}</strong> destaques confirmados`
   else if (!leituraEnviada) t = 'Role até o fim da tabela de contratos'
   else t = `<strong>Tudo lido.</strong> Pode assinar ${plural(estado.pendentes, 'contrato', 'contratos')}.`
   $('#progresso').innerHTML = t
   const trilho = $('#trilho')
-  trilho.innerHTML = crit.map(c => `<i${c.ciente_em ? ' class="feito"' : ''}></i>`).join('') || '<i class="feito"></i>'
-  trilho.classList.toggle('completo', feitas === crit.length && leituraEnviada)
-  $('#btn-ir-assinar').disabled = !(feitas === crit.length && leituraEnviada)
+  trilho.innerHTML = crit.map(c => `<i data-ir="${esc(c.chave)}" title="${esc(c.titulo)}"${c.ciente_em ? ' class="feito"' : ''}></i>`).join('') || '<i class="feito"></i>'
+  trilho.classList.toggle('completo', pronto)
+  const btn = $('#btn-ir-assinar')
+  const proximo = crit.find(c => !c.ciente_em)
+  if (pronto) { btn.textContent = `Assinar ${plural(estado.pendentes, 'contrato', 'contratos')}`; btn.disabled = false; btn.dataset.acao = 'assinar' }
+  else if (proximo) { btn.textContent = 'Próximo destaque'; btn.disabled = false; btn.dataset.acao = proximo.chave }
+  else { btn.textContent = 'Ir até a tabela'; btn.disabled = false; btn.dataset.acao = 'fim' }
 }
 
 let obs
@@ -238,16 +256,19 @@ async function assinar(ev) {
 }
 
 function telaFim(acabouDeAssinar) {
-  const faltamPessoas = estado.contratos.filter(c => c.outros.some(o => o.status !== 'assinado') && ['enviado', 'parcialmente_assinado'].includes(c.contrato_status)).length
+  const emAssinatura = estado.contratos.filter(c => ['enviado', 'parcialmente_assinado'].includes(c.contrato_status))
+  const faltamPessoas = emAssinatura.filter(c => c.outros.some(o => o.status !== 'assinado')).length
+  const concluidos = estado.contratos.filter(c => c.contrato_status === 'assinado').length
   const titulo = acabouDeAssinar ? `${plural(acabouDeAssinar, 'contrato assinado', 'contratos assinados')} pela empresa` : 'Nada pendente da empresa neste lote'
   const texto = faltamPessoas
-    ? `${plural(faltamPessoas, 'pessoa ainda não assinou', 'pessoas ainda não assinaram')}. Cada contrato é selado quando a pessoa assina, e quem enviou o lote acompanha o andamento.`
+    ? `${plural(faltamPessoas, 'pessoa ainda não assinou', 'pessoas ainda não assinaram')} o próprio contrato. Cada um é selado quando a pessoa assina, e quem enviou o lote acompanha o andamento.`
     : 'Todos os contratos deste lote estão concluídos.'
-  fim(titulo, texto)
+  fim(titulo, texto, `<ul class="fim-lote"><li><b>${concluidos}</b> ${concluidos === 1 ? 'contrato concluído' : 'contratos concluídos'} por todos</li><li><b>${faltamPessoas}</b> ${faltamPessoas === 1 ? 'aguarda a pessoa' : 'aguardam a pessoa'}</li></ul>`)
 }
 
-function fim(t, x) {
-  $('#fim').innerHTML = `<h2>${esc(t)}</h2><p>${esc(x)}</p>`
+function fim(t, x, extra = '') {
+  $('#fim').innerHTML = `<h2>${esc(t)}</h2><p>${esc(x)}</p>${extra}`
+  $('#topo-acoes').hidden = true
   ir('fim')
 }
 
@@ -262,12 +283,23 @@ function tratar(e) {
   window.scrollTo({ top: 0 })
 }
 
+const irAte = (chave) => document.querySelector(`.clausula[data-chave="${CSS.escape(chave)}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 $('#btn-pedir').addEventListener('click', pedirCodigo)
 $('#btn-reenviar').addEventListener('click', pedirCodigo)
 $('#form-codigo').addEventListener('submit', validar)
-$('#codigo').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6) })
+$('#codigo').addEventListener('input', e => {
+  e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6)
+  if (e.target.value.length === 6) $('#form-codigo').requestSubmit()
+})
 $('#documento').addEventListener('click', e => { const b = e.target.closest('[data-ciencia]'); if (b) ciencia(b) })
-$('#btn-ir-assinar').addEventListener('click', telaAssinar)
+$('#btn-ir-assinar').addEventListener('click', () => {
+  const acao = $('#btn-ir-assinar').dataset.acao
+  if (acao === 'assinar') return telaAssinar()
+  if (acao === 'fim') return $('#secao-tabela').scrollIntoView({ behavior: 'smooth', block: 'start' })
+  irAte(acao)
+})
+$('#trilho').addEventListener('click', e => { const i = e.target.closest('[data-ir]'); if (i) irAte(i.dataset.ir) })
+$('#btn-ir-tabela').addEventListener('click', () => $('#secao-tabela').scrollIntoView({ behavior: 'smooth', block: 'start' }))
 $('#btn-voltar-ler').addEventListener('click', () => ir('ler'))
 $('#form-assinar').addEventListener('submit', assinar)
 

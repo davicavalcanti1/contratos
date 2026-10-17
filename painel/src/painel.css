@@ -469,3 +469,73 @@ mark.lacuna { background: var(--marca); color: var(--marca-tinta); border-radius
 .linha-do-tempo li.marco > span { font-weight: 500; }
 .linha-do-tempo .ip { color: var(--tinta-3); font-family: var(--mono); font-size: 12px; }
 .linha-do-tempo time { font-size: 13px; }
+
+/* ── Lotes ───────────────────────────────────────────────────────────── */
+.lista-lotes-painel { list-style: none; margin: 0; padding: 0; }
+.lista-lotes-painel li { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto; gap: 6px 20px; align-items: center; padding: 14px 0; border-top: 1px solid var(--borda); }
+.lista-lotes-painel li:first-child { border-top: 0; padding-top: 6px; }
+.lote-texto { display: grid; gap: 2px; min-width: 0; }
+.lote-texto a { font-weight: 600; text-decoration: none; }
+.lote-texto a:hover { text-decoration: underline; }
+.lote-texto span { color: var(--tinta-3); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lote-progresso { display: grid; gap: 6px; font-size: 13.5px; color: var(--tinta-2); }
+.lote-progresso b { color: var(--tinta); font-weight: 600; }
+.lote-progresso small { color: var(--tinta-3); }
+.lote-progresso .medidor { margin: 0; }
+.medidor.completo i { background: var(--ok); }
+.medidor.grande { height: 10px; border-radius: 5px; }
+@media (max-width: 760px) { .lista-lotes-painel li { grid-template-columns: 1fr; } }
+
+.etapas-largas { max-width: 720px; margin-bottom: 20px; }
+.etapas-largas li { font-size: 13.5px; }
+.h2-espaco { margin-top: 22px !important; }
+.soltar-planilha { display: grid; gap: 4px; padding: 26px 16px; border-radius: 14px; border: 1.5px dashed var(--borda); background: var(--superficie); margin-bottom: 14px; }
+.soltar-planilha strong { font-weight: 600; color: var(--tinta); }
+.soltar-planilha span { font-size: 13.5px; color: var(--tinta-3); }
+.soltar-planilha.sobre { border-color: var(--acao); background: var(--acao-claro); }
+.dica-lote .passos-inicio.compacto { grid-template-columns: 1fr; gap: 12px; }
+.dica-lote .passos-inicio li { border: 0; padding: 0; grid-template-columns: 28px 1fr; display: grid; gap: 2px 12px; }
+.dica-lote .passos-inicio li::before { grid-row: 1 / span 2; margin: 0; }
+.dica-lote .passos-inicio li strong { font-weight: 600; }
+.mapa { font-size: 14.5px; }
+.mapa th { font-size: 12.5px; font-weight: 600; letter-spacing: .02em; color: var(--tinta-3); }
+.mapa td, .mapa th { border-bottom: 1px solid var(--borda); padding: 10px 8px; }
+.mapa td:first-child small { color: var(--tinta-3); font-weight: 400; }
+.mapa select, .mapa input { border: 1px solid var(--borda); }
+.mapa select + select, .mapa select + input { margin-top: 6px; }
+.mapa tr.linha-problema td { background: transparent; }
+.mapa tr.linha-problema td:first-child { color: var(--erro); }
+.acoes-passo { margin-top: 14px; }
+.tabela-previa .lista-curta.problemas { color: var(--erro); }
+.tabela .lista-curta.problemas { color: var(--erro); font-size: 13px; }
+.tabela small.motivo { color: var(--erro); font-style: italic; }
+.tabela .link-situacao { text-decoration: none; }
+
+.lote-andamento .lote-barra { display: grid; gap: 8px; font-size: 14.5px; color: var(--tinta-2); margin-bottom: 14px; }
+.lote-barra b { color: var(--tinta); font-weight: 600; font-size: 18px; }
+.lote-totais { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 14px; color: var(--tinta-2); align-items: center; }
+.lote-totais b { color: var(--tinta); font-weight: 600; }
+.lote-totais li.mal b { color: var(--erro); }
+.lote-empresa-item small { color: var(--tinta-3); margin-left: 6px; }
+.chips-lote { margin-bottom: 14px; }
+.lista-linhas-m { display: none; list-style: none; margin: 0; padding: 0; }
+.lista-linhas-m li { display: grid; gap: 3px; padding: 12px 0; border-top: 1px solid var(--borda); font-size: 14px; }
+.lista-linhas-m li:first-child { border-top: 0; padding-top: 4px; }
+.linha-m-topo { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+.linha-m-topo strong { font-weight: 600; }
+.linha-m-topo a { text-decoration: none; }
+.linha-m-meta { color: var(--tinta-3); font-size: 13px; }
+.lista-linhas-m li.problema .linha-m-meta { color: var(--tinta-2); }
+@media (max-width: 760px) { .lista-linhas-m { display: block; } .cartao-lista .tabela-desktop { display: none; } }
+
+.tabela-previa th:last-child, .tabela-previa td:last-child { min-width: 260px; }
+.tabela-previa .lista-curta { margin: 0; padding-left: 16px; }
+
+/* Passo final do lote: três cartões, a tabela em largura total e a ação fixa embaixo. */
+.tres-cartoes { display: grid; gap: 16px; margin-bottom: 16px; }
+@media (min-width: 1000px) { .tres-cartoes { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; } .tres-cartoes .cartao { margin-bottom: 0; } }
+.barra-acao { position: sticky; bottom: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; background: var(--folha); border: 1px solid var(--borda); border-radius: 16px; padding: 12px 18px; margin: 0 0 16px; box-shadow: 0 -8px 24px -18px rgba(27, 38, 51, .35); }
+.resumo-envio-lista.horizontal { display: flex; flex-wrap: wrap; gap: 6px 24px; margin: 0; }
+.resumo-envio-lista.horizontal li { font-size: 13px; }
+.barra-acao-botoes { display: flex; align-items: center; gap: 16px; margin-left: auto; }
+.barra-acao-botoes .link-botao { padding: 0; font-size: 14px; }

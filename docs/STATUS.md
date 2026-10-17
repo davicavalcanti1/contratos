@@ -16,9 +16,9 @@ página por página**, com foco em funcionalidade e design, nesta ordem:
 | 3 | Lista de contratos e novo contrato | ✅ pronto | `245b1e5` |
 | 4 | Detalhe do contrato | ✅ pronto | `cabd125` |
 | 5 | Tela pública de assinatura (`assinar.html`) | ✅ pronto | `ec2041b` |
-| 6 | Selo de verificação (`verificar.html`) | ✅ pronto | este commit |
-| 7 | Lotes, lote e assinatura em lote | ⏭ próxima | |
-| 8 | Agenda | | |
+| 6 | Selo de verificação (`verificar.html`) | ✅ pronto | `385b536` |
+| 7 | Lotes, lote e assinatura em lote | ✅ pronto | este commit |
+| 8 | Agenda | ⏭ próxima | |
 | 9 | Empresa, usuários, chaves e webhooks | | |
 | 10 | Plataforma: organizações, saúde, auditoria | | |
 | 11 | `/dev` | | |

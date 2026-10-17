@@ -12,7 +12,7 @@ import { Contratos } from './paginas/org/Contratos.jsx'
 import { Agenda } from './paginas/org/Agenda.jsx'
 import { Empresa } from './paginas/org/Empresa.jsx'
 import { Lote } from './paginas/org/Lote.jsx'
-import { Lotes } from './paginas/org/Lotes.jsx'
+import { Lotes, NovoLote } from './paginas/org/Lotes.jsx'
 import { NovoContrato } from './paginas/org/NovoContrato.jsx'
 import { Usuarios } from './paginas/org/Usuarios.jsx'
 import { VisaoGeral } from './paginas/org/VisaoGeral.jsx'
@@ -140,6 +140,7 @@ function Moldura() {
               <Route path="/contratos/:id" element={<Contrato />} />
               <Route path="/agenda" element={<Agenda />} />
               <Route path="/lotes" element={<Lotes />} />
+              <Route path="/lotes/novo" element={<NovoLote />} />
               <Route path="/lotes/:id" element={<Lote />} />
             </>}
             {ehAdmin && <>

@@ -37,7 +37,7 @@ export function VisaoGeral() {
     ...agenda.vencimentos.map(x => ({ ...x, tipo: 'vencimento' })),
     ...agenda.reajustes.map(x => ({ ...x, tipo: 'reajuste' })),
   ].sort((a, b) => a.data.localeCompare(b.data)).slice(0, 6)
-  const lotesAbertos = lotes.filter(l => l.totais && l.totais.assinados < l.totais.total).slice(0, 3)
+  const lotesAbertos = lotes.filter(l => l.totais && l.totais.assinados < l.totais.contratos).slice(0, 3)
   const vazio = recentes.total === 0
 
   return (
@@ -162,8 +162,8 @@ export function VisaoGeral() {
                   {lotesAbertos.map(l => (
                     <li key={l.id}>
                       <Link to={`/lotes/${l.id}`}>{l.nome}</Link>
-                      <span>{l.totais.assinados} de {l.totais.total} assinados</span>
-                      <div className="medidor"><i style={{ width: `${Math.round((l.totais.assinados / l.totais.total) * 100)}%` }} /></div>
+                      <span>{l.totais.assinados} de {l.totais.contratos} assinados</span>
+                      <div className="medidor"><i style={{ width: `${Math.round((l.totais.assinados / l.totais.contratos) * 100)}%` }} /></div>
                     </li>
                   ))}
                 </ul>
