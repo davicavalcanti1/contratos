@@ -1,7 +1,7 @@
 // Tela de assinatura: identificar (código) → ler com a bula → assinar.
 // O servidor é quem decide se pode assinar; a tela só guia e explica.
 
-import { $, ErroApi, api, baixar, dataHora, esc, guardar, mostrarErro } from './comum.js'
+import { $, ErroApi, api, baixar, dataHora, esc, guardar, mostrarErro, rosetaSvg } from './comum.js'
 
 const token = decodeURIComponent(location.pathname.split('/assinar/')[1] || '')
 const base = `/api/assinar/${encodeURIComponent(token)}`
@@ -18,6 +18,7 @@ const TELAS = ['identificar', 'ler', 'assinar', 'fim']
 function ir(tela) {
   for (const t of TELAS) $(`#tela-${t}`).hidden = t !== tela
   $('#barra').hidden = tela !== 'ler'
+  $('#topo-acoes').hidden = tela !== 'ler' && tela !== 'assinar'
   const etapas = $('#etapas')
   etapas.hidden = tela === 'fim'
   const idx = TELAS.indexOf(tela)
@@ -59,7 +60,13 @@ async function iniciar() {
   $('#saudacao').textContent = jaAssinou ? `${primeiroNome}, sua assinatura já está registrada` : `Olá, ${primeiroNome}`
   $('#explica-identificar').textContent = jaAssinou
     ? `Para ver ou baixar o contrato, confirme que é você com um código enviado para ${info.signatario.email}.`
-    : `${info.organizacao} pediu sua assinatura como ${info.signatario.papel.toLowerCase()}. Antes de mostrar o contrato, vamos confirmar que é você com um código enviado para ${info.signatario.email}.`
+    : `${info.organizacao} pediu a sua assinatura como ${info.signatario.papel.toLowerCase()}. Leva poucos minutos, em três passos:`
+  $('#passos-assinatura').hidden = jaAssinou
+  if (info.expira_em && !jaAssinou) {
+    const dias = Math.ceil((new Date(info.expira_em) - Date.now()) / 864e5)
+    $('#validade').textContent = dias > 1 ? `Este link vale por mais ${dias} dias (até ${dataHora(info.expira_em)}).` : dias === 1 ? `Este link vale até amanhã, ${dataHora(info.expira_em)}.` : `Este link vale até hoje, ${dataHora(info.expira_em)}.`
+    $('#validade').hidden = false
+  }
   ir('identificar')
 }
 
@@ -175,9 +182,15 @@ function atualizarProgresso() {
   else texto = '<strong>Tudo lido.</strong> Pode assinar.'
   $('#progresso').innerHTML = texto
   const trilho = $('#trilho')
-  trilho.innerHTML = criticas.map(c => `<i${c.ciente_em ? ' class="feito"' : ''}></i>`).join('') || '<i class="feito"></i>'
+  // Cada segmento é uma cláusula em destaque: tocar leva até ela.
+  trilho.innerHTML = criticas.map(c => `<i data-ir="${esc(c.chave)}" title="Cláusula ${c.numero}"${c.ciente_em ? ' class="feito"' : ''}></i>`).join('') || '<i class="feito"></i>'
   trilho.classList.toggle('completo', pronto)
-  $('#btn-ir-assinar').disabled = !(pronto && suaVez)
+  // O botão leva ao próximo destaque pendente; quando tudo está lido, à assinatura.
+  const btn = $('#btn-ir-assinar')
+  const proximo = criticas.find(c => !c.ciente_em)
+  if (pronto) { btn.textContent = 'Ir para assinatura'; btn.disabled = !suaVez; btn.dataset.acao = 'assinar' }
+  else if (proximo) { btn.textContent = 'Próximo destaque'; btn.disabled = false; btn.dataset.acao = proximo.chave }
+  else { btn.textContent = 'Ir até o fim'; btn.disabled = false; btn.dataset.acao = 'fim' }
 }
 
 let observador
@@ -325,9 +338,9 @@ function telaFim() {
     return fim({
       titulo: 'Contrato assinado por todos',
       texto: 'A sua via tem um QR e um código em cada página. Qualquer pessoa pode conferir por eles que o documento é autêntico e não foi alterado.',
-      extra: `<p class="codigo-grande">${esc(estado.codigo_verificacao)}</p>
-        <button class="botao largo" data-baixar="final">Baixar a via assinada</button>
-        <p><a href="/v/${encodeURIComponent(estado.codigo_verificacao)}">Ver o selo de autenticidade</a></p>`,
+      extra: `<div class="fim-selo"><div class="carimbo" aria-hidden="true">${rosetaSvg()}<b>✓</b></div><div><span>Código de verificação</span><p class="codigo-grande">${esc(estado.codigo_verificacao)}</p></div></div>
+        <div class="fim-acoes"><button class="botao largo" data-baixar="final">Baixar a via assinada</button>
+        <a href="/v/${encodeURIComponent(estado.codigo_verificacao)}">Ver o selo de autenticidade</a></div>`,
     })
   }
   if (s.status === 'assinado') {
@@ -335,7 +348,7 @@ function telaFim() {
     return fim({
       titulo: 'Sua assinatura foi registrada',
       texto: `Falta${faltam > 1 ? 'm' : ''} ${faltam} assinatura${faltam > 1 ? 's' : ''}. Quando todos assinarem, você recebe um e-mail com o código de verificação e pode baixar a via assinada por este mesmo link.`,
-      extra: '<button class="botao secundario largo" data-baixar="original">Baixar o texto que você assinou</button>',
+      extra: '<div class="fim-acoes"><button class="botao secundario largo" data-baixar="original">Baixar o texto que você assinou</button></div>',
     })
   }
   const msgs = { expirado: 'O prazo para assinar terminou', cancelado: 'Quem enviou cancelou este contrato', recusado: 'Outra pessoa recusou este contrato' }
@@ -344,6 +357,7 @@ function telaFim() {
 
 function fim({ titulo, texto, extra = '' }) {
   $('#fim').innerHTML = `<h2>${esc(titulo)}</h2><p>${esc(texto)}</p>${extra}`
+  $('#topo-acoes').hidden = true
   ir('fim')
 }
 
@@ -364,9 +378,22 @@ function tratarErro(e) {
 $('#btn-pedir').addEventListener('click', pedirCodigo)
 $('#btn-reenviar').addEventListener('click', pedirCodigo)
 $('#form-codigo').addEventListener('submit', validarCodigo)
-$('#codigo').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6) })
+$('#codigo').addEventListener('input', e => {
+  e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6)
+  if (e.target.value.length === 6) $('#form-codigo').requestSubmit()
+})
 $('#documento').addEventListener('click', e => { const b = e.target.closest('[data-ciencia]'); if (b) darCiencia(b) })
-$('#btn-ir-assinar').addEventListener('click', telaAssinar)
+const irAte = (chave) => document.querySelector(`.clausula[data-chave="${CSS.escape(chave)}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+$('#btn-ir-assinar').addEventListener('click', () => {
+  const acao = $('#btn-ir-assinar').dataset.acao
+  if (acao === 'assinar') return telaAssinar()
+  if (acao === 'fim') return $('#fim-leitura').scrollIntoView({ behavior: 'smooth', block: 'end' })
+  irAte(acao)
+})
+$('#trilho').addEventListener('click', e => { const i = e.target.closest('[data-ir]'); if (i) irAte(i.dataset.ir) })
+$('#btn-baixar-ler').addEventListener('click', async () => {
+  try { await baixar(await comSessao('/arquivo?qual=original'), 'contrato.pdf') } catch (er) { tratarErro(er) }
+})
 $('#btn-voltar-ler').addEventListener('click', () => { ir('ler') })
 $('#form-assinar').addEventListener('submit', assinar)
 $('#btn-abrir-recusa').addEventListener('click', () => { $('#form-recusar').hidden = false; $('#motivo').focus() })

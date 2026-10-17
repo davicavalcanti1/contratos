@@ -1,14 +1,17 @@
-/* Identidade das telas: bula + linguagem simples.
-   - Da bula vêm os títulos em caixa-alta condensada (Archivo), o marca-texto
-     amarelo sobre o que importa e o texto técnico logo abaixo, completo.
+/* Identidade das telas: bula + linguagem simples, numa casca branca e limpa.
+   - Da bula vêm os títulos de cláusula em caixa-alta condensada (Archivo), o
+     marca-texto amarelo sobre o resumo e o texto técnico logo abaixo, completo.
    - Da linguagem simples vem a hierarquia: o resumo é grande e vem primeiro,
-     em Lexend (fonte desenhada para fluência de leitura), em cores claras:
-     branco-gelo, azul-céu e menta.
+     em Lexend (fonte desenhada para fluência de leitura).
+   - A casca (fundo, cartões, barras) é branca, separada por contornos finos;
+     azul-céu é a única cor de ação. Sempre em tema claro (decisão de 16/out).
    Os PDFs têm outra cara, de documento oficial (src/motor/estilo-pdf.js);
    o código de verificação usa a mesma fonte de máquina nos dois. */
 :root {
-  --papel: #f5f8fa;
+  --papel: #ffffff;
   --folha: #ffffff;
+  --borda: #e6ebf0;
+  --superficie: #f4f8fc;
   --tinta: #1b2633;
   --tinta-2: #4f5b68;
   --tinta-3: #77828e;
@@ -30,20 +33,6 @@
   --raio-cartao: 20px;
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --papel: #11171e; --folha: #19212b; --tinta: #e9eef3; --tinta-2: #b3bec9; --tinta-3: #85919d;
-    --linha: #2b3642; --acao: #7cc0f5; --acao-forte: #a6d5fa; --acao-claro: #1c3346;
-    --ok: #74d9a8; --ok-claro: #163a2b; --erro: #f28b82; --erro-claro: #3b1c1a;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --papel: #11171e; --folha: #19212b; --tinta: #e9eef3; --tinta-2: #b3bec9; --tinta-3: #85919d;
-  --linha: #2b3642; --acao: #7cc0f5; --acao-forte: #a6d5fa; --acao-claro: #1c3346;
-  --ok: #74d9a8; --ok-claro: #163a2b; --erro: #f28b82; --erro-claro: #3b1c1a;
-  color-scheme: dark;
-}
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -62,11 +51,15 @@ code, .codigo { font-family: var(--mono); }
 
 /* ── Estrutura ─────────────────────────────────────────────────────────── */
 .topo {
-  background: var(--folha); border-bottom: 3px solid var(--tinta);
-  padding: 14px 16px 12px;
+  background: var(--folha); border-bottom: 1px solid var(--borda);
+  padding: 14px 16px 14px;
 }
-.topo .emissor { font-size: 14px; color: var(--tinta-2); margin: 0; }
-.topo h1 { font: 800 26px/1 var(--bula); font-stretch: 72%; text-transform: uppercase; margin: 4px 0 0; text-wrap: balance; }
+.topo .dentro { max-width: 1040px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: flex-end; justify-content: space-between; }
+.topo .emissor { font-size: 13.5px; color: var(--tinta-3); margin: 0; }
+.topo h1 { font: 600 22px/1.2 var(--sans); letter-spacing: -.02em; margin: 2px 0 0; text-wrap: balance; }
+.topo .topo-acoes { margin: 0; font-size: 14px; }
+.topo .topo-acoes .link-botao { padding: 0; color: var(--acao); text-decoration: none; }
+.topo .topo-acoes .link-botao:hover { text-decoration: underline; }
 .conteudo { max-width: 1040px; margin: 0 auto; padding: 20px 16px 140px; }
 .estreito { max-width: 520px; margin: 0 auto; }
 
@@ -74,7 +67,7 @@ code, .codigo { font-family: var(--mono); }
 .etapas { display: flex; gap: 6px; list-style: none; margin: 0 0 22px; padding: 0; counter-reset: e; }
 .etapas li {
   counter-increment: e; flex: 1; font-size: 13px; color: var(--tinta-3);
-  border-top: 5px solid var(--linha); border-radius: 3px 3px 0 0; padding-top: 6px;
+  border-top: 3px solid var(--borda); border-radius: 3px; padding-top: 8px;
 }
 .etapas li::before { content: counter(e) ". "; }
 .etapas li[aria-current="step"] { color: var(--tinta); border-color: var(--acao); font-weight: 600; }
@@ -89,9 +82,6 @@ code, .codigo { font-family: var(--mono); }
   transition: background-color .15s;
 }
 .botao:hover:not(:disabled) { background: var(--acao-forte); }
-/* No escuro a ação é lilás claro: o texto do botão cheio passa a ser escuro. */
-:root[data-theme="dark"] .botao:not(.secundario) { color: #11171e; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .botao:not(.secundario) { color: #11171e; } }
 .botao:disabled { opacity: .45; cursor: not-allowed; }
 .botao.secundario { background: transparent; color: var(--acao); box-shadow: inset 0 0 0 1.5px currentColor; }
 .botao.secundario:hover:not(:disabled) { background: var(--acao-claro); }
@@ -102,7 +92,7 @@ code, .codigo { font-family: var(--mono); }
 .campo span { display: block; font-weight: 600; font-size: 15px; margin-bottom: 6px; }
 .campo input, .campo textarea, .campo select {
   width: 100%; min-height: 50px; padding: 10px 14px; font: inherit; color: var(--tinta);
-  background: var(--folha); border: 1.5px solid var(--linha); border-radius: 12px;
+  background: var(--folha); border: 1px solid var(--borda); border-radius: 12px;
 }
 .campo input:focus, .campo textarea:focus, .campo select:focus { border-color: var(--acao); outline: none; box-shadow: 0 0 0 3px var(--acao-claro); }
 .campo textarea { min-height: 96px; resize: vertical; }
@@ -116,7 +106,7 @@ code, .codigo { font-family: var(--mono); }
 .aviso.ok { background: var(--ok-claro); color: var(--ok); }
 .aviso.info { background: var(--acao-claro); color: var(--acao-forte); }
 
-.cartao { background: var(--folha); border-radius: var(--raio-cartao); padding: 24px 20px; }
+.cartao { background: var(--folha); border: 1px solid var(--borda); border-radius: var(--raio-cartao); padding: 24px 20px; }
 .cartao h2 { font: 600 22px/1.25 var(--sans); letter-spacing: -.01em; margin: 0 0 8px; text-wrap: balance; }
 .cartao p { margin: 0 0 16px; color: var(--tinta-2); }
 .estreito > .cartao + .cartao, #resultado:not(:empty) + .cartao { margin-top: 16px; }
@@ -132,7 +122,7 @@ code, .codigo { font-family: var(--mono); }
 .documento { display: grid; gap: 14px; }
 .documento .preambulo, .documento .fecho { font: 16px/1.65 var(--serif); color: var(--tinta-2); margin: 4px 4px; }
 
-.clausula { background: var(--folha); border-radius: var(--raio-cartao); padding: 20px 18px 22px; }
+.clausula { background: var(--folha); border: 1px solid var(--borda); border-radius: var(--raio-cartao); padding: 20px 18px 22px; }
 .clausula .cl-num { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: var(--tinta-3); margin: 0 0 6px; }
 .clausula h3 { font: 800 22px/1 var(--bula); font-stretch: 72%; text-transform: uppercase; margin: 0 0 14px; color: var(--tinta); text-wrap: balance; }
 
@@ -151,7 +141,7 @@ code, .codigo { font-family: var(--mono); }
 
 /* Em destaque: contorno de ação, selo no topo e texto jurídico em negrito,
    como no PDF (CDC art. 54 §4º). */
-.clausula.critica { box-shadow: inset 0 0 0 2px var(--acao); }
+.clausula.critica { border-color: var(--acao); box-shadow: inset 0 0 0 1px var(--acao); }
 .clausula.critica .texto-juridico p { font-weight: 600; }
 .destaque { display: inline-block; font: 600 12px var(--sans); color: var(--acao-forte); background: var(--acao-claro); border-radius: 999px; padding: 2px 10px; }
 .ciencia { margin-top: 16px; }
@@ -183,7 +173,7 @@ code, .codigo { font-family: var(--mono); }
 /* Barra fixa embaixo: um segmento por cláusula em destaque. */
 .barra {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
-  background: var(--folha); border-top: 1px solid var(--linha);
+  background: var(--folha); border-top: 1px solid var(--borda); box-shadow: 0 -8px 24px -20px rgba(27, 38, 51, .25);
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
 }
 .barra .dentro { max-width: 1040px; margin: 0 auto; display: flex; gap: 14px; align-items: center; justify-content: space-between; }
@@ -197,7 +187,9 @@ code, .codigo { font-family: var(--mono); }
 }
 .barra .progresso strong { color: var(--tinta); }
 .barra .trilho { display: flex; gap: 4px; margin-top: 8px; width: 170px; }
-.barra .trilho i { flex: 1; height: 6px; border-radius: 3px; background: var(--linha); transition: background-color .3s; }
+.barra .trilho i { flex: 1; height: 6px; border-radius: 3px; background: var(--linha); transition: background-color .3s; cursor: pointer; position: relative; }
+.barra .trilho i::after { content: ""; position: absolute; inset: -8px 0; } /* alvo de toque maior */
+.barra .trilho i:hover { background: var(--acao-claro); }
 .barra .trilho i.feito { background: var(--acao); }
 .barra .trilho.completo i { background: var(--ok); }
 
@@ -233,7 +225,7 @@ code, .codigo { font-family: var(--mono); }
 @media (min-width: 1000px) { .dev { grid-template-columns: 1fr 1fr; align-items: start; } }
 .dev .cartao h2 { font: 600 18px var(--sans); }
 .tabela { width: 100%; border-collapse: collapse; font-size: 14px; }
-.tabela td, .tabela th { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--linha); vertical-align: top; }
+.tabela td, .tabela th { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--borda); vertical-align: top; }
 .tabela th { color: var(--tinta-3); font-weight: 400; font-size: 13px; white-space: nowrap; }
 .status { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 13px; font-weight: 500; white-space: nowrap; background: var(--acao-claro); color: var(--acao-forte); }
 .status.assinado { background: var(--ok-claro); color: var(--ok); }
@@ -304,3 +296,21 @@ p.condicao { display: inline-block; margin: 0 0 8px; }
 /* O último elemento do cartão não soma margem ao respiro de baixo. */
 .cartao > :last-child { margin-bottom: 0; }
 .selo .historia { list-style: none; padding: 0; }
+
+/* ── Assinatura: identificação explicada e fim com selo ───────────────── */
+.passos-assinatura { list-style: none; margin: 18px 0 20px; padding: 0; display: grid; gap: 10px; counter-reset: pa; }
+.passos-assinatura li { counter-increment: pa; display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: start; font-size: 14.5px; color: var(--tinta-2); }
+.passos-assinatura li::before { content: counter(pa); width: 26px; height: 26px; border-radius: 50%; background: var(--acao-claro); color: var(--acao-forte); display: grid; place-items: center; font: 600 13px var(--sans); }
+.passos-assinatura b { color: var(--tinta); font-weight: 600; }
+.validade { font-size: 13.5px; color: var(--tinta-3); margin: 12px 0 0; }
+.codigo-otp { letter-spacing: .4em; }
+.fim-selo { display: grid; grid-template-columns: 84px 1fr; gap: 16px; align-items: center; margin: 0 0 16px; }
+.fim-selo .carimbo { width: 84px; height: 84px; position: relative; color: var(--ok); display: grid; place-items: center; }
+.fim-selo .carimbo svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.fim-selo .carimbo b { position: relative; width: 36px; height: 36px; border-radius: 50%; background: var(--folha); display: grid; place-items: center; font: 700 20px var(--sans); }
+.fim-selo .codigo-grande { margin: 4px 0 0 !important; }
+.fim-selo span { display: block; font-size: 13px; color: var(--tinta-3); }
+.fim-acoes { display: grid; gap: 10px; margin-top: 16px; }
+.fim-acoes .botao { width: 100%; }
+.fim-acoes a { text-align: center; font-size: 15px; }
+.clausula { scroll-margin-top: 14px; }

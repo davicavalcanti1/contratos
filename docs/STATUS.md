@@ -1,6 +1,6 @@
 # Status do projeto
 
-> Atualizado em 16/out/2026, fim do dia. Este arquivo é o ponto de retomada:
+> Atualizado em 17/out/2026, de manhã. Este arquivo é o ponto de retomada:
 > o que está pronto, o que foi decidido e o que vem a seguir.
 
 ## Onde estamos
@@ -14,9 +14,9 @@ página por página**, com foco em funcionalidade e design, nesta ordem:
 | 1 | Site de apresentação (`/`) | ✅ pronto | `725fb80`, `bb713b7` |
 | 2 | Entrar, redefinir senha e visão geral do painel | ✅ pronto | `a8cd58c` |
 | 3 | Lista de contratos e novo contrato | ✅ pronto | `245b1e5` |
-| 4 | Detalhe do contrato | ✅ pronto | este commit |
-| 5 | Tela pública de assinatura (`assinar.html`) | ⏭ próxima | |
-| 6 | Selo de verificação (`verificar.html`) | | |
+| 4 | Detalhe do contrato | ✅ pronto | `cabd125` |
+| 5 | Tela pública de assinatura (`assinar.html`) | ✅ pronto | este commit |
+| 6 | Selo de verificação (`verificar.html`) | ⏭ próxima | |
 | 7 | Lotes, lote e assinatura em lote | | |
 | 8 | Agenda | | |
 | 9 | Empresa, usuários, chaves e webhooks | | |
@@ -38,9 +38,10 @@ página por página**, com foco em funcionalidade e design, nesta ordem:
 - **Painel**: mesmo visual limpo. Formulários numa grade de 12 colunas com
   largura por tipo de campo, rótulos curtos (o grupo diz de quem é o campo),
   inicial maiúscula em rótulos de opção e de situação.
-- **Telas públicas (assinatura e selo)** ainda têm a identidade "bula +
-  linguagem simples" original. Ao refazê-las, manter a bula no conteúdo e
-  aplicar o branco e os contornos finos em volta.
+- **Telas públicas (assinatura e selo)**: a bula fica no conteúdo (títulos de
+  cláusula em caixa-alta condensada, marca-texto amarelo no resumo); a casca
+  em volta é branca, com contornos finos e título em Lexend. O `app.css` não
+  tem mais modo escuro: sempre claro.
 
 ## O que foi acrescentado de funcionalidade nesta rodada
 

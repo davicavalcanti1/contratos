@@ -14,9 +14,12 @@ linguagem simples, e o PDF fica com a fé pública. O produto ainda não tem nom
 | Texto do contrato | Source Serif 4. Nunca escondido: a leitura até o fim é prova |
 | Códigos e hashes | IBM Plex Mono, a mesma fonte do PDF |
 
-Os tokens ficam em `public/estatico/app.css` (claro e escuro); o painel e o
-site reaproveitam esses tokens. No desktop, a cláusula abre em duas colunas:
-o resumo à esquerda e o texto do contrato à direita.
+Os tokens ficam em `public/estatico/app.css`, sempre em tema claro (o modo
+escuro saiu em 17/out/2026: fundo branco é regra do produto). A casca das
+telas públicas (topo, cartões, barra) é branca com contornos finos e título em
+Lexend; a bula fica no conteúdo das cláusulas. O painel e o site reaproveitam
+esses tokens. No desktop, a cláusula abre em duas colunas: o resumo à esquerda
+e o texto do contrato à direita.
 
 ## Site de apresentação: página de produto, branca e limpa
 

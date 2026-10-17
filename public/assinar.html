@@ -15,8 +15,13 @@
 </head>
 <body>
   <header class="topo">
-    <p class="emissor" id="emissor">Carregando…</p>
-    <h1 id="titulo"></h1>
+    <div class="dentro">
+      <div>
+        <p class="emissor" id="emissor">Carregando…</p>
+        <h1 id="titulo"></h1>
+      </div>
+      <p class="topo-acoes" id="topo-acoes" hidden><button class="link-botao" type="button" id="btn-baixar-ler">Baixar o PDF</button></p>
+    </div>
   </header>
 
   <main class="conteudo">
@@ -33,6 +38,12 @@
       <div class="cartao">
         <h2 id="saudacao"></h2>
         <p id="explica-identificar"></p>
+        <ol class="passos-assinatura" id="passos-assinatura">
+          <li><span><b>Confirme que é você</b> com um código que enviamos para o seu e-mail.</span></li>
+          <li><span><b>Leia o contrato com a bula.</b> Cada cláusula tem um resumo em palavras simples; nas que estão em destaque, você confirma que entendeu.</span></li>
+          <li><span><b>Assine</b> digitando o seu nome. O documento sai com um selo que qualquer pessoa confere.</span></li>
+        </ol>
+        <p class="validade" id="validade" hidden></p>
         <div id="pedir-codigo">
           <button class="botao largo" id="btn-pedir">Enviar código</button>
         </div>
@@ -131,7 +142,7 @@
         <div class="progresso" id="progresso" aria-live="polite"></div>
         <div class="trilho" aria-hidden="true" id="trilho"></div>
       </div>
-      <button class="botao" id="btn-ir-assinar" disabled>Ir para assinatura</button>
+      <button class="botao" id="btn-ir-assinar">Próximo destaque</button>
     </div>
   </nav>
 </body>
