@@ -12,7 +12,7 @@ gerado a partir dos dados da empresa e assinatura com validade jurídica.
 npm install
 npm run build             # compila o painel (React)
 npm start                 # http://localhost:3000/painel  (e-mails de teste em /dev)
-npm test                  # 115 testes: site, motor, assinatura, lote, plataforma, webhooks, vida, carimbo, ICP-Brasil, painel, HTTP
+npm test                  # 116 testes: site, motor, assinatura, lote, plataforma, webhooks, vida, carimbo, ICP-Brasil, painel, HTTP
 npm run lint:modelos      # linter jurídico em todos os modelos da biblioteca
 npm run exemplos          # gera saida/*.pdf a partir de exemplos/*.json
 ```
@@ -51,6 +51,7 @@ cláusula, mas **não passou por advogado**. Ver `docs/VALIDADE-JURIDICA.md` §6
 
 | Documento | O que responde |
 |---|---|
+| [docs/STATUS.md](docs/STATUS.md) | **Onde paramos**: telas refeitas, decisões, pendências e como retomar |
 | [docs/VISION.md](docs/VISION.md) | Que dor resolve, para quem e o que fica de fora |
 | [docs/DIFERENCIAIS.md](docs/DIFERENCIAIS.md) | O que faz ele não ser "mais um DocuSign". **Decisões em aberto** |
 | [docs/ARQUITETURA.md](docs/ARQUITETURA.md) | Hierarquia, papéis, serviços internos, API e integrações |

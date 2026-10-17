@@ -200,3 +200,18 @@ test('prévia do modelo: monta o contrato com lacunas marcadas, sem criar nada',
   assert.equal(r.corpo.rotulos['contratado.cnpj'], 'CNPJ do contratado')
   assert.equal((await A.json(await painel('/org/contratos?limite=1', admin))).corpo.total, antes, 'não criou contrato')
 })
+
+test('detalhe do contrato conta a história: eventos com autor e dados resumidos, e o índice de cláusulas', async () => {
+  const admin = await A.entrar(ADMIN)
+  const c = (await A.json(await A.api('/v1/contratos', { metodo: 'POST', corpo: { ...exemplo('pf-determinado'), referencia: 'HIST-1' } }))).corpo
+  await A.api(`/v1/contratos/${c.id}/enviar`, { metodo: 'POST', corpo: { signatarios: [{ nome: 'João da Silva Exemplo', email: 'joao.hist@exemplo.com' }] } })
+  await assinarPeloLink(A, 'joao.hist@exemplo.com', 'João da Silva Exemplo')
+  const d = (await A.json(await painel(`/org/contratos/${c.id}`, admin))).corpo
+  const ciencia = d.eventos.find(e => e.tipo === 'clausula.ciencia')
+  assert.match(ciencia.ator, /^signatario:/)
+  assert.ok(ciencia.dados.clausula && ciencia.dados.numero, 'a ciência diz qual cláusula')
+  assert.equal(ciencia.dados.resumo_exibido, undefined, 'blocos grandes ficam no dossiê')
+  assert.ok(d.clausulas.some(cl => cl.chave === ciencia.dados.clausula && cl.critica), 'o índice de cláusulas resolve a chave')
+  const assinou = d.eventos.find(e => e.tipo === 'assinatura.aceita')
+  assert.equal(assinou.dados.nome_digitado, 'João da Silva Exemplo')
+})

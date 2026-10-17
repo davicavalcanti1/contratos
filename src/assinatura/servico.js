@@ -218,7 +218,10 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
         certificado: s.evidencias?.certificado ? { nome: s.evidencias.certificado.nome, emissor: s.evidencias.certificado.emissor, serial: s.evidencias.certificado.serial } : null,
         assinado_em: s.assinado_em || null, recusado_em: s.recusado_em || null, recusa_motivo: s.recusa_motivo || null,
       })),
-      eventos: trilha.listar(c.id).map(e => ({ seq: e.seq, tipo: e.tipo, em: e.em })),
+      // Para o painel contar a história: quem fez, de onde, e o essencial do
+      // que aconteceu (sem os blocos grandes, que ficam no dossiê).
+      eventos: trilha.listar(c.id).map(e => ({ seq: e.seq, tipo: e.tipo, em: e.em, ator: e.ator, ip: e.ip || null, dados: resumoEvento(e.dados) })),
+      clausulas: (c.snapshot?.clausulas || []).map(cl => ({ chave: cl.chave, numero: cl.numero, titulo: cl.titulo, critica: !!cl.critica })),
     }
   }
 
@@ -1067,6 +1070,11 @@ function mensagemStatus(status) {
     expirado: 'O prazo para assinar este contrato terminou.',
     cancelado: 'Este contrato foi cancelado por quem o enviou.',
   }[status] || `Contrato "${status}".`
+}
+
+const CAMPOS_EVENTO = ['clausula', 'numero', 'motivo', 'destino', 'tentativa', 'nome_digitado', 'metodo', 'ciencias', 'codigo_verificacao', 'act', 'icp_brasil', 'expira_em', 'mudancas', 'titular', 'emissor', 'canal', 'via_lote', 'ordem', 'contrato_id', 'data_encerramento', 'quitacao']
+function resumoEvento(d) {
+  return Object.fromEntries(Object.entries(d || {}).filter(([k]) => CAMPOS_EVENTO.includes(k)))
 }
 
 function resumoContrato(c) {

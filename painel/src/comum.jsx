@@ -49,6 +49,7 @@ export function data(iso) {
   // passar por fuso a transforma em meia-noite UTC e "01/11" vira "31/10".
   const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/)
   if (m) return `${m[3]}/${m[2]}/${m[1]}`
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(String(iso))) return String(iso) // já veio como DD/MM/AAAA
   return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeZone: 'America/Sao_Paulo' }).format(new Date(iso))
 }
 

@@ -68,7 +68,7 @@ nunca o arquivo. Valor e texto do contrato não aparecem.
 | `POST /v1/contratos/:id/enviar` | organização | `{ signatarios: [{nome, email, cpf?, papel}], ordem: paralela\|sequencial, prazo_dias? }` |
 | `POST /v1/contratos/:id/signatarios/:sid/reenviar` | organização | novo link; **o anterior para de funcionar** |
 | `POST /v1/contratos/:id/cancelar` | organização | antes de assinado |
-| `GET /v1/contratos/:id` | organização | situação, signatários, eventos |
+| `GET /v1/contratos/:id` | organização | situação, signatários, dados preenchidos, eventos (com autor, IP e o essencial de cada um) e índice de cláusulas |
 | `GET /v1/contratos/:id/arquivo?qual=original\|final` | organização | PDF |
 | `GET /v1/contratos/:id/dossie[?formato=pdf]` | organização | evidências |
 | `/api/assinar/:token/*` | signatário | `codigo`, `codigo/validar`, `conteudo`, `ciencia`, `leitura`, `assinar`, `recusar`, `arquivo` (exige `X-Sessao` depois do código) |
