@@ -69,6 +69,11 @@ página por página**, com foco em funcionalidade e design, nesta ordem:
 
 ## Pendências e decisões em aberto
 
+> As pendências viraram **issues no GitHub** em 17/out (ver `gh issue list`):
+> #1 averiguação na IMAGO (ponto de partida), #2-#4 kit saúde v1, #5 e-mail
+> Resend, #6 hospedagem/domínio/produção, #7 piloto, #8 nome, #9 consentimento
+> (segunda onda), #10 página /dev. O que está abaixo é o contexto.
+
 - **Nome do produto.** "Contratos" é provisório. Sugestões levantadas: Ciente
   (recomendada), Bulla, Clausa, Nítido. Davi pediu para pensar depois. Onde
   trocar está em [IDENTIDADE.md](IDENTIDADE.md).
