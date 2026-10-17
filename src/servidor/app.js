@@ -14,7 +14,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { gerarDossiePdf } from '../assinatura/dossie-pdf.js'
-import { acharModelo } from '../biblioteca.js'
+import { ErroBiblioteca, acharModelo } from '../biblioteca.js'
 import { signatariosDaLinha } from '../lote/mapear.js'
 import { camposNecessarios, montarContrato } from '../motor/montar.js'
 import { humanizar } from '../motor/texto-modelo.js'
@@ -66,11 +66,17 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     })
     const org = (req) => req.acesso.org
     const dados = (req) => repo.obter('organizacoes', org(req).id).dados
+    // A organização só gera com modelo publicado. Aditivo e distrato nascem de
+    // um contrato e não passam por aqui.
+    const exigirPublicado = (chave) => {
+      if (!biblioteca.estaPublicado(chave)) throw new ErroNegocio(404, 'Este modelo não está disponível. Escolha um dos modelos publicados.')
+      return chave
+    }
 
     r.get('/conta', (req, res) => res.json(plataforma.resumoOrganizacao(repo.obter('organizacoes', org(req).id))))
     r.get('/modelos', (req, res) => {
       // Aditivo e distrato não aparecem aqui: nascem de um contrato assinado (rota própria).
-      res.json(biblioteca.modelos.filter(m => !m.derivado).map(m => ({
+      res.json(biblioteca.publicados.filter(m => !m.derivado).map(m => ({
         chave: m.chave, versao: m.versao, titulo: m.titulo, descricao: m.descricao,
         variaveis: m.variaveis.filter(v => v.origem !== 'organizacao').map(({ chave, rotulo, tipo, origem, opcoes, padrao, obrigatoria }) => ({ chave, rotulo, tipo, origem, opcoes, padrao, obrigatoria })),
         signatarios_da_parte: m.signatarios_da_parte || [],
@@ -80,7 +86,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     // Formulário dinâmico: dado o que já foi preenchido, quais campos este
     // contrato precisa, o que falta, o que está inválido e quem assina.
     r.post('/modelos/:chave/conferir', (req, res) => {
-      const modelo = acharModelo(biblioteca, req.params.chave)
+      const modelo = acharModelo(biblioteca, exigirPublicado(req.params.chave))
       const d = { ...(req.body?.dados || {}), organizacao: dados(req) }
       const necessarios = camposNecessarios({ modelo, biblioteca: biblioteca.indice, dados: d })
       const m = montarContrato({ modelo, biblioteca: biblioteca.indice, dados: d })
@@ -96,7 +102,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     // Prévia: o contrato montado com o que já foi preenchido, lacunas marcadas
     // como {{variável}}. É leitura, não cria nada nem conta no plano.
     r.post('/modelos/:chave/previa', (req, res) => {
-      const modelo = acharModelo(biblioteca, req.params.chave)
+      const modelo = acharModelo(biblioteca, exigirPublicado(req.params.chave))
       const d = { ...(req.body?.dados || {}), organizacao: dados(req) }
       const m = montarContrato({ modelo, biblioteca: biblioteca.indice, dados: d })
       const rotulos = Object.fromEntries(modelo.variaveis.map(v => [v.chave, v.rotulo]))
@@ -107,6 +113,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     r.post('/contratos', h(async (req, res) => {
       plataforma.checarLimite(org(req).id, 1)
       const { modelo, dados: d, referencia } = req.body || {}
+      exigirPublicado(modelo)
       res.status(201).json(await servico.gerar({ organizacaoId: org(req).id, organizacao: dados(req), modelo, dados: d, referencia }))
     }))
     r.get('/contratos/:id', (req, res) => res.json(servico.consultar(req.params.id, org(req).id)))
@@ -149,9 +156,10 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     r.post('/lotes/planilha', planilhaCrua, h(async (req, res) => {
       res.status(201).json(await lotes.receberPlanilha(org(req).id, req.body, String(req.query.nome || '')))
     }))
-    r.get('/lotes/planilha/:id/sugestao', (req, res) => res.json(lotes.sugerir(org(req).id, req.params.id, req.query.modelo)))
-    r.post('/lotes/previa', (req, res) => res.json(lotes.previa(org(req).id, dados(req), req.body || {})))
+    r.get('/lotes/planilha/:id/sugestao', (req, res) => res.json(lotes.sugerir(org(req).id, req.params.id, exigirPublicado(req.query.modelo))))
+    r.post('/lotes/previa', (req, res) => res.json(lotes.previa(org(req).id, dados(req), { ...req.body, modelo: exigirPublicado(req.body?.modelo) })))
     r.post('/lotes', h(async (req, res) => {
+      exigirPublicado(req.body?.modelo)
       const p = lotes.previa(org(req).id, dados(req), req.body || {})
       plataforma.checarLimite(org(req).id, p.prontas)
       res.status(201).json(await lotes.criar(org(req).id, dados(req), req.body || {}))
@@ -314,6 +322,51 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
   dono.post('/organizacoes/:id/usuarios', h(async (req, res) => res.status(201).json(await plataforma.convidar({ organizacaoId: req.params.id, ...pick(req.body, ['nome', 'email', 'papel']) }, req.usuario))))
   dono.post('/developers', h(async (req, res) => res.status(201).json(await plataforma.convidar({ ...pick(req.body, ['nome', 'email']), papel: 'developer' }, req.usuario))))
   dono.get('/saude', (req, res) => res.json(saude()))
+
+  // Biblioteca: o developer edita cláusulas (sempre versão nova) e modelos
+  // (salvar vira rascunho; publicar exige linter ok). Organizações só veem o publicado.
+  const b = (fn) => (req, res, next) => { try { res.json(fn(req)) } catch (e) { next(e) } }
+  dono.get('/biblioteca', b(() => biblioteca.resumo()))
+  dono.get('/biblioteca/modelos/:chave', b(req => biblioteca.obterModelo(req.params.chave)))
+  dono.put('/biblioteca/modelos/:chave', b(req => {
+    const salvo = biblioteca.salvarModelo({ ...req.body, chave: req.params.chave })
+    plataforma.auditar(req.usuario, 'modelo.salvo', { alvo: req.params.chave })
+    return salvo
+  }))
+  dono.post('/biblioteca/modelos', b(req => {
+    const { copiar_de, chave, titulo } = req.body || {}
+    const m = copiar_de ? biblioteca.duplicarModelo(copiar_de, chave, titulo) : biblioteca.salvarModelo({ chave, titulo, variaveis: [], blocos: [{ clausula: 'partes', versao: 1 }] })
+    plataforma.auditar(req.usuario, 'modelo.criado', { alvo: chave, dados: { copiar_de: copiar_de || null } })
+    return m
+  }))
+  dono.post('/biblioteca/modelos/:chave/publicar', b(req => {
+    const m = biblioteca.publicarModelo(req.params.chave)
+    plataforma.auditar(req.usuario, 'modelo.publicado', { alvo: req.params.chave, dados: { versao: m.versao } })
+    return m
+  }))
+  dono.post('/biblioteca/modelos/:chave/despublicar', b(req => {
+    plataforma.auditar(req.usuario, 'modelo.despublicado', { alvo: req.params.chave })
+    return biblioteca.despublicarModelo(req.params.chave)
+  }))
+  dono.post('/biblioteca/modelos/:chave/lint', b(req => biblioteca.lintar({ ...req.body, chave: req.params.chave })))
+  // Prévia com dados de exemplo: o que a pessoa vai ler, com lacunas marcadas.
+  dono.post('/biblioteca/modelos/:chave/previa', b(req => {
+    const modelo = req.body?.modelo || biblioteca.obterModelo(req.params.chave)
+    const organizacao = req.body?.organizacao || JSON.parse(readFileSync(join(RAIZ, 'exemplos', '_organizacao.json'), 'utf8'))
+    const m = montarContrato({ modelo, biblioteca: biblioteca.indice, dados: { organizacao, ...(req.body?.dados || {}) } })
+    return { pronto: m.ok, contrato: m.contrato, faltando: m.faltando, invalidos: m.invalidos, rotulos: Object.fromEntries((modelo.variaveis || []).map(v => [v.chave, v.rotulo])) }
+  }))
+  dono.get('/biblioteca/clausulas/:chave', b(req => biblioteca.obterClausula(req.params.chave, req.query.versao)))
+  dono.post('/biblioteca/clausulas', b(req => {
+    const c = biblioteca.salvarClausula(req.body || {})
+    plataforma.auditar(req.usuario, 'clausula.salva', { alvo: `${c.chave}@${c.versao}` })
+    return c
+  }))
+  dono.post('/biblioteca/clausulas/:chave/aplicar', b(req => {
+    const r = biblioteca.atualizarVersaoNosModelos(req.params.chave, Number(req.body?.versao), req.body?.modelos || [])
+    plataforma.auditar(req.usuario, 'clausula.aplicada', { alvo: `${req.params.chave}@${req.body?.versao}`, dados: { modelos: r.afetados } })
+    return r
+  }))
   dono.get('/auditoria', (req, res) => res.json(plataforma.listarAuditoria({ limite: 200 })))
   painel.use('/plataforma', dono)
 
@@ -454,7 +507,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
   // ── Erros ─────────────────────────────────────────────────────────────────
   app.use('/api', (req, res) => res.status(404).json({ erro: 'Rota não encontrada.' }))
   app.use((err, req, res, _next) => {
-    if (err instanceof ErroNegocio) return res.status(err.status).json({ erro: err.message, detalhes: err.detalhes })
+    if (err instanceof ErroNegocio || err instanceof ErroBiblioteca) return res.status(err.status).json({ erro: err.message, detalhes: err.detalhes })
     if (err.type === 'entity.parse.failed') return res.status(400).json({ erro: 'JSON inválido.' })
     if (err.type === 'entity.too.large') return res.status(413).json({ erro: 'Arquivo grande demais.' })
     if (/não existe \(há:/.test(err.message)) return res.status(400).json({ erro: err.message })

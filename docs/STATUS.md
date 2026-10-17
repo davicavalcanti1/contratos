@@ -45,6 +45,17 @@ página por página**, com foco em funcionalidade e design, nesta ordem:
 
 ## O que foi acrescentado de funcionalidade nesta rodada
 
+- **Biblioteca viva (17/out):** cláusulas e modelos moram no armazenamento
+  (coleções `clausulas` e `modelos`), semeados dos arquivos de `biblioteca/` na
+  primeira subida. O developer administra em Plataforma → Biblioteca: editor de
+  modelo (variáveis, cláusulas com condição, signatários, vida, lote, modo JSON,
+  prévia com dados de exemplo) e editor de cláusula (parágrafos com condição,
+  bula, destaque, prévia ao vivo). Cláusula editada = versão nova; modelos só
+  mudam quando o developer aplica. Modelo salvo = rascunho; publicar exige
+  linter ok e sobe a versão. Organização só vê e gera com modelo publicado;
+  contratos existentes guardam o snapshot. Decisão do Davi: "o dev refina e
+  libera, o usuário só consome", como no ExameQR (biblioteca.test.js).
+
 - `GET /api/demo/contrato?exemplo=…`: monta os exemplos do repositório para o
   site mostrar o motor ao vivo (site.test.js).
 - Senha esquecida: `POST /painel/api/senha/esquecida`, `GET|POST

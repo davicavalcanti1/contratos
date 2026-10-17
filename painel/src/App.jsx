@@ -21,6 +21,9 @@ import { Auditoria } from './paginas/plataforma/Auditoria.jsx'
 import { Organizacao } from './paginas/plataforma/Organizacao.jsx'
 import { Organizacoes } from './paginas/plataforma/Organizacoes.jsx'
 import { Saude } from './paginas/plataforma/Saude.jsx'
+import { Biblioteca } from './paginas/plataforma/Biblioteca.jsx'
+import { EditorModelo } from './paginas/plataforma/EditorModelo.jsx'
+import { EditorClausula } from './paginas/plataforma/EditorClausula.jsx'
 
 export function App() {
   const { eu } = useSessao()
@@ -48,6 +51,7 @@ const ICONES = {
   organizacoes: 'M3 21h18M5 21V8l7-5 7 5v13M9 21v-5h6v5',
   saude: 'M3 12h4l3-7 4 14 3-7h4',
   auditoria: 'M9 5h9a1 1 0 011 1v13a1 1 0 01-1 1H6a1 1 0 01-1-1V9zM5 9h4V5M9 13h6M9 17h6',
+  biblioteca: 'M4 5a2 2 0 012-2h5v18H6a2 2 0 01-2-2zM11 3h7a2 2 0 012 2v14a2 2 0 01-2 2h-7M14 8h3M14 12h3',
 }
 function Icone({ nome }) {
   return <svg className="icone-menu" viewBox="0 0 24 24" aria-hidden="true"><path d={ICONES[nome]} /></svg>
@@ -81,6 +85,7 @@ function Moldura() {
             <div className="grupo">
               <p className="grupo-titulo">Plataforma</p>
               <Item to="/plataforma" icone="organizacoes" end>Organizações</Item>
+              <Item to="/plataforma/biblioteca" icone="biblioteca">Biblioteca</Item>
               <Item to="/plataforma/saude" icone="saude">Saúde</Item>
               <Item to="/plataforma/auditoria" icone="auditoria">Auditoria</Item>
             </div>
@@ -152,6 +157,9 @@ function Moldura() {
             {ehDeveloper && <>
               <Route path="/plataforma" element={<Organizacoes />} />
               <Route path="/plataforma/organizacoes/:id" element={<Organizacao />} />
+              <Route path="/plataforma/biblioteca" element={<Biblioteca />} />
+              <Route path="/plataforma/biblioteca/modelos/:chave" element={<EditorModelo />} />
+              <Route path="/plataforma/biblioteca/clausulas/:chave" element={<EditorClausula />} />
               <Route path="/plataforma/saude" element={<Saude />} />
               <Route path="/plataforma/auditoria" element={<Auditoria />} />
             </>}

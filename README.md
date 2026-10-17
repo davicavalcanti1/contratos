@@ -12,7 +12,7 @@ gerado a partir dos dados da empresa e assinatura com validade jurídica.
 npm install
 npm run build             # compila o painel (React)
 npm start                 # http://localhost:3000/painel  (e-mails de teste em /dev)
-npm test                  # 116 testes: site, motor, assinatura, lote, plataforma, webhooks, vida, carimbo, ICP-Brasil, painel, HTTP
+npm test                  # 123 testes: site, motor, assinatura, lote, plataforma, webhooks, vida, carimbo, ICP-Brasil, painel, HTTP
 npm run lint:modelos      # linter jurídico em todos os modelos da biblioteca
 npm run exemplos          # gera saida/*.pdf a partir de exemplos/*.json
 ```
@@ -43,7 +43,7 @@ que falta e onde resolver**, em vez de mandar lacuna para assinatura.
 
 | Caminho | O quê |
 |---|---|
-| `biblioteca/clausulas.json` | cláusulas versionadas, com resumo simples (bula), marca de crítica e base legal |
+| `biblioteca/clausulas.json` | **semente** das cláusulas versionadas (bula, crítica, base legal). Em execução, a biblioteca mora no armazenamento e é editada em Plataforma → Biblioteca; só o publicado chega às organizações |
 | `biblioteca/modelos/` | modelos = blocos de cláusula + regras + variáveis tipadas. `prestacao_servicos` cobre PF, PJ e MEI; `termo_confidencialidade_colaborador` é para a empresa inteira; `termo_aditivo` e `distrato` nascem de um contrato assinado |
 | `src/motor/tipos.js` | tipos de variável: CPF/CNPJ com dígito, moeda com extenso, data, endereço, enum… |
 | `src/motor/regras.js` | regras declarativas (`eq`, `in`, `gte`, `e`/`ou`/`nao`) |

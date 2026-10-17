@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { criarRepo } from '../src/armazenamento/repo.js'
 import { criarServico } from '../src/assinatura/servico.js'
-import { carregarBiblioteca } from '../src/biblioteca.js'
+import { criarBibliotecaViva } from '../src/biblioteca.js'
 import { criarLotes } from '../src/lote/lotes.js'
 import { transporteCaixa } from '../src/notificacoes.js'
 import { criarPlataforma } from '../src/plataforma/plataforma.js'
@@ -24,8 +24,8 @@ export async function subirServidor({ fetchWebhook, fetchIndices, agora, carimba
   const servidor = createServer()
   await new Promise(r => servidor.listen(0, '127.0.0.1', r))
   const base = `http://127.0.0.1:${servidor.address().port}`
-  const biblioteca = carregarBiblioteca()
   const repo = criarRepo()
+  const biblioteca = criarBibliotecaViva({ repo })
   const notificar = transporteCaixa(repo, { log: false })
   const recebidos = []
   const webhooks = criarWebhooks({

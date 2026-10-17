@@ -15,7 +15,7 @@ import { join } from 'node:path'
 import { criarRepo } from '../armazenamento/repo.js'
 import { criarRepoSupabase } from '../armazenamento/supabase.js'
 import { criarServico } from '../assinatura/servico.js'
-import { carregarBiblioteca } from '../biblioteca.js'
+import { criarBibliotecaViva } from '../biblioteca.js'
 import { criarLotes } from '../lote/lotes.js'
 import { lintModelo } from '../motor/linter.js'
 import { transporteCaixa } from '../notificacoes.js'
@@ -32,18 +32,20 @@ const producao = process.env.NODE_ENV === 'production'
 const porta = Number(process.env.PORT || 3000)
 const baseUrl = (process.env.BASE_URL || `http://localhost:${porta}`).replace(/\/$/, '')
 
-const biblioteca = carregarBiblioteca()
-// Modelo que não passa no linter não sobe: é a mesma régua da publicação.
-for (const m of biblioteca.modelos) {
-  const r = lintModelo(m, biblioteca.indice)
-  if (!r.ok) throw new Error(`Modelo ${m.chave} reprovado no linter: ${r.graves.map(g => g.msg).join('; ')}`)
-}
-
 // Com SUPABASE_URL, tudo mora no Supabase e a memória é só a cópia de trabalho;
 // sem, JSON em disco (desenvolvimento e testes).
 const repo = process.env.SUPABASE_URL
   ? await criarRepoSupabase({ url: process.env.SUPABASE_URL, chave: process.env.SUPABASE_KEY })
   : criarRepo({ dir: process.env.DADOS_DIR || join(process.cwd(), 'dados') })
+
+// A biblioteca mora no armazenamento (semeada dos arquivos na primeira vez) e
+// é administrada pelo developer no painel. Modelo publicado que não passa no
+// linter é despublicado ao subir, com aviso: a régua da publicação é a mesma.
+const biblioteca = criarBibliotecaViva({ repo })
+for (const m of biblioteca.publicados) {
+  const r = lintModelo(m, biblioteca.indice)
+  if (!r.ok) { console.warn(`[biblioteca] modelo ${m.chave} reprovado no linter e despublicado: ${r.graves.map(g => g.msg).join('; ')}`); biblioteca.despublicarModelo(m.chave) }
+}
 const notificar = transporteCaixa(repo)
 const webhooks = criarWebhooks({ repo, producao })
 const plataforma = criarPlataforma({ repo, notificar, config: { baseUrl } })

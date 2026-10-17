@@ -16,7 +16,7 @@
 
 import { randomUUID } from 'node:crypto'
 
-const COLECOES = ['contratos', 'signatarios', 'eventos', 'sessoes', 'caixa', 'lotes', 'planilhas', 'mapeamentos', 'organizacoes', 'usuarios', 'convites', 'chaves_api', 'webhooks', 'entregas', 'auditoria']
+const COLECOES = ['contratos', 'signatarios', 'eventos', 'sessoes', 'caixa', 'lotes', 'planilhas', 'mapeamentos', 'organizacoes', 'usuarios', 'convites', 'chaves_api', 'webhooks', 'entregas', 'auditoria', 'clausulas', 'modelos']
 const SO_ANEXA = new Set(['eventos', 'auditoria'])
 const PAGINA = 1000
 const TENTATIVAS = 4
