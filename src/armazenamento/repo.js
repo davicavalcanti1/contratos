@@ -1,8 +1,8 @@
-// Armazenamento SEM banco (Fase 2). Coleções em memória, opcionalmente
-// persistidas em JSON numa pasta, e arquivos (PDFs) em disco.
-//
-// A interface é a que o Postgres vai implementar depois: inserir, obter,
-// atualizar, listar, mais arquivos. Duas garantias já moram AQUI, e não só no
+// Armazenamento SEM banco: coleções em memória, opcionalmente persistidas
+// em JSON numa pasta, e arquivos (PDFs) em disco. Serve aos testes e a quem
+// roda sem Supabase; com SUPABASE_URL, o servidor usa supabase.js, que tem a
+// MESMA interface: inserir, obter, atualizar, listar, mais arquivos
+// (lerArquivo é assíncrono nos dois, porque no Supabase vem da rede). Duas garantias já moram AQUI, e não só no
 // serviço, para que trocar o armazenamento não as perca:
 //   - `eventos` é append-only: atualizar ou apagar evento lança erro;
 //   - arquivo gravado não é sobrescrito (o PDF original é prova).
@@ -78,12 +78,13 @@ export function criarRepo({ dir = null } = {}) {
       else arquivos.set(nome, Buffer.from(buffer))
       return nome
     },
-    lerArquivo(nome) {
+    async lerArquivo(nome) {
       if (dir) {
         const p = join(dir, 'arquivos', nome)
         return existsSync(p) ? readFileSync(p) : null
       }
       return arquivos.get(nome) || null
     },
+    aguardar: async () => {},
   }
 }

@@ -248,7 +248,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     }
   }
 
-  function arquivo(id, organizacaoId, qual) {
+  async function arquivo(id, organizacaoId, qual) {
     const c = contratoDaOrg(id, organizacaoId)
     return lerPdf(c, qual)
   }
@@ -490,7 +490,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     exigirProntoParaAssinar(c, s)
     if (!pdfAssinado?.length) throw new ErroNegocio(400, 'Envie o PDF assinado.')
 
-    const original = repo.lerArquivo(c.pdf_original.arquivo)
+    const original = await repo.lerArquivo(c.pdf_original.arquivo)
     const v = await icp.verificar(Buffer.from(pdfAssinado), { original })
     const tentativa = { valida: v.valida, icp_brasil: !!v.icp_brasil, motivos: v.motivos, certificado: v.certificado ? { nome: v.certificado.nome, emissor: v.certificado.emissor, cpf_final: v.certificado.cpf?.slice(-2) || null } : null }
     if (!v.valida) {
@@ -522,12 +522,12 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     return { assinado_em: em, contrato_status: repo.obter('contratos', c.id).status, certificado: { nome: v.certificado.nome, emissor: v.certificado.emissor } }
   }
 
-  function arquivoIcp(id, organizacaoId, signatarioId) {
+  async function arquivoIcp(id, organizacaoId, signatarioId) {
     contratoDaOrg(id, organizacaoId)
     const s = repo.obter('signatarios', signatarioId)
     const cert = s?.contrato_id === id ? s.evidencias?.certificado : null
     if (!cert) throw new ErroNegocio(404, 'Este signatário não assinou com certificado.')
-    return { buffer: repo.lerArquivo(cert.arquivo), nome: `assinatura-icp-${s.nome.split(' ')[0].toLowerCase()}.pdf`, sha256: cert.sha256 }
+    return { buffer: await repo.lerArquivo(cert.arquivo), nome: `assinatura-icp-${s.nome.split(' ')[0].toLowerCase()}.pdf`, sha256: cert.sha256 }
   }
 
   // Depois de cada assinatura: sela se foi a última; senão avança a fila.
@@ -554,7 +554,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     return { recusado_em: em }
   }
 
-  function arquivoDoSignatario(token, sessao, qual) {
+  async function arquivoDoSignatario(token, sessao, qual) {
     const { c } = comSessao(token, sessao)
     return lerPdf(c, qual)
   }
@@ -939,10 +939,10 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     return pendentes.length
   }
 
-  function arquivoCarimbo(id, organizacaoId) {
+  async function arquivoCarimbo(id, organizacaoId) {
     const c = contratoDaOrg(id, organizacaoId)
     if (!c.carimbo) throw new ErroNegocio(404, c.carimbo_pendente ? 'O carimbo do tempo ainda está pendente: a ACT não respondeu. Tentamos de novo sozinhos.' : 'Este contrato não tem carimbo do tempo.')
-    return { buffer: repo.lerArquivo(c.carimbo.arquivo), nome: `carimbo-${slug(c.titulo)}.tsr` }
+    return { buffer: await repo.lerArquivo(c.carimbo.arquivo), nome: `carimbo-${slug(c.titulo)}.tsr` }
   }
 
   // ── Verificação pública (página do QR) ────────────────────────────────────
@@ -1012,10 +1012,10 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     return signatariosDe(c.id).filter(x => x.ordem < s.ordem).every(x => x.status === 'assinado')
   }
 
-  function lerPdf(c, qual) {
+  async function lerPdf(c, qual) {
     const ref = qual === 'final' ? c.pdf_final : c.pdf_original
     if (!ref) throw new ErroNegocio(404, qual === 'final' ? 'O PDF final só existe depois que todos assinam.' : 'PDF não encontrado.')
-    return { buffer: repo.lerArquivo(ref.arquivo), sha256: ref.sha256, nome: `${slug(c.titulo)}-${qual === 'final' ? 'assinado' : 'original'}.pdf` }
+    return { buffer: await repo.lerArquivo(ref.arquivo), sha256: ref.sha256, nome: `${slug(c.titulo)}-${qual === 'final' ? 'assinado' : 'original'}.pdf` }
   }
 
   function validarSignatarios(lista) {

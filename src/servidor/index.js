@@ -2,7 +2,9 @@
 //
 //   PORT                 porta (padrão 3000)
 //   BASE_URL             URL pública, usada nos links, no QR e nos convites (padrão http://localhost:PORT)
-//   DADOS_DIR            onde ficam as coleções JSON e os PDFs (padrão ./dados)
+//   DADOS_DIR            onde ficam as coleções JSON e os PDFs (padrão ./dados), quando NÃO há Supabase
+//   SUPABASE_URL         https://<ref>.supabase.co — liga o armazenamento no Supabase (Postgres + Storage)
+//   SUPABASE_KEY         chave service_role do projeto (nunca a anon, nunca no front)
 //   ORGANIZACOES_ARQUIVO opcional: importa organizações no formato antigo { id: { api_key, dados } }
 //   NODE_ENV=production  desliga /dev, exige https nos webhooks e não cria contas de teste
 //
@@ -11,6 +13,7 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { criarRepo } from '../armazenamento/repo.js'
+import { criarRepoSupabase } from '../armazenamento/supabase.js'
 import { criarServico } from '../assinatura/servico.js'
 import { carregarBiblioteca } from '../biblioteca.js'
 import { criarLotes } from '../lote/lotes.js'
@@ -36,7 +39,11 @@ for (const m of biblioteca.modelos) {
   if (!r.ok) throw new Error(`Modelo ${m.chave} reprovado no linter: ${r.graves.map(g => g.msg).join('; ')}`)
 }
 
-const repo = criarRepo({ dir: process.env.DADOS_DIR || join(process.cwd(), 'dados') })
+// Com SUPABASE_URL, tudo mora no Supabase e a memória é só a cópia de trabalho;
+// sem, JSON em disco (desenvolvimento e testes).
+const repo = process.env.SUPABASE_URL
+  ? await criarRepoSupabase({ url: process.env.SUPABASE_URL, chave: process.env.SUPABASE_KEY })
+  : criarRepo({ dir: process.env.DADOS_DIR || join(process.cwd(), 'dados') })
 const notificar = transporteCaixa(repo)
 const webhooks = criarWebhooks({ repo, producao })
 const plataforma = criarPlataforma({ repo, notificar, config: { baseUrl } })
@@ -74,8 +81,21 @@ agenda.iniciar() // roda agora e de hora em hora
 if (carimbador) setInterval(() => servico.carimbarPendentes().catch(e => console.error('[carimbo]', e)), 10 * 60e3).unref()
 const app = criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, dev: !producao, chaveDev: producao ? null : CHAVE_DEV })
 
+// Escrita no Supabase que falhou (rede, chave) volta para a fila a cada 5 min.
+if (repo.reenfileirarFalhas) setInterval(() => { const n = repo.reenfileirarFalhas(); if (n) console.log(`[supabase] tentando de novo ${n} escrita(s)`) }, 5 * 60e3).unref()
+
+// Desligar sem perder escrita: espera a fila do Supabase esvaziar.
+for (const sinal of ['SIGINT', 'SIGTERM']) {
+  process.on(sinal, async () => {
+    if (repo.pendentes) console.log(`aguardando ${repo.pendentes} escrita(s) no Supabase…`)
+    await repo.aguardar()
+    process.exit(0)
+  })
+}
+
 app.listen(porta, () => {
   console.log(`contratos-saas em ${baseUrl}/painel`)
+  console.log(`  armazenamento: ${process.env.SUPABASE_URL ? `Supabase (${process.env.SUPABASE_URL})` : `JSON em ${process.env.DADOS_DIR || join(process.cwd(), 'dados')}`}`)
   if (!producao) {
     console.log(`  logins de teste (senha "${SENHA_DEV}"): dev@contratos.local (plataforma), admin@clinica-exemplo.com.br (empresa)`)
     console.log(`  caixa de saída e contrato avulso: ${baseUrl}/dev`)

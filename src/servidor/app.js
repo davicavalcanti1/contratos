@@ -113,15 +113,16 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     r.post('/contratos/:id/enviar', h(async (req, res) => res.json(await servico.enviar(req.params.id, org(req).id, req.body))))
     r.post('/contratos/:id/signatarios/:sid/reenviar', h(async (req, res) => res.json(await servico.reenviar(req.params.id, org(req).id, req.params.sid))))
     r.post('/contratos/:id/cancelar', (req, res) => res.json(servico.cancelar(req.params.id, org(req).id, req.body?.motivo)))
-    r.get('/contratos/:id/arquivo', (req, res) => enviarPdf(res, servico.arquivo(req.params.id, org(req).id, req.query.qual)))
-    r.get('/contratos/:id/assinaturas/:sid/arquivo', (req, res) => enviarPdf(res, servico.arquivoIcp(req.params.id, org(req).id, req.params.sid)))
+    r.get('/contratos/:id/arquivo', h(async (req, res) => enviarPdf(res, await servico.arquivo(req.params.id, org(req).id, req.query.qual))))
+    r.get('/contratos/:id/assinaturas/:sid/arquivo', h(async (req, res) => enviarPdf(res, await servico.arquivoIcp(req.params.id, org(req).id, req.params.sid))))
     // Token RFC 3161, para o perito: openssl ts -verify -data <pdf assinado> -in <este arquivo> -CAfile <cadeia da ACT>
-    r.get('/contratos/:id/carimbo.tsr', (req, res) => {
-      const { buffer, nome } = servico.arquivoCarimbo(req.params.id, org(req).id)
+    r.get('/contratos/:id/carimbo.tsr', h(async (req, res) => {
+      const { buffer, nome } = await servico.arquivoCarimbo(req.params.id, org(req).id)
+      if (!buffer) return res.status(404).json({ erro: 'Carimbo indisponível no momento. Tente de novo em instantes.' })
       res.set('Content-Type', 'application/timestamp-reply')
       res.set('Content-Disposition', `attachment; filename="${nome}"`)
       res.send(buffer)
-    })
+    }))
     r.get('/contratos/:id/dossie', h(async (req, res) => {
       const d = servico.dossie(req.params.id, org(req).id)
       if (req.query.formato === 'pdf') return enviarPdf(res, { buffer: await gerarDossiePdf(d), nome: `dossie-${d.contrato.id}.pdf` })
@@ -354,7 +355,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
   assinar.post('/leitura', (req, res) => res.json(servico.registrarLeitura(req.params.token, sess(req), req.body, ctx(req))))
   assinar.post('/assinar', h(async (req, res) => res.json(await servico.assinar(req.params.token, sess(req), req.body, ctx(req)))))
   assinar.post('/recusar', (req, res) => res.json(servico.recusar(req.params.token, sess(req), req.body, ctx(req))))
-  assinar.get('/arquivo', (req, res) => enviarPdf(res, servico.arquivoDoSignatario(req.params.token, sess(req), req.query.qual)))
+  assinar.get('/arquivo', h(async (req, res) => enviarPdf(res, await servico.arquivoDoSignatario(req.params.token, sess(req), req.query.qual))))
   // Assinatura ICP-Brasil: o PDF do contrato, assinado com o certificado de quem assina.
   assinar.post('/icp', express.raw({ type: () => true, limit: '20mb' }), h(async (req, res) => res.json(await servico.assinarComIcp(req.params.token, sess(req), req.body, ctx(req)))))
   app.use('/api/assinar/:token', assinar)
@@ -464,6 +465,8 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
 }
 
 function enviarPdf(res, { buffer, nome, sha256 }) {
+  // Sem bytes: o arquivo ainda não chegou ao armazenamento (ou se perdeu). Nunca um 200 vazio.
+  if (!buffer) return res.status(404).json({ erro: 'Arquivo indisponível no momento. Tente de novo em instantes; se continuar, fale com o suporte.' })
   res.set('Content-Type', 'application/pdf')
   res.set('Content-Disposition', `attachment; filename="${nome}"`)
   res.set('Cache-Control', 'no-store')

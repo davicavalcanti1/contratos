@@ -59,7 +59,7 @@ test('fluxo completo: dois signatários em paralelo → selado, com código e PD
   assert.ok(consulta.pdf_final_sha256 && consulta.pdf_final_sha256 !== consulta.pdf_original_sha256)
   assert.equal(consulta.conteudo_sha256, c.conteudo_sha256, 'o conteúdo assinado é o gerado')
 
-  const final = amb.servico.arquivo(c.id, 'org1', 'final')
+  const final = await amb.servico.arquivo(c.id, 'org1', 'final')
   assert.equal(final.buffer.subarray(0, 5).toString(), '%PDF-')
 
   const d = amb.servico.dossie(c.id, 'org1')

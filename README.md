@@ -3,7 +3,7 @@
 SaaS de contratos, multi-tenant e independente: modelos inteligentes, contrato
 gerado a partir dos dados da empresa e assinatura com validade jurídica.
 
-> **Fase atual: 6 — plugáveis: carimbo do tempo (RFC 3161) e assinatura com certificado ICP-Brasil.** As seis fases do plano estão feitas, ainda sem banco e sem e-mail real.
+> **Fase atual: refação página por página + armazenamento no Supabase.** As seis fases do plano estão feitas; o banco agora pode ser o Supabase (Postgres + Storage), ainda sem e-mail real. Onde paramos: [docs/STATUS.md](docs/STATUS.md).
 > Origem: o módulo de contratos do ExameQR (`exam-qr-system`), generalizado.
 
 ## Rodar
@@ -19,6 +19,22 @@ npm run exemplos          # gera saida/*.pdf a partir de exemplos/*.json
 
 Logins de teste (senha `senha-de-teste-local`): `dev@contratos.local` (plataforma) e
 `admin@clinica-exemplo.com.br` (empresa de exemplo). Ver [docs/PLATAFORMA.md](docs/PLATAFORMA.md).
+
+### Armazenamento
+
+Sem configuração, tudo fica em JSON na pasta `dados/` (ou `DADOS_DIR`). Com
+duas variáveis, tudo mora no Supabase e a memória é só a cópia de trabalho:
+
+```powershell
+$env:SUPABASE_URL = "https://<ref>.supabase.co"
+$env:SUPABASE_KEY = "<service_role>"   # nunca a anon, nunca no front
+npm start
+```
+
+O esquema é uma tabela `registros` (coleção + id + JSON) e um bucket privado
+`arquivos`; está em `supabase/migrations/0001_registros.sql`. O servidor carrega
+tudo ao subir e grava cada escrita em seguida, numa fila que tenta de novo se a
+rede falhar (`src/armazenamento/supabase.js`). Vale para uma instância.
 
 `exemplos/com-erros.json` é recusado de propósito: mostra o motor dizendo **o
 que falta e onde resolver**, em vez de mandar lacuna para assinatura.

@@ -52,13 +52,17 @@ const comandos = {
   async developer(email, nome) {
     if (!email || !nome) throw new Error('uso: developer <email> "<nome completo>"')
     const { criarRepo } = await import('./armazenamento/repo.js')
+    const { criarRepoSupabase } = await import('./armazenamento/supabase.js')
     const { criarPlataforma } = await import('./plataforma/plataforma.js')
-    const repo = criarRepo({ dir: process.env.DADOS_DIR || join(process.cwd(), 'dados') })
+    const repo = process.env.SUPABASE_URL
+      ? await criarRepoSupabase({ url: process.env.SUPABASE_URL, chave: process.env.SUPABASE_KEY })
+      : criarRepo({ dir: process.env.DADOS_DIR || join(process.cwd(), 'dados') })
     const baseUrl = (process.env.BASE_URL || 'http://localhost:3000').replace(/\/$/, '')
     const p = criarPlataforma({ repo, notificar: async () => {}, config: { baseUrl } })
     const c = await p.convidar({ nome, email, papel: 'developer' }, { tipo: 'cli' })
     console.log(`Convite criado para ${c.email}. Abra para criar a senha (vale 7 dias):`)
     console.log(c.link)
+    await repo.aguardar()
   },
 }
 
