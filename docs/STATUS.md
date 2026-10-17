@@ -19,9 +19,9 @@ página por página**, com foco em funcionalidade e design, nesta ordem:
 | 6 | Selo de verificação (`verificar.html`) | ✅ pronto | `385b536` |
 | 7 | Lotes, lote e assinatura em lote | ✅ pronto | `a1cf1fb` |
 | 8 | Agenda | ✅ pronto | `62f2835` |
-| 9 | Empresa, usuários, chaves e webhooks | ✅ pronto | este commit |
-| 10 | Plataforma: organizações, saúde, auditoria | ⏭ próxima | |
-| 11 | `/dev` | | |
+| 9 | Empresa, usuários, chaves e webhooks | ✅ pronto | `51ed8ee` |
+| 10 | Plataforma: organizações, saúde, auditoria | ✅ pronto | este commit |
+| 11 | `/dev` | ⏭ próxima | |
 
 116 testes passando (`npm test`).
 
