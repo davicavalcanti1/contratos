@@ -230,7 +230,7 @@ body.site .botao.botao:not(.secundario) { color: #fff; }
 .chamada-cta { background: var(--acao); border-color: var(--acao) !important; color: #fff; }
 .chamada-cta h2 { color: #fff; font-size: clamp(26px, 2.8vw, 34px); font-weight: 600; }
 .chamada-cta p { margin: 14px 0 26px; color: rgba(255, 255, 255, .85); max-width: 30em; }
-.chamada-cta .botao { background: #fff; color: var(--acao-forte); }
+body.site .chamada-cta .botao.botao:not(.secundario) { background: #fff; color: var(--acao-forte); }
 .chamada-cta .botao:hover { background: var(--acao-claro); }
 .chamada-conferir { background: var(--superficie); display: grid; align-content: center; }
 .chamada-conferir h3 { font-size: 20px; font-weight: 600; }
