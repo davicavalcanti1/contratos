@@ -61,15 +61,14 @@ página por página**, com foco em funcionalidade e design, nesta ordem:
 - **Nome do produto.** "Contratos" é provisório. Sugestões levantadas: Ciente
   (recomendada), Bulla, Clausa, Nítido. Davi pediu para pensar depois. Onde
   trocar está em [IDENTIDADE.md](IDENTIDADE.md).
-- **Supabase: feito, falta a chave.** Projeto "contratos" (ref
-  `gjpfplwirjterbkrybds`, org `fkoxcgsfvwwkecvudrqs`), tabela `registros` e
-  bucket `arquivos` criados pelo conector em 17/out. `src/armazenamento/supabase.js`
-  faz write-through (memória como cópia de trabalho, fila de escrita com
-  tentativas e re-tentativa a cada 5 min). Testado de ponta a ponta com a chave
-  anon: os registros chegam ao Postgres; os **arquivos não sobem** porque o
-  Storage tem RLS e a anon não passa. Falta Davi passar a **service_role key**
-  (Project Settings → API) e, depois, ligar o RLS na tabela (`alter table
-  public.registros enable row level security;`). Vale para uma instância.
+- **Supabase: ligado.** Projeto "contratos" (ref `gjpfplwirjterbkrybds`), tabela
+  `registros` com RLS e bucket privado `arquivos`, criados pelo conector em
+  17/out (`supabase/migrations/`). O servidor usa a **service_role** via
+  `SUPABASE_URL` e `SUPABASE_KEY` (a chave fica só com o Davi e no ambiente do
+  servidor; não está no repo nem em nota). Testado de ponta a ponta: registros
+  e PDFs chegam, o servidor reinicia e recarrega tudo, a chave anon não lê
+  nada. Vale para uma instância; com mais de uma, converter os serviços para
+  ler do Postgres a cada pedido.
 - E-mail real ainda não existe (tudo cai na caixa do `/dev`).
 - Biblioteca de cláusulas sem revisão de advogado; raízes ICP-Brasil com
   impressões digitais a conferir antes de produção; ZapSign adiado.
