@@ -44,15 +44,15 @@
       "opcoes": [
         {
           "valor": "pf",
-          "texto": "pessoa física"
+          "texto": "Pessoa física"
         },
         {
           "valor": "pj",
-          "texto": "pessoa jurídica"
+          "texto": "Pessoa jurídica"
         },
         {
           "valor": "mei",
-          "texto": "microempreendedor individual"
+          "texto": "Microempreendedor"
         }
       ]
     },

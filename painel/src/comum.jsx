@@ -91,9 +91,9 @@ export function Cabecalho({ titulo, sub, children }) {
   )
 }
 
-export function Campo({ rotulo, dica, children, obrigatorio }) {
+export function Campo({ rotulo, dica, children, obrigatorio, classe = '' }) {
   return (
-    <label className="campo">
+    <label className={`campo ${classe}`.trim()}>
       <span>{rotulo}{obrigatorio && <em className="obrig" aria-label="obrigatório"> *</em>}</span>
       {children}
       {dica && <small>{dica}</small>}

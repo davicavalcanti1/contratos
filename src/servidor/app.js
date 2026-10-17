@@ -93,6 +93,16 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
       })
     })
 
+    // Prévia: o contrato montado com o que já foi preenchido, lacunas marcadas
+    // como {{variável}}. É leitura, não cria nada nem conta no plano.
+    r.post('/modelos/:chave/previa', (req, res) => {
+      const modelo = acharModelo(biblioteca, req.params.chave)
+      const d = { ...(req.body?.dados || {}), organizacao: dados(req) }
+      const m = montarContrato({ modelo, biblioteca: biblioteca.indice, dados: d })
+      const rotulos = Object.fromEntries(modelo.variaveis.map(v => [v.chave, v.rotulo]))
+      res.json({ pronto: m.ok, contrato: m.contrato, faltando: m.faltando, invalidos: m.invalidos, rotulos })
+    })
+
     r.get('/contratos', (req, res) => res.json(servico.listarContratos(org(req).id, req.query)))
     r.post('/contratos', h(async (req, res) => {
       plataforma.checarLimite(org(req).id, 1)

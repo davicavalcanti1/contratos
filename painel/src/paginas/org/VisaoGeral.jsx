@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { api } from '../../api.js'
 import { Cabecalho, Carregando, Erro, Situacao, Vazio, data, dataHora, plural, useDados } from '../../comum.jsx'
 import { useSessao } from '../../sessao.jsx'
+import { ListaContratos } from './ListaContratos.jsx'
 
 const DIA = 864e5
 const saudacao = () => { const h = new Date().getHours(); return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite' }
@@ -208,54 +209,5 @@ function ItemPendente({ c }) {
         {dias == null ? '' : dias < 0 ? 'expirado' : dias === 0 ? 'expira hoje' : `expira em ${plural(dias, 'dia', 'dias')}`}
       </span>
     </li>
-  )
-}
-
-export function ListaContratos({ itens }) {
-  return (
-    <>
-    <ul className="lista-contratos-m">
-      {itens.map(c => {
-        const total = c.signatarios.length
-        const feitas = c.signatarios.filter(s => s.status === 'assinado').length
-        return (
-          <li key={c.id}>
-            <Link to={`/contratos/${c.id}`}>{c.titulo}</Link>
-            <span>{c.referencia ? `ref. ${c.referencia} · ` : ''}{total ? c.signatarios.map(s => s.nome).join(', ') : 'ainda não enviado'}</span>
-            <div className="lista-contratos-m-rodape">
-              <Situacao valor={c.status} />
-              {total > 0 && <small>{feitas} de {total} {total === 1 ? 'assinatura' : 'assinaturas'}</small>}
-              <small>{dataHora(c.criado_em)}</small>
-            </div>
-          </li>
-        )
-      })}
-    </ul>
-    <div className="rolagem tabela-desktop">
-      <table className="tabela">
-        <thead><tr><th>Contrato</th><th>Quem assina</th><th>Assinaturas</th><th>Situação</th><th>Criado</th></tr></thead>
-        <tbody>
-          {itens.map(c => {
-            const total = c.signatarios.length
-            const feitas = c.signatarios.filter(s => s.status === 'assinado').length
-            return (
-              <tr key={c.id}>
-                <td><Link to={`/contratos/${c.id}`}>{c.titulo}</Link>{c.referencia && <><br /><small>ref. {c.referencia}</small></>}</td>
-                <td>{total ? c.signatarios.map(s => s.nome).join(', ') : <small>ainda não enviado</small>}</td>
-                <td className="col-assinaturas">
-                  {total > 0 && <>
-                    <span className="assinaturas-trilho" aria-hidden="true">{c.signatarios.map(s => <i key={s.id} className={s.status === 'assinado' ? 'feito' : s.status === 'recusado' ? 'recusado' : ''} />)}</span>
-                    <small>{feitas} de {total}</small>
-                  </>}
-                </td>
-                <td><Situacao valor={c.status} /></td>
-                <td><small>{dataHora(c.criado_em)}</small></td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-    </div>
-    </>
   )
 }

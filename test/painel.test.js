@@ -184,3 +184,19 @@ test('senha esquecida: resposta igual com ou sem conta, link vale uma vez, derru
   const t2 = A.caixa(ADMIN, 'redefinicao').meta.link.split('/redefinir/')[1]
   assert.equal((await painel(`/redefinir/${t2}`, null, { metodo: 'POST', corpo: { senha: SENHA } })).status, 200)
 })
+
+test('prévia do modelo: monta o contrato com lacunas marcadas, sem criar nada', async () => {
+  const admin = await A.entrar(ADMIN)
+  const antes = (await A.json(await painel('/org/contratos?limite=1', admin))).corpo.total
+  const dados = { contratado: { tipo: 'pj', nome: 'Limpeza Exemplo Ltda.' }, contrato: { prazo_tipo: 'indeterminado' } }
+  const r = await A.json(await painel('/org/modelos/prestacao_servicos/previa', admin, { metodo: 'POST', corpo: { dados } }))
+  assert.equal(r.status, 200)
+  assert.equal(r.corpo.pronto, false)
+  assert.ok(r.corpo.contrato.clausulas.length > 10)
+  assert.ok(!r.corpo.contrato.clausulas.some(c => c.chave === 'multa_rescisoria'), 'sem prazo não há multa')
+  const partes = r.corpo.contrato.clausulas.find(c => c.chave === 'partes')
+  assert.match(partes.paragrafos.map(p => p.texto).join(' '), /Limpeza Exemplo Ltda\./)
+  assert.match(partes.paragrafos.map(p => p.texto).join(' '), /\{\{contratado\.cnpj\}\}/, 'lacuna fica marcada')
+  assert.equal(r.corpo.rotulos['contratado.cnpj'], 'CNPJ do contratado')
+  assert.equal((await A.json(await painel('/org/contratos?limite=1', admin))).corpo.total, antes, 'não criou contrato')
+})

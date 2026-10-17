@@ -21,7 +21,7 @@ test('a demonstração do motor monta o exemplo com bula, numeração e a regra 
   assert.equal(r.status, 200)
   const d = await r.json()
   assert.equal(d.ok, true)
-  assert.equal(d.contratado.tipo, 'pessoa jurídica')
+  assert.equal(d.contratado.tipo, 'Pessoa jurídica')
   assert.equal(d.clausulas[0].numero, 1)
   const prazo = d.clausulas.find(c => c.chave === 'prazo_indeterminado')
   assert.match(prazo.condicao, /prazo indeterminado/)
