@@ -126,7 +126,72 @@ Em ordem do que trava a primeira venda:
 6. **Cobrança**: nada existe. Começar manual (Pix/boleto mensal) e só automatizar
    com 10 clientes pagantes.
 
-## 7. Decisões pedidas ao Davi
+## 7. Saúde primeiro: clínicas de imagem, hospitais e clínicas com convênio
+
+Decidido em 17/out/2026 (Davi). É o setor que ele conhece pelo ExameQR e o que
+tem mais contrato repetido por metro quadrado. Mapa do que circula numa clínica
+de imagem ou num hospital de médio porte, e o que vale atacar:
+
+| Contrato | Quem assina | Volume | Risco que o dono não vê | Prioridade |
+|---|---|---|---|---|
+| **Médico/radiologista PJ** (presencial ou laudo remoto) | clínica + médico | alto e recorrente; renova todo ano | pejotização; falta de cláusula de autonomia compreendida; exclusividade mal escrita | **1** |
+| **Técnico de radiologia / enfermagem / biomédico PJ** | clínica + profissional | alto | idem, com escala e carga horária que sugerem subordinação | **1** |
+| **Termo de confidencialidade e LGPD do colaborador** (recepção, faturamento, TI) | clínica + colaborador | todo mundo da casa, a cada admissão | dado de saúde é sensível; sem prova de ciência, o termo não documenta nada | **1** (existe) |
+| **Termo de consentimento informado do paciente** (contraste iodado/gadolínio, sedação, biópsia, procedimentos) | paciente + clínica | **gigantesco**: todo exame com contraste | é a bula pura: CDC art. 46 e dever de informar do CFM; hoje é papel assinado na recepção sem ler | **2**, produto diferente de "contrato" mas mesmo motor |
+| **Prestação de serviço entre clínicas** (laudo terceirizado, telerradiologia, mamografia móvel) | clínica + clínica | médio | SLA, responsabilidade pelo laudo, LGPD entre controladoras | 2 |
+| **Termo de responsabilidade técnica** (RT perante Vigilância/CNEN) | clínica + médico RT | baixo volume, alto peso | obrigação regulatória; muda quando o RT sai | 3 |
+| **Credenciamento com operadora de saúde** | operadora + clínica | baixo | é contrato de adesão da operadora: não controlamos o texto | fora: só guardar/acompanhar vigência e reajuste |
+| **Comodato/locação de equipamento** com fabricante | fabricante + clínica | baixo | idem, texto do fornecedor | fora |
+
+### Por onde começar: o kit saúde v1
+
+Três modelos, todos variações do que o motor já faz:
+
+1. **Contrato de prestação de serviços médicos (PJ/MEI)**: evolução do modelo
+   atual, com variáveis de saúde: conselho e registro (CRM-UF), especialidade,
+   RQE, modalidade (presencial, laudo remoto, plantão), escala e volume estimado
+   **escritos como estimativa, não como obrigação de horário**, responsabilidade
+   pelo laudo e pela guarda do prontuário, seguro de responsabilidade civil
+   (opcional), exclusividade (opcional), sigilo de prontuário e LGPD como
+   operador. Cláusulas críticas com bula: autonomia, exclusividade, multa, foro,
+   responsabilidade pelo laudo.
+2. **Contrato de prestação de serviços técnicos em saúde (PJ/MEI)**: técnico de
+   radiologia, enfermagem, biomédico; mesma base, com dosimetria/CNEN quando
+   radiologia, EPI e protocolos da clínica.
+3. **Termo de confidencialidade e LGPD do colaborador de saúde**: o que existe,
+   com a cláusula de dado sensível (art. 11 da LGPD), prontuário, imagens e
+   laudos, e uso dos sistemas (PACS, RIS).
+
+Cada um em **lote pela planilha do RH**, que é como o volume entra.
+
+### A segunda onda: consentimento informado com bula
+
+É o maior volume da clínica de imagem e a aplicação mais pura da ideia: o
+paciente lê, em palavras simples, o que vai acontecer e os riscos (contraste,
+reação alérgica, gravidez, marca-passo), dá ciência item a item, assina com o
+nome, e a clínica guarda o dossiê. Hoje isso é um papel na prancheta da
+recepção. Diferenças do produto atual: o signatário é anônimo até chegar
+(não há e-mail antes), assina no tablet da recepção ou no próprio celular por
+QR, e o volume é de centenas por dia. Vale um produto-irmão ("consentimento
+com bula") sobre o mesmo motor, depois que o kit v1 estiver rodando em uma
+clínica. **Não misturar agora.**
+
+### Mensagem para o dono da clínica
+
+"Seus médicos e técnicos são PJ. Quando um deles entrar na Justiça dizendo que
+era empregado, você vai mostrar o quê? Com a gente, você mostra que ele leu e
+confirmou, com horário, que trabalha por conta própria, sem exclusividade e sem
+horário imposto. E cada funcionário seu assinou o termo de sigilo de prontuário
+entendendo o que assinou. Tudo isso a partir da planilha que o seu RH já tem."
+
+### O que isso pede do Davi (conhecimento do setor)
+
+- Validar as variáveis do contrato médico: o que o ExameQR e as clínicas que ele
+  conhece pedem de verdade (escala? valor por laudo? por plantão? por hora?).
+- Um médico ou gestor de clínica para ler o modelo v1 antes do advogado.
+- Nomes de 2 ou 3 clínicas da rede do ExameQR para o piloto gratuito.
+
+## 8. Decisões pedidas ao Davi
 
 - Confirmar o recorte: PMEs que contratam PJ/colaboradores, começando por saúde.
 - Nome do produto, para domínio e e-mail.
