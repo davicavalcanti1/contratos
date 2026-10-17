@@ -163,3 +163,24 @@ test('formulário dinâmico: PJ pede CNPJ e representante, PF pede CPF', async (
   assert.equal(pronto.pronto, true)
   assert.deepEqual(pronto.signatarios.map(s => s.papel), ['representante'])
 })
+
+test('senha esquecida: resposta igual com ou sem conta, link vale uma vez, derruba as outras sessões e já entra', async () => {
+  const antes = await A.entrar(ADMIN)
+  assert.equal((await painel('/senha/esquecida', null, { metodo: 'POST', corpo: { email: 'ninguem@org1.exemplo' } })).status, 200)
+  assert.equal(A.caixa('ninguem@org1.exemplo', 'redefinicao'), undefined, 'sem conta, sem e-mail')
+  assert.equal((await painel('/senha/esquecida', null, { metodo: 'POST', corpo: { email: ADMIN.toUpperCase() } })).status, 200)
+  const token = A.caixa(ADMIN, 'redefinicao').meta.link.split('/redefinir/')[1]
+  assert.equal((await A.json(await painel(`/redefinir/${token}`, null))).corpo.email, ADMIN)
+  assert.equal((await painel(`/redefinir/${token}`, null, { metodo: 'POST', corpo: { senha: 'curta' } })).status, 400)
+  const r = await painel(`/redefinir/${token}`, null, { metodo: 'POST', corpo: { senha: 'nova-senha-do-admin-1' } })
+  assert.equal(r.status, 200)
+  assert.match(r.headers.get('set-cookie'), /HttpOnly/)
+  assert.equal((await A.json(await painel('/eu', antes))).corpo, null, 'a sessão antiga caiu')
+  assert.equal((await painel(`/redefinir/${token}`, null, { metodo: 'POST', corpo: { senha: 'nova-senha-do-admin-2' } })).status, 404, 'o link não vale duas vezes')
+  assert.equal((await painel('/sessao', null, { metodo: 'POST', corpo: { email: ADMIN, senha: 'nova-senha-do-admin-1' } })).status, 200)
+  assert.equal((await painel(`/convite/${token}`, null)).status, 404, 'link de redefinição não serve como convite')
+  // Devolve a senha original para os outros testes.
+  await painel('/senha/esquecida', null, { metodo: 'POST', corpo: { email: ADMIN } })
+  const t2 = A.caixa(ADMIN, 'redefinicao').meta.link.split('/redefinir/')[1]
+  assert.equal((await painel(`/redefinir/${t2}`, null, { metodo: 'POST', corpo: { senha: SENHA } })).status, 200)
+})

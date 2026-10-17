@@ -46,6 +46,11 @@ modelos (hoje os modelos são da biblioteca da plataforma).
   os mesmos para e-mail existente e inexistente.
 - Sessão em cookie **HttpOnly, SameSite=Strict**, Secure atrás de https, 12 h.
   Trocar a senha encerra as outras sessões; desativar o usuário também.
+- **Senha esquecida** (`POST /painel/api/senha/esquecida`): a resposta é a mesma
+  exista ou não a conta. Se existir, vai um link por e-mail que vale 1 hora e uma
+  vez só (`/painel/redefinir/:token`); redefinir derruba as outras sessões e já
+  entra. O link mora na coleção de convites com `tipo: redefinicao` e não serve
+  como convite.
 - **CSRF**: além do SameSite, o painel recusa escrita com os tipos de conteúdo
   que um formulário de outro site consegue mandar.
 - O token do convite também é mascarado no log, como o dos links de assinatura.

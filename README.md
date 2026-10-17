@@ -12,7 +12,7 @@ gerado a partir dos dados da empresa e assinatura com validade jurídica.
 npm install
 npm run build             # compila o painel (React)
 npm start                 # http://localhost:3000/painel  (e-mails de teste em /dev)
-npm test                  # 113 testes: site, motor, assinatura, lote, plataforma, webhooks, vida, carimbo, ICP-Brasil, painel, HTTP
+npm test                  # 114 testes: site, motor, assinatura, lote, plataforma, webhooks, vida, carimbo, ICP-Brasil, painel, HTTP
 npm run lint:modelos      # linter jurídico em todos os modelos da biblioteca
 npm run exemplos          # gera saida/*.pdf a partir de exemplos/*.json
 ```

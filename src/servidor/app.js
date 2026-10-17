@@ -220,6 +220,15 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     gravarCookie(req, res, sessao)
     res.json({ ok: true })
   })
+  // Senha esquecida: pede o link (resposta igual com ou sem conta) e redefine, já entrando.
+  painel.post('/senha/esquecida', limitadorLogin, h(async (req, res) => res.json(await plataforma.pedirRedefinicao(req.body?.email, ctx(req)))))
+  painel.get('/redefinir/:token', (req, res) => res.json(plataforma.verRedefinicao(req.params.token)))
+  painel.post('/redefinir/:token', limitadorLogin, (req, res) => {
+    const { sessao, usuario } = plataforma.redefinirSenha(req.params.token, req.body?.senha, ctx(req))
+    gravarCookie(req, res, sessao)
+    const u = repo.obter('usuarios', usuario.id)
+    res.json(eu(u, u.organizacao_id ? repo.obter('organizacoes', u.organizacao_id) : null))
+  })
 
   // Rotas da organização para quem está logado. O developer pode ABRIR uma
   // organização só para leitura (suporte), dizendo qual no cabeçalho.

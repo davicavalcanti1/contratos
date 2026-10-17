@@ -4,6 +4,7 @@ import { Carregando } from './comum.jsx'
 import { useSessao } from './sessao.jsx'
 import { Convite } from './paginas/Convite.jsx'
 import { Entrar } from './paginas/Entrar.jsx'
+import { Redefinir } from './paginas/Redefinir.jsx'
 import { Conta } from './paginas/Conta.jsx'
 import { Chaves } from './paginas/org/Chaves.jsx'
 import { Contrato } from './paginas/org/Contrato.jsx'
@@ -27,10 +28,32 @@ export function App() {
   return (
     <Routes>
       <Route path="/convite/:token" element={<Convite />} />
+      <Route path="/redefinir/:token" element={<Redefinir />} />
       <Route path="/entrar" element={eu ? <Navigate to="/" replace /> : <Entrar />} />
       <Route path="/*" element={eu ? <Moldura /> : <Navigate to="/entrar" replace state={{ voltar: location.pathname }} />} />
     </Routes>
   )
+}
+
+// Ícones de traço do menu, 20px. Sem biblioteca: são poucos e simples.
+const ICONES = {
+  inicio: 'M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z',
+  contratos: 'M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6',
+  agenda: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
+  lotes: 'M4 5h16v14H4zM4 10h16M10 5v14',
+  empresa: 'M4 21V7l8-4 8 4v14M9 21v-6h6v6M9 10h.01M15 10h.01',
+  usuarios: 'M16 19v-1a4 4 0 00-8 0v1M12 11a3 3 0 100-6 3 3 0 000 6zM20 19v-1a3 3 0 00-2-2.8M16 5.2a3 3 0 010 5.6',
+  chaves: 'M14 10a4 4 0 10-3.5 3.97L13 11.5l1 1 1-1 1 1 2-2v-2zM9 15l-5 5v-3l2-2',
+  webhooks: 'M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16',
+  organizacoes: 'M3 21h18M5 21V8l7-5 7 5v13M9 21v-5h6v5',
+  saude: 'M3 12h4l3-7 4 14 3-7h4',
+  auditoria: 'M9 5h9a1 1 0 011 1v13a1 1 0 01-1 1H6a1 1 0 01-1-1V9zM5 9h4V5M9 13h6M9 17h6',
+}
+function Icone({ nome }) {
+  return <svg className="icone-menu" viewBox="0 0 24 24" aria-hidden="true"><path d={ICONES[nome]} /></svg>
+}
+function Item({ to, icone, children, end }) {
+  return <NavLink to={to} end={end}><Icone nome={icone} />{children}</NavLink>
 }
 
 function Moldura() {
@@ -42,10 +65,12 @@ function Moldura() {
 
   const veOrg = !!org
   const inicio = ehDeveloper && !suporte ? '/plataforma' : '/inicio'
+  const iniciais = eu.usuario.nome.split(' ').filter(Boolean).slice(0, 2).map(p => p[0]).join('').toUpperCase()
 
   return (
     <div className="moldura">
       <a className="pular" href="#conteudo">Pular para o conteúdo</a>
+      {menuAberto && <button className="cortina" aria-label="Fechar o menu" onClick={() => setMenuAberto(false)} />}
       <aside className={`lateral${menuAberto ? ' aberta' : ''}`}>
         <div className="marca">
           <span className="marca-icone" aria-hidden="true" />
@@ -55,30 +80,34 @@ function Moldura() {
           {ehDeveloper && (
             <div className="grupo">
               <p className="grupo-titulo">Plataforma</p>
-              <NavLink to="/plataforma" end>Organizações</NavLink>
-              <NavLink to="/plataforma/saude">Saúde</NavLink>
-              <NavLink to="/plataforma/auditoria">Auditoria</NavLink>
+              <Item to="/plataforma" icone="organizacoes" end>Organizações</Item>
+              <Item to="/plataforma/saude" icone="saude">Saúde</Item>
+              <Item to="/plataforma/auditoria" icone="auditoria">Auditoria</Item>
             </div>
           )}
           {veOrg && (
             <div className="grupo">
-              <p className="grupo-titulo">{org.nome}</p>
-              <NavLink to="/inicio">Visão geral</NavLink>
-              <NavLink to="/contratos">Contratos</NavLink>
-              <NavLink to="/agenda">Agenda</NavLink>
-              <NavLink to="/lotes">Lotes</NavLink>
+              <p className="grupo-titulo" title={org.nome}>{org.nome}</p>
+              <Item to="/inicio" icone="inicio">Visão geral</Item>
+              <Item to="/contratos" icone="contratos">Contratos</Item>
+              <Item to="/agenda" icone="agenda">Agenda</Item>
+              <Item to="/lotes" icone="lotes">Lotes</Item>
               {ehAdmin && <>
-                <NavLink to="/empresa">Dados da empresa</NavLink>
-                <NavLink to="/usuarios">Usuários</NavLink>
-                <NavLink to="/chaves">Chaves de API</NavLink>
-                <NavLink to="/webhooks">Webhooks</NavLink>
+                <p className="grupo-titulo grupo-titulo-sub">Administração</p>
+                <Item to="/empresa" icone="empresa">Dados da empresa</Item>
+                <Item to="/usuarios" icone="usuarios">Usuários</Item>
+                <Item to="/chaves" icone="chaves">Chaves de API</Item>
+                <Item to="/webhooks" icone="webhooks">Webhooks</Item>
               </>}
             </div>
           )}
         </nav>
         <div className="quem">
-          <strong>{eu.usuario.nome}</strong>
-          <span>{eu.usuario.papel_rotulo}</span>
+          <span className="avatar" aria-hidden="true">{iniciais}</span>
+          <div className="quem-texto">
+            <strong>{eu.usuario.nome}</strong>
+            <span>{eu.usuario.papel_rotulo}</span>
+          </div>
           <div className="quem-acoes">
             <NavLink to="/conta">Minha conta</NavLink>
             <button className="link-botao" onClick={async () => { await sair(); navegar('/entrar') }}>Sair</button>

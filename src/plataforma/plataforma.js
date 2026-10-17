@@ -42,6 +42,7 @@ export const CAMPOS_ORGANIZACAO = [
 
 const SESSAO_HORAS = 12
 const CONVITE_DIAS = 7
+const REDEFINICAO_MIN = 60
 const LOGIN_TENTATIVAS = 5
 const LOGIN_BLOQUEIO_MIN = 15
 const SENHA_MIN = 10
@@ -201,7 +202,7 @@ export function criarPlataforma({ repo, notificar, config = {}, agora = () => ne
   }
 
   function conviteDe(token) {
-    const c = repo.listar('convites', x => x.token_hash === sha256(String(token || '')))[0]
+    const c = repo.listar('convites', x => !x.tipo && x.token_hash === sha256(String(token || '')))[0]
     if (!c || c.usado_em) throw new ErroNegocio(404, 'Convite inválido ou já usado.')
     if (c.expira_em < agoraIso()) throw new ErroNegocio(410, 'Convite expirado. Peça um novo a quem convidou você.')
     return c
@@ -275,6 +276,56 @@ export function criarPlataforma({ repo, notificar, config = {}, agora = () => ne
     for (const s of repo.listar('sessoes', x => x.usuario_id === u.id)) repo.remover('sessoes', s.id)
     auditar(u, 'usuario.senha_trocada', { organizacao_id: u.organizacao_id })
     return abrirSessao(u, {})
+  }
+
+  // ── Senha esquecida ──────────────────────────────────────────────────────
+  // A resposta é a mesma exista ou não a conta: o link vai por e-mail e vale
+  // uma hora, uma vez só. Fica na coleção de convites, marcado como redefinição.
+  async function pedirRedefinicao(email, ctx = {}) {
+    const e = String(email || '').trim().toLowerCase()
+    if (TIPOS.email.validar(e)) throw new ErroNegocio(400, 'E-mail inválido.')
+    const u = repo.listar('usuarios', x => x.email === e && x.ativo)[0]
+    if (!u) {
+      auditar({ email: e, tipo: 'anonimo' }, 'senha.redefinicao_pedida', { dados: { ip: ctx.ip || null, conta: false } })
+      return { ok: true }
+    }
+    for (const c of repo.listar('convites', c => c.tipo === 'redefinicao' && c.usuario_id === u.id && !c.usado_em)) repo.remover('convites', c.id)
+    const { token, hash } = novoToken()
+    repo.inserir('convites', { tipo: 'redefinicao', token_hash: hash, usuario_id: u.id, email: e, criado_em: agoraIso(), expira_em: depois(REDEFINICAO_MIN * 60e3) })
+    const link = `${baseUrl}/painel/redefinir/${token}`
+    await notificar({
+      para: e, canal: 'email',
+      assunto: 'Redefinir a senha do painel de contratos',
+      texto: `Olá, ${u.nome.split(' ')[0]}.\n\nAlguém pediu para redefinir a senha da sua conta. Se foi você, use este link (vale ${REDEFINICAO_MIN} minutos e uma vez só):\n${link}\n\nSe não foi você, ignore esta mensagem: a senha continua a mesma.`,
+      meta: { tipo: 'redefinicao', link, organizacao_id: u.organizacao_id },
+    })
+    auditar(u, 'senha.redefinicao_pedida', { organizacao_id: u.organizacao_id, dados: { ip: ctx.ip || null, conta: true } })
+    return { ok: true }
+  }
+
+  function redefinicaoDe(token) {
+    const c = repo.listar('convites', x => x.tipo === 'redefinicao' && x.token_hash === sha256(String(token || '')))[0]
+    if (!c || c.usado_em) throw new ErroNegocio(404, 'Este link não vale mais. Peça um novo na tela de entrar.')
+    if (c.expira_em < agoraIso()) throw new ErroNegocio(410, 'Este link expirou. Peça um novo na tela de entrar.')
+    return c
+  }
+
+  function verRedefinicao(token) {
+    const c = redefinicaoDe(token)
+    return { email: c.email, expira_em: c.expira_em }
+  }
+
+  function redefinirSenha(token, senha, ctx = {}) {
+    const c = redefinicaoDe(token)
+    validarSenha(senha)
+    const u = repo.obter('usuarios', c.usuario_id)
+    if (!u?.ativo) throw new ErroNegocio(404, 'Esta conta não está mais ativa.')
+    repo.atualizar('usuarios', u.id, { senha_hash: hashSenha(senha) })
+    for (const s of repo.listar('sessoes', x => x.usuario_id === u.id)) repo.remover('sessoes', s.id)
+    repo.atualizar('convites', c.id, { usado_em: agoraIso() })
+    tentativasLogin.delete(u.email)
+    auditar(u, 'usuario.senha_redefinida', { organizacao_id: u.organizacao_id, dados: { ip: ctx.ip || null } })
+    return abrirSessao(u, ctx)
   }
 
   function listarUsuarios(orgId) {
@@ -373,6 +424,7 @@ export function criarPlataforma({ repo, notificar, config = {}, agora = () => ne
     auditar, listarAuditoria,
     criarOrganizacao, atualizarOrganizacao, listarOrganizacoes, obterOrganizacao, resumoOrganizacao, faltandoNoCadastro, consumo, checarLimite,
     convidar, verConvite, aceitarConvite, login, sessaoDe, sair, trocarSenha, listarUsuarios, alterarUsuario,
+    pedirRedefinicao, verRedefinicao, redefinirSenha,
     criarChave, autenticarChave, listarChaves, revogarChave,
     importarOrganizacoes, criarUsuarioDireto, temDeveloper,
   }

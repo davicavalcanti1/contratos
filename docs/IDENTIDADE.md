@@ -5,7 +5,7 @@ linguagem simples). A escolha foi uma **mistura**: as telas juntam a bula com a
 linguagem simples, e o PDF fica com a fé pública. O produto ainda não tem nome;
 "Contratos" é provisório e aparece só no topo do site, no painel e no rodapé.
 
-## Telas (assinatura, selo, painel): bula + linguagem simples
+## Telas públicas (assinatura, selo): bula + linguagem simples
 
 | | |
 |---|---|
@@ -27,6 +27,15 @@ azul-céu como única cor de ação e muito respiro. O amarelo e os títulos de
 bula aparecem só **dentro da demonstração**, que é o componente real da tela
 de assinatura, e no logotipo. Estilos em `public/estatico/site.css`; a seção
 "O modelo é lógica" lê o motor em `/api/demo/contrato`.
+
+## Painel: ferramenta limpa, como o site
+
+Decidido em 16/out/2026, junto com o site: o painel segue o mesmo visual de
+produto (fundo branco puro, cartões brancos com borda fina, títulos em Lexend
+sem caixa-alta, azul como única cor de ação, sempre em tema claro). A caixa-alta
+condensada fica só no logotipo. Estilos em `painel/src/painel.css`. A tela de
+entrar tem um painel azul lateral com a promessa do produto; as telas de convite
+e de redefinir senha usam a mesma estrutura.
 
 ## PDF (contrato, via assinada, dossiê): fé pública
 
