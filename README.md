@@ -12,7 +12,7 @@ gerado a partir dos dados da empresa e assinatura com validade jurídica.
 npm install
 npm run build             # compila o painel (React)
 npm start                 # http://localhost:3000/painel  (e-mails de teste em /dev)
-npm test                  # 109 testes: motor, assinatura, lote, plataforma, webhooks, vida, carimbo, ICP-Brasil, painel, HTTP
+npm test                  # 113 testes: site, motor, assinatura, lote, plataforma, webhooks, vida, carimbo, ICP-Brasil, painel, HTTP
 npm run lint:modelos      # linter jurídico em todos os modelos da biblioteca
 npm run exemplos          # gera saida/*.pdf a partir de exemplos/*.json
 ```
@@ -42,7 +42,7 @@ que falta e onde resolver**, em vez de mandar lacuna para assinatura.
 | `src/plataforma/` | organizações, usuários, convites, sessão, chaves de API, planos, auditoria e webhooks |
 | `painel/` | painel em React + Vite (developer e organização), compilado para `public/painel` |
 | `src/servidor/` | HTTP: API da organização, rotas do signatário, verificação pública, `/dev` |
-| `public/` | tela de assinatura (mobile-first), assinatura em lote, página do selo e `/dev`. HTML/JS puros, sem build |
+| `public/` | site de apresentação (com a assinatura para experimentar e o motor ao vivo em `/api/demo/contrato`), tela de assinatura (mobile-first), assinatura em lote, página do selo e `/dev`. HTML/JS puros, sem build |
 
 ⚠️ O texto da biblioteca foi redigido a partir da legislação citada em cada
 cláusula, mas **não passou por advogado**. Ver `docs/VALIDADE-JURIDICA.md` §6.

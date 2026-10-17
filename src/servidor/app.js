@@ -17,6 +17,7 @@ import { gerarDossiePdf } from '../assinatura/dossie-pdf.js'
 import { acharModelo } from '../biblioteca.js'
 import { signatariosDaLinha } from '../lote/mapear.js'
 import { camposNecessarios, montarContrato } from '../motor/montar.js'
+import { humanizar } from '../motor/texto-modelo.js'
 import { ErroNegocio } from '../assinatura/servico.js'
 import { EVENTOS_WEBHOOK } from '../plataforma/webhooks.js'
 import { periodoPadrao } from '../vida/indices.js'
@@ -360,6 +361,35 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     const r = servico.conferirHash(req.params.codigo, req.body?.sha256)
     if (!r) return res.status(404).json({ erro: 'Nenhum contrato com este código.' })
     res.json(r)
+  })
+
+  // Demonstração do motor para o site: monta os exemplos do repositório (nunca
+  // dados de quem visita) e devolve as cláusulas com bula, numeração e a regra
+  // que fez cada uma entrar. É estático, então fica em cache na memória.
+  const demo = new Map()
+  app.get('/api/demo/contrato', (req, res) => {
+    const nome = String(req.query.exemplo || 'pf-determinado')
+    if (!demo.has(nome)) {
+      const ex = lerExemplos().find(e => e.nome === nome)
+      if (!ex) return res.status(404).json({ erro: 'Exemplo desconhecido.' })
+      const organizacao = JSON.parse(readFileSync(join(RAIZ, 'exemplos', '_organizacao.json'), 'utf8'))
+      const modelo = acharModelo(biblioteca, ex.modelo)
+      const m = montarContrato({ modelo, biblioteca: biblioteca.indice, dados: { organizacao, ...ex.dados } })
+      const defs = Object.fromEntries(modelo.variaveis.map(v => [v.chave, v]))
+      const condicoes = Object.fromEntries(modelo.blocos.filter(b => b.quando).map(b => [b.clausula, humanizar(b.quando, defs)]))
+      const tipo = defs['contratado.tipo']?.opcoes?.find(o => o.valor === ex.dados.contratado?.tipo)?.texto || null
+      demo.set(nome, {
+        exemplo: nome,
+        ok: m.ok,
+        titulo: m.contrato.titulo,
+        contratado: { nome: ex.dados.contratado?.nome || null, tipo },
+        clausulas: m.contrato.clausulas.map(c => ({ ...c, condicao: condicoes[c.chave] || null })),
+        faltando: m.faltando,
+        invalidos: m.invalidos,
+      })
+    }
+    res.set('Cache-Control', 'public, max-age=300')
+    res.json(demo.get(nome))
   })
 
   // ── Páginas ───────────────────────────────────────────────────────────────

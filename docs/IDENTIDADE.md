@@ -5,11 +5,11 @@ linguagem simples). A escolha foi uma **mistura**: as telas juntam a bula com a
 linguagem simples, e o PDF fica com a fé pública. O produto ainda não tem nome;
 "Contratos" é provisório e aparece só no topo do site, no painel e no rodapé.
 
-## Telas (assinatura, selo, painel, site): bula + linguagem simples
+## Telas (assinatura, selo, painel): bula + linguagem simples
 
 | | |
 |---|---|
-| Da **bula** | títulos em caixa-alta condensada (Archivo, `font-stretch: 72%`); marca-texto amarelo `#FFE04A` sobre o resumo; texto técnico logo abaixo, completo; seções do site como perguntas ("Para que serve?", "Contraindicações") |
+| Da **bula** | títulos em caixa-alta condensada (Archivo, `font-stretch: 72%`); marca-texto amarelo `#FFE04A` sobre o resumo; texto técnico logo abaixo, completo |
 | Da **linguagem simples** | o resumo vem **primeiro** e grande (Lexend 19px); cores claras: fundo branco-gelo `#F5F8FA`, ação azul-céu `#1F6AA5` (fundo claro `#E2F0FB`), ok em menta `#DAF5E7`. Sem roxo (pedido do Davi, 16/out); botões em pílula; progresso em segmentos, um por cláusula em destaque |
 | Texto do contrato | Source Serif 4. Nunca escondido: a leitura até o fim é prova |
 | Códigos e hashes | IBM Plex Mono, a mesma fonte do PDF |
@@ -17,6 +17,16 @@ linguagem simples, e o PDF fica com a fé pública. O produto ainda não tem nom
 Os tokens ficam em `public/estatico/app.css` (claro e escuro); o painel e o
 site reaproveitam esses tokens. No desktop, a cláusula abre em duas colunas:
 o resumo à esquerda e o texto do contrato à direita.
+
+## Site de apresentação: página de produto, branca e limpa
+
+Decidido em 16/out/2026 (Davi): o site **não** usa a cara de bula. É uma
+vitrine de sistema: fundo branco predominante, títulos em Lexend sem
+caixa-alta, bordas finas (`#e6ebf0`), superfícies quase brancas (`#f7f9fb`),
+azul-céu como única cor de ação e muito respiro. O amarelo e os títulos de
+bula aparecem só **dentro da demonstração**, que é o componente real da tela
+de assinatura, e no logotipo. Estilos em `public/estatico/site.css`; a seção
+"O modelo é lógica" lê o motor em `/api/demo/contrato`.
 
 ## PDF (contrato, via assinada, dossiê): fé pública
 
