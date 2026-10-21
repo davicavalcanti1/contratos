@@ -19,6 +19,7 @@ import { Usuarios } from './paginas/org/Usuarios.jsx'
 import { VisaoGeral } from './paginas/org/VisaoGeral.jsx'
 import { Webhooks } from './paginas/org/Webhooks.jsx'
 import { Auditoria } from './paginas/plataforma/Auditoria.jsx'
+import { Interessados } from './paginas/plataforma/Interessados.jsx'
 import { Organizacao } from './paginas/plataforma/Organizacao.jsx'
 import { Organizacoes } from './paginas/plataforma/Organizacoes.jsx'
 import { Saude } from './paginas/plataforma/Saude.jsx'
@@ -53,6 +54,7 @@ const ICONES = {
   organizacoes: 'M3 21h18M5 21V8l7-5 7 5v13M9 21v-5h6v5',
   saude: 'M3 12h4l3-7 4 14 3-7h4',
   auditoria: 'M9 5h9a1 1 0 011 1v13a1 1 0 01-1 1H6a1 1 0 01-1-1V9zM5 9h4V5M9 13h6M9 17h6',
+  interessados: 'M3 13h5l2 3h4l2-3h5M3 13v6h18v-6M5 5h14l2 8H3z',
   biblioteca: 'M4 5a2 2 0 012-2h5v18H6a2 2 0 01-2-2zM11 3h7a2 2 0 012 2v14a2 2 0 01-2 2h-7M14 8h3M14 12h3',
 }
 function Icone({ nome }) {
@@ -88,6 +90,7 @@ function Moldura() {
               <p className="grupo-titulo">Plataforma</p>
               <Item to="/plataforma" icone="organizacoes" end>Organizações</Item>
               <Item to="/plataforma/biblioteca" icone="biblioteca">Biblioteca</Item>
+              <Item to="/plataforma/interessados" icone="interessados">Interessados</Item>
               <Item to="/plataforma/saude" icone="saude">Saúde</Item>
               <Item to="/plataforma/auditoria" icone="auditoria">Auditoria</Item>
             </div>
@@ -165,6 +168,7 @@ function Moldura() {
               <Route path="/plataforma/biblioteca/modelos/:chave" element={<EditorModelo />} />
               <Route path="/plataforma/biblioteca/clausulas/:chave" element={<EditorClausula />} />
               <Route path="/plataforma/saude" element={<Saude />} />
+              <Route path="/plataforma/interessados" element={<Interessados />} />
               <Route path="/plataforma/auditoria" element={<Auditoria />} />
             </>}
             <Route path="*" element={<p className="vazio">Esta página não existe ou seu papel não dá acesso a ela. <NavLink to={inicio}>Voltar ao início</NavLink></p>} />

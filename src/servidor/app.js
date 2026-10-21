@@ -20,6 +20,7 @@ import { signatariosDaLinha } from '../lote/mapear.js'
 import { camposNecessarios, montarContrato } from '../motor/montar.js'
 import { humanizar } from '../motor/texto-modelo.js'
 import { ErroNegocio } from '../assinatura/servico.js'
+import { ORG_DEMO } from '../plataforma/demonstracao.js'
 import { EVENTOS_WEBHOOK } from '../plataforma/webhooks.js'
 import { periodoPadrao } from '../vida/indices.js'
 
@@ -30,7 +31,7 @@ const COOKIE = 'cs_painel'
 // Fontes e estilos vêm do próprio sistema (public/estatico/fontes): nada de terceiro na tela de quem assina.
 const CSP = "default-src 'self'; img-src 'self' data: blob:; style-src 'self'; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
 
-export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes = null, marca = null, dev = false, log = true, chaveDev = null }) {
+export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes = null, marca = null, demonstracao = null, dev = false, log = true, chaveDev = null }) {
   const app = express()
   app.disable('x-powered-by')
   // Atrás do proxy do EasyPanel: o IP real vem no X-Forwarded-For (é evidência
@@ -388,6 +389,8 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     return r
   }))
   dono.get('/auditoria', (req, res) => res.json(plataforma.listarAuditoria({ limite: 200 })))
+  // Quem pediu o contrato de exemplo pelo site, e até onde foi.
+  dono.get('/interessados', (req, res) => res.json(demonstracao ? demonstracao.listar() : []))
   painel.use('/plataforma', dono)
 
   app.use('/painel/api', painel)
@@ -398,7 +401,8 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     const agora = Date.now()
     const orgs = new Map(repo.listar('organizacoes').map(o => [o.id, o.dados.razao_social]))
     const contratos = repo.listar('contratos')
-    const parados = contratos.filter(c => ['enviado', 'parcialmente_assinado'].includes(c.status) && agora - new Date(c.enviado_em) > 7 * 864e5)
+    // Contratos de demonstração do site expiram sozinhos: não são "parados".
+    const parados = contratos.filter(c => c.organizacao_id !== ORG_DEMO && ['enviado', 'parcialmente_assinado'].includes(c.status) && agora - new Date(c.enviado_em) > 7 * 864e5)
     const falhas = webhooks.falhando()
     const porOrg = (lista) => [...lista.reduce((m, x) => m.set(x.organizacao_id, (m.get(x.organizacao_id) || 0) + 1), new Map())]
       .map(([id, n]) => ({ organizacao_id: id, organizacao: orgs.get(id) || id, n })).sort((a, b) => b.n - a.n)
@@ -484,6 +488,14 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     res.set('Cache-Control', 'public, max-age=300')
     res.json(demo.get(nome))
   })
+
+  // Demonstração de verdade: o visitante pede e recebe um contrato de exemplo
+  // por e-mail. Poucos pedidos por IP por hora; o resto do abuso é tratado no módulo.
+  const limitadorDemo = limitarPorIp({ janelaMs: 3600e3, maximo: 10 })
+  app.post('/api/demo/pedir', limitadorDemo, h(async (req, res) => {
+    if (!demonstracao) return res.status(404).json({ erro: 'Demonstração desligada.' })
+    res.status(201).json(await demonstracao.pedir(req.body || {}, ctx(req)))
+  }))
 
   // ── Páginas ───────────────────────────────────────────────────────────────
   const pagina = (arquivo, raiz = PUBLICO) => (req, res) => {

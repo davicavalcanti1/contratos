@@ -33,7 +33,7 @@
       <div class="topo-acoes">
         <a class="link-discreto so-desktop" href="/verificar">Conferir um contrato</a>
         <a class="botao secundario" href="/painel">Entrar</a>
-        <a class="botao so-desktop" href="/painel">Começar</a>
+        <a class="botao so-desktop" href="#experimentar">Receber um contrato de teste</a>
       </div>
     </div>
   </header>
@@ -46,8 +46,8 @@
         <h1>O contrato que quem assina <em>entende</em>.</h1>
         <p class="abre-sub">E que qualquer pessoa confere. Você escreve o modelo uma vez, o sistema monta cada contrato com os dados certos, quem assina lê cada cláusula com um resumo em palavras simples, e o PDF sai com um selo que se verifica em segundos.</p>
         <div class="abre-acoes">
-          <a class="botao" href="/painel">Começar agora</a>
-          <a class="botao secundario" href="#demo">Experimentar a assinatura</a>
+          <a class="botao" href="#experimentar">Receber um contrato de teste</a>
+          <a class="botao secundario" href="#demo">Ver a bula aqui mesmo</a>
         </div>
         <ul class="abre-provas" aria-label="Em resumo">
           <li>Resumo simples em cada cláusula</li>
@@ -123,6 +123,34 @@
       </div>
     </section>
 
+    <!-- ── Teste de verdade: contrato por e-mail ────────────────────────── -->
+    <section class="secao faixa banda" id="experimentar" aria-labelledby="t-experimentar">
+      <div class="experimentar">
+        <div class="experimentar-texto">
+          <p class="olho">Teste de verdade</p>
+          <h2 id="t-experimentar">Receba um contrato no seu e-mail e assine com a bula</h2>
+          <p>Em dois minutos você vive o que o seu médico ou colaborador vai viver: o link, o código, a leitura com o resumo em palavras simples, a ciência nas cláusulas em destaque e o selo no fim.</p>
+          <p>O contrato é de exemplo: uma clínica fictícia contratando você para laudos, com dados fictícios além do seu nome e e-mail. Nada é cobrado e nada vale como contrato.</p>
+          <ul class="lista-check">
+            <li><b>Um e-mail com o link</b>, igual ao que o seu signatário receberia</li>
+            <li><b>A tela de assinatura de verdade</b>, no celular ou no computador</li>
+            <li><b>O PDF selado e o selo público</b>, para você conferir o QR</li>
+          </ul>
+        </div>
+        <form class="experimentar-form" id="form-experimentar" novalidate>
+          <h3>Quero receber o contrato de exemplo</h3>
+          <label class="campo"><span>Nome completo</span><input name="nome" autocomplete="name" required maxlength="80" placeholder="Como vai assinar"></label>
+          <label class="campo"><span>E-mail</span><input name="email" type="email" autocomplete="email" required placeholder="voce@suaclinica.com.br"></label>
+          <label class="campo"><span>Clínica ou empresa <small>opcional</small></span><input name="empresa" autocomplete="organization" maxlength="120"></label>
+          <label class="campo"><span>WhatsApp <small>opcional, se quiser que a gente fale com você</small></span><input name="telefone" type="tel" autocomplete="tel" maxlength="40"></label>
+          <label class="campo oculto" aria-hidden="true"><span>Site</span><input name="site" tabindex="-1" autocomplete="off"></label>
+          <div id="experimentar-erro" class="aviso erro" role="alert" hidden></div>
+          <button class="botao largo" type="submit">Enviar o contrato para mim</button>
+          <p class="nota-pequena">Usamos seu nome e e-mail só para esta demonstração, e o WhatsApp só se você deixar. O contrato de exemplo expira em 2 dias.</p>
+        </form>
+        <div class="experimentar-form experimentar-ok" id="experimentar-ok" hidden aria-live="polite"></div>
+      </div>
+    </section>
     <!-- ── Recursos ────────────────────────────────────────────────────── -->
     <section class="secao faixa" id="recursos" aria-labelledby="t-recursos">
       <div class="secao-cabeca">
@@ -279,8 +307,8 @@
       <div class="chamada">
         <div class="chamada-cta">
           <h2 id="t-chamada">Comece com um contrato de teste</h2>
-          <p>Crie a conta, escolha um modelo e mande o primeiro contrato para o seu próprio e-mail. Leva menos de cinco minutos.</p>
-          <a class="botao" href="/painel">Começar agora</a>
+          <p>Receba um contrato de exemplo no seu e-mail e assine como o seu médico assinaria. Gostou? A gente migra os seus modelos, com bula, em uma semana.</p>
+          <a class="botao" href="#experimentar">Receber o contrato de exemplo</a>
         </div>
         <div class="chamada-conferir">
           <h3>Recebeu um contrato?</h3>

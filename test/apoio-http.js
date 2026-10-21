@@ -10,6 +10,7 @@ import { criarLotes } from '../src/lote/lotes.js'
 import { criarPartes } from '../src/partes.js'
 import { transporteCaixa } from '../src/notificacoes.js'
 import { criarAvisos } from '../src/plataforma/avisos.js'
+import { criarDemonstracao } from '../src/plataforma/demonstracao.js'
 import { criarMarca } from '../src/plataforma/marca.js'
 import { criarPlataforma } from '../src/plataforma/plataforma.js'
 import { criarWebhooks } from '../src/plataforma/webhooks.js'
@@ -42,10 +43,11 @@ export async function subirServidor({ fetchWebhook, fetchIndices, agora, carimba
   const marca = criarMarca({ repo, auditar: plataforma.auditar })
   const servico = criarServico({ repo, biblioteca, notificar, config: { baseUrl: base }, aoEvento, carimbador, icp, partes, marcaDe: marca.publica, ...(agora ? { agora } : {}) })
   const lotes = criarLotes({ repo, biblioteca, servico })
+  const demonstracao = criarDemonstracao({ repo, servico, plataforma, marca, notificar, config: { baseUrl: base, dev: true }, ...(agora ? { agora } : {}) })
   const agenda = criarAgenda({ repo, servico, notificar, aoEvento, config: { baseUrl: base }, ...(agora ? { agora } : {}) })
   const indices = criarIndices({ fetchFn: fetchIndices || (async () => { throw new Error('sem rede no teste') }) })
   await plataforma.importarOrganizacoes({ org1: { api_key: CHAVE, dados: ORG } })
-  servidor.on('request', criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes, marca, dev: true, log: false, chaveDev: CHAVE }))
+  servidor.on('request', criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes, marca, demonstracao, dev: true, log: false, chaveDev: CHAVE }))
 
   const api = (caminho, { metodo = 'GET', corpo, chave = CHAVE, sessao, cookie, cabecalhos = {} } = {}) =>
     fetch(base + caminho, {
@@ -69,7 +71,7 @@ export async function subirServidor({ fetchWebhook, fetchIndices, agora, carimba
     return r.headers.get('set-cookie').split(';')[0]
   }
 
-  return { servidor, base, repo, plataforma, servico, webhooks, avisos, lotes, agenda, partes, marca, recebidos, api, json, caixa, entrar, fechar: () => servidor.close() }
+  return { servidor, base, repo, plataforma, servico, webhooks, avisos, lotes, agenda, partes, marca, demonstracao, recebidos, api, json, caixa, entrar, fechar: () => servidor.close() }
 }
 
 // Assina um contrato como o signatário faria pelo link.

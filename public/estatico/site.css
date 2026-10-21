@@ -250,3 +250,19 @@ body.site .chamada-cta .botao.botao:not(.secundario) { background: #fff; color: 
 .rodape-grade nav a { color: var(--tinta-2); text-decoration: none; }
 .rodape-grade nav a:hover { color: var(--tinta); text-decoration: underline; }
 .rodape-nota { border-top: 1px solid var(--borda); padding-top: 20px; padding-bottom: 36px; font-size: 13.5px; color: var(--tinta-3); }
+
+/* ── Teste de verdade: contrato por e-mail ──────────────────────────────── */
+.experimentar { display: grid; gap: 28px; }
+@media (min-width: 900px) { .experimentar { grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); gap: 56px; align-items: start; } }
+.experimentar-texto > p:not(.olho) { margin-top: 14px; color: var(--tinta-2); font-size: 17px; }
+.experimentar-texto .lista-check { margin-top: 22px; }
+.experimentar-form { background: var(--folha); border: 1px solid var(--borda); border-radius: 20px; padding: 26px 24px; display: grid; gap: 14px; }
+@media (min-width: 900px) { .experimentar-form { padding: 32px 30px; } }
+.experimentar-form h3 { font-size: 19px; font-weight: 600; margin: 0 0 4px; }
+.experimentar-form .campo { margin: 0; }
+.experimentar-form .campo span small { font-weight: 400; color: var(--tinta-3); margin-left: 6px; }
+.experimentar-form .botao.largo { width: 100%; margin-top: 4px; }
+.campo.oculto { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.nota-pequena { font-size: 13px; color: var(--tinta-3); margin: 0; line-height: 1.5; }
+.experimentar-ok p { color: var(--tinta-2); }
+.experimentar-ok .aviso { margin: 0; }

@@ -160,3 +160,38 @@ if (form) {
     location.href = `/v/${encodeURIComponent(codigo)}`
   })
 }
+
+// ── 3. Teste de verdade: um contrato de exemplo no e-mail do visitante ──────
+const formExp = $('#form-experimentar')
+if (formExp) {
+  const ok = $('#experimentar-ok')
+  const erro = $('#experimentar-erro')
+  formExp.addEventListener('submit', async (ev) => {
+    ev.preventDefault()
+    erro.hidden = true
+    const btn = formExp.querySelector('button[type=submit]')
+    const rotulo = btn.textContent
+    btn.disabled = true
+    btn.textContent = 'Enviando…'
+    try {
+      const r = await fetch('/api/demo/pedir', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(formExp))) })
+      const j = await r.json().catch(() => ({}))
+      if (!r.ok) throw new Error(j.erro || `Não deu certo (${r.status}). Tente de novo em instantes.`)
+      ok.innerHTML = `
+        <h3>Enviado para ${esc(j.enviado_para)}</h3>
+        <p>Abra o e-mail, clique no link, confirme o código e leia com a bula. O link vale ${j.expira_em_dias || 2} dias. Não achou? Olhe o spam.</p>
+        ${j.link ? `<p class="aviso info">Ambiente de desenvolvimento: o e-mail fica na caixa interna. <a href="${esc(j.link)}">Abrir o link de assinatura</a></p>` : ''}
+        <p><button type="button" class="link-botao" id="experimentar-outro">Pedir para outro e-mail</button></p>`
+      formExp.hidden = true
+      ok.hidden = false
+      ok.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+      $('#experimentar-outro').addEventListener('click', () => { ok.hidden = true; formExp.hidden = false; formExp.reset(); formExp.querySelector('input').focus() })
+    } catch (e) {
+      erro.textContent = e.message
+      erro.hidden = false
+    } finally {
+      btn.disabled = false
+      btn.textContent = rotulo
+    }
+  })
+}

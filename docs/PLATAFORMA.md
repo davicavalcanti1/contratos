@@ -93,6 +93,7 @@ lugar da chave. O que a API faz, o painel faz, e vice-versa. Novidades desta fas
 | `POST /v1/contratos` | aceita `referencia`: o id do contrato no **seu** sistema; volta em toda consulta e webhook |
 | `POST /v1/modelos/:chave/conferir` | `{ dados }` → campos que este contrato precisa, o que falta, o que está inválido, quem assina |
 | `GET /plataforma/biblioteca`, `GET/PUT /plataforma/biblioteca/modelos/:chave`, `POST …/publicar`, `…/despublicar`, `…/lint`, `…/previa`, `POST /plataforma/biblioteca/modelos` (novo ou `copiar_de`), `GET /plataforma/biblioteca/clausulas/:chave`, `POST /plataforma/biblioteca/clausulas` (versão nova), `POST …/clausulas/:chave/aplicar` | developer | biblioteca: editar, publicar, versionar |
+| `POST /api/demo/pedir` (público) `{ nome, email, empresa?, telefone? }` | **demonstração real** (20/out): contrato de exemplo enviado ao e-mail; vira interessado. `GET /painel/api/plataforma/interessados` lista para o developer |
 | `GET /v1/partes?busca=&pagina=&limite=`, `GET /v1/partes/:id` | **diretório de partes** (20/out): quem já recebeu contrato desta organização, com os dados do último contrato; preenchido a cada geração (`src/partes.js`). Busca por nome sem acento, dígitos do CPF/CNPJ ou e-mail. Só leitura |
 | `POST /v1/modelos/:chave/previa` | `{ dados }` → o contrato montado com o que já há, lacunas como `{{variável}}`, mais `rotulos`; só leitura, não conta no plano |
 

@@ -73,6 +73,16 @@ basta; não precisa de certificado ICP-Brasil do médico.
 
 ## O que foi acrescentado de funcionalidade nesta rodada
 
+- **Demonstração real pelo site (20/out):** o visitante deixa nome e e-mail
+  (clínica e WhatsApp opcionais) em `/#experimentar` e recebe um contrato de
+  exemplo de verdade, da organização "Clínica Exemplo" (criada sozinha no
+  primeiro pedido), com o nome dele e o resto fictício; assina com a bula e vê
+  o selo. Vira **interessado**: e-mail ao developer e lista em Plataforma →
+  Interessados, com até onde a pessoa foi (abriu, confirmou, leu, assinou).
+  Um pedido por e-mail por dia, cinco por IP por hora, campo-armadilha para
+  robô, link de 2 dias (`src/plataforma/demonstracao.js`,
+  demonstracao.test.js). Fora de produção o link vem na resposta, para a demo
+  no notebook. O site não manda mais ninguém para o login.
 - **Bloco técnico (20/out):** fontes servidas pelo próprio sistema
   (`public/estatico/fontes/`, CSP sem Google: nada de terceiro na tela de
   quem assina); `link.aberto` registrado no máximo uma vez por hora por
