@@ -66,6 +66,13 @@ SUPABASE_URL=… SUPABASE_KEY=… node ferramentas/backup.mjs --restaurar backup
 | Link de assinatura "substituído por um mais novo" | reenvio ou lembrete automático gerou link novo | a pessoa usa o último e-mail recebido |
 | Painel em branco ou 503 "Painel não compilado" | build não rodou no deploy | `npm run build` antes de `npm start` |
 
+## Encerrar uma conta
+
+Antes de suspender ou apagar uma organização, ela (ou você, como suporte)
+baixa a exportação completa em Dados da empresa → Exportar tudo. A prova de
+cada contrato vai com ela; o que fica aqui só se apaga depois do prazo de
+guarda combinado no termo de uso (#12).
+
 ## O que nunca fazer
 
 - Trocar `BASE_URL` com contratos assinados: o QR impresso quebra.

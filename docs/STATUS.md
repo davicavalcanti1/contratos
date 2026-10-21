@@ -73,6 +73,15 @@ basta; não precisa de certificado ICP-Brasil do médico.
 
 ## O que foi acrescentado de funcionalidade nesta rodada
 
+- **Exportação completa da organização (20/out):** Dados da empresa →
+  "Exportar tudo" (administrador; developer como suporte; `GET /v1/exportar`
+  pela API, `?desde=AAAA-MM-DD` opcional): .zip escrito direto na resposta
+  com uma pasta por contrato (os mesmos arquivos do pacote de prova),
+  `indice.csv` para o Excel, `pessoas.csv`, `organizacao.json` (sem
+  segredos), `auditoria.json`, logotipo e LEIA-ME. Uma exportação por
+  organização de cada vez; fica na auditoria. É o "a prova é do cliente" da
+  VISION como botão, e a portabilidade da LGPD
+  (`src/plataforma/exportacao.js`, exportacao.test.js).
 - **Painel de leitura e recusas (20/out):** tela Leitura (organização) e
   Plataforma → Leitura (todas as organizações ou uma; a demonstração do site
   fica de fora por padrão): funil de quem recebeu, abriu, confirmou o código,

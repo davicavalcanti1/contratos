@@ -791,3 +791,7 @@ button.numero:hover { border-color: var(--acao); }
 .lista-recusas-meta { font-size: 13px; color: var(--tinta-3); }
 .lista-recusas blockquote { margin: 0; padding-left: 12px; border-left: 3px solid var(--linha); font-size: 14.5px; }
 .lista-recusas small { color: var(--tinta-3); }
+
+/* ── Exportar tudo (Dados da empresa) ─────────────────────────────────── */
+.exportar p { max-width: 70ch; }
+.exportar .acoes { margin: 6px 0 10px; }

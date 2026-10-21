@@ -2,15 +2,17 @@
 // conferir o contrato sem o nosso sistema. PDF assinado, PDF original,
 // dossiê (PDF e JSON), carimbo do tempo, PDFs assinados com certificado e um
 // LEIA-ME com os comandos de conferência. É o "a prova é do cliente" da
-// VISION.md em um arquivo só.
+// VISION.md em um arquivo só. A exportação completa da organização
+// (plataforma/exportacao.js) monta o mesmo conteúdo para cada contrato.
 
 import archiver from 'archiver'
 import { gerarDossiePdf } from './dossie-pdf.js'
 import { dataHora } from '../motor/pdf.js'
 
-const slug = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)
+export const slug = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)
 
-export async function gerarPacote({ servico, contratoId, organizacaoId, baseUrl }) {
+// Os arquivos do pacote de um contrato: [nome, Buffer][], com o LEIA-ME primeiro.
+export async function montarPacote({ servico, contratoId, organizacaoId, baseUrl }) {
   const d = servico.dossie(contratoId, organizacaoId)
   const c = d.contrato
   const entradas = []
@@ -26,7 +28,7 @@ export async function gerarPacote({ servico, contratoId, organizacaoId, baseUrl 
 
   entradas.push(['dossie.pdf', await gerarDossiePdf(d)])
   entradas.push(['dossie.json', Buffer.from(JSON.stringify(d, null, 2))])
-  linhas.push('- dossie.pdf e dossie.json: as evidências (identificação por código, ciência em cada cláusula em destaque, leitura até o fim, assinatura, IP e aparelho) e a trilha de eventos encadeada por hash. O PDF é para ler; o JSON é para conferir por programa.')
+  linhas.push('- dossie.pdf e dossie.json: as evidências (identificação por código, ciência em cada cláusula em destaque, leitura até o fim, dúvidas e respostas, assinatura, IP e aparelho) e a trilha de eventos encadeada por hash. O PDF é para ler; o JSON é para conferir por programa.')
 
   const ct = d.integridade.carimbo_do_tempo
   if (ct?.gen_time) {
@@ -73,11 +75,15 @@ export async function gerarPacote({ servico, contratoId, organizacaoId, baseUrl 
   ].join('\n')
   entradas.unshift(['LEIA-ME.txt', Buffer.from(leiame, 'utf8')])
 
-  const buffer = await zipar(entradas)
-  return { buffer, nome: `prova-${slug(c.titulo)}-${c.codigo_verificacao || c.id.slice(0, 8)}.zip` }
+  return { entradas, contrato: c, nome: `prova-${slug(c.titulo)}-${c.codigo_verificacao || c.id.slice(0, 8)}.zip` }
 }
 
-function zipar(entradas) {
+export async function gerarPacote(opts) {
+  const { entradas, nome } = await montarPacote(opts)
+  return { buffer: await zipar(entradas), nome }
+}
+
+export function zipar(entradas) {
   return new Promise((resolve, reject) => {
     const arq = archiver('zip', { zlib: { level: 6 } })
     const partes = []

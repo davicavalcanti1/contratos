@@ -2,7 +2,7 @@
 // contratante. Quem muda aqui muda os PRÓXIMOS contratos; os gerados ficam.
 
 import { useEffect, useState } from 'react'
-import { api } from '../../api.js'
+import { api, baixar } from '../../api.js'
 import { Cabecalho, Campo, Carregando, Erro, endereco, useAcao, useDados } from '../../comum.jsx'
 import { Marca } from './Marca.jsx'
 import { useSessao } from '../../sessao.jsx'
@@ -17,6 +17,26 @@ const DICA = {
 const GRUPO = {
   'A empresa': ['razao_social', 'cnpj', 'endereco'],
   'Quem responde por ela': ['representante_nome', 'representante_cargo', 'encarregado_email'],
+}
+
+// Exportação completa: a prova é do cliente, e sair do sistema não a destrói.
+function Exportar() {
+  const acao = useAcao()
+  const [feito, setFeito] = useState(false)
+  const exportar = () => acao.executar(async () => { setFeito(false); await baixar('/org/exportar', 'exportacao.zip'); setFeito(true) })
+  return (
+    <section className="cartao exportar">
+      <h2>Exportar tudo</h2>
+      <p>Um .zip com todos os contratos da empresa, cada um com a via assinada, o original, o dossiê de provas, o carimbo do tempo e as instruções de conferência, mais um índice que abre no Excel, o diretório de pessoas e os dados da conta. É a sua cópia: mesmo que a conta seja encerrada, a prova continua com você.</p>
+      <div className="acoes">
+        <button type="button" className="botao secundario" disabled={acao.ocupado} onClick={exportar}>{acao.ocupado ? 'Preparando o arquivo…' : 'Baixar a exportação (.zip)'}</button>
+        {acao.ocupado && <span className="nota">Pode levar alguns minutos com muitos contratos. Não feche a página.</span>}
+        {feito && !acao.ocupado && <span className="nota">Pronto. Guarde o arquivo em lugar seguro.</span>}
+      </div>
+      <Erro erro={acao.erro} onFechar={acao.limparErro} />
+      <p className="nota">Fica registrado na auditoria quem exportou e quando. Senhas, segredos de webhook e valores de chave de API nunca saem.</p>
+    </section>
+  )
 }
 
 export function Empresa() {
@@ -100,6 +120,7 @@ export function Empresa() {
         </aside>
       </form>
       <Marca razao={e.dados?.razao_social} />
+      <Exportar />
     </>
   )
 }

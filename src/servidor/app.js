@@ -31,7 +31,7 @@ const COOKIE = 'cs_painel'
 // Fontes e estilos vêm do próprio sistema (public/estatico/fontes): nada de terceiro na tela de quem assina.
 const CSP = "default-src 'self'; img-src 'self' data: blob:; style-src 'self'; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
 
-export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes = null, marca = null, demonstracao = null, metricas = null, dev = false, log = true, chaveDev = null }) {
+export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes = null, marca = null, demonstracao = null, metricas = null, exportacao = null, dev = false, log = true, chaveDev = null }) {
   const app = express()
   app.disable('x-powered-by')
   // Atrás do proxy do EasyPanel: o IP real vem no X-Forwarded-For (é evidência
@@ -159,6 +159,16 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
       res.status(201).json(await servico.gerarDerivado(req.params.id, org(req).id, dados(req), 'distrato', req.body?.campos || req.body || {}))
     }))
     r.get('/agenda', (req, res) => res.json(agenda.proximos(org(req).id, Math.min(Number(req.query.dias) || 90, 365))))
+    // Exportação completa: tudo da organização num .zip, escrito direto na
+    // resposta. Só o administrador, o developer (suporte) ou a API.
+    r.get('/exportar', h(async (req, res) => {
+      const ator = req.acesso.ator
+      if (!(ator?.tipo === 'chave_api' || ['org_admin', 'developer'].includes(ator?.papel))) return res.status(403).json({ erro: 'Só o administrador da organização (ou a API) exporta tudo.' })
+      res.set('Content-Type', 'application/zip')
+      res.set('Content-Disposition', `attachment; filename="${exportacao.nomeArquivo(org(req).id)}"`)
+      res.set('Cache-Control', 'no-store')
+      await exportacao.escrever({ organizacaoId: org(req).id, desde: req.query.desde || null, saida: res, ator })
+    }))
     // Leitura e assinatura: funil, tempo por cláusula, dúvidas e recusas.
     r.get('/metricas', (req, res) => res.json(metricas.calcular({ organizacaoId: org(req).id, dias: req.query.dias, modelo: req.query.modelo || null })))
     // Acumulado do índice no período (ou no período padrão antes de uma data de reajuste).
