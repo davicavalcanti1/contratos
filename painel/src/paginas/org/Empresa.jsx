@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api.js'
 import { Cabecalho, Campo, Carregando, Erro, endereco, useAcao, useDados } from '../../comum.jsx'
+import { Marca } from './Marca.jsx'
 import { useSessao } from '../../sessao.jsx'
 
 const MASCARA_CNPJ = (v) => v.replace(/\D/g, '').slice(0, 14).replace(/(\d{2})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1/$2').replace(/(\d{4})(\d{1,2})$/, '$1-$2')
@@ -98,6 +99,7 @@ export function Empresa() {
           <p className="nota">Plano e limite são definidos pela plataforma. Para mudar, fale com o suporte.</p>
         </aside>
       </form>
+      <Marca razao={e.dados?.razao_social} />
     </>
   )
 }

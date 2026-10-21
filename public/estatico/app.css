@@ -379,3 +379,8 @@ p.condicao { display: inline-block; margin: 0 0 8px; }
 @media (max-width: 700px) { .lista-lote-m { display: block; } .tabela-lote-desktop { display: none; } }
 .fim-lote { list-style: none; margin: 16px 0 0; padding: 14px 0 0; border-top: 1px solid var(--borda); display: flex; gap: 24px; font-size: 14.5px; color: var(--tinta-2); }
 .fim-lote b { color: var(--tinta); font-weight: 600; font-size: 18px; margin-right: 4px; }
+
+/* ── Marca da organização: logotipo acima do "Enviado por". A cor, quando há,
+   troca o azul de ação pelas variáveis (comum.js → aplicarMarca). ── */
+.logo-org { display: block; height: 36px; max-width: 180px; object-fit: contain; object-position: left center; margin: 0 0 8px; }
+@media (max-width: 600px) { .logo-org { height: 30px; max-width: 150px; margin-bottom: 6px; } }

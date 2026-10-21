@@ -40,6 +40,7 @@ async function iniciar() {
     $('#emissor').textContent = 'Assinatura em lote'
     return fim('Este link não funciona', e.message)
   }
+  aplicarMarca(info.marca)
   $('#emissor').textContent = `${info.organizacao} · ${info.lote}`
   $('#titulo').textContent = info.modelo
   document.title = `Assinar em lote: ${info.lote}`

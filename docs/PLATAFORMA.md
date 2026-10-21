@@ -150,5 +150,5 @@ celular de quem assina.
 | Redefinir senha esquecida sozinho | hoje o admin (ou o developer) convida de novo |
 | Cobrança do plano | o plano limita, mas ninguém paga ainda |
 | Editor de modelos e papel `redator` | biblioteca por organização |
-| White-label (marca da organização na tela de assinatura) | depois |
+| ~~White-label (marca da organização na tela de assinatura)~~ | **feito em 20/out**: Dados da empresa → Marca: nome de exibição, cor de destaque (com contraste mínimo) e logotipo; entram na tela de assinatura, no lote e no assunto do e-mail (`src/plataforma/marca.js`, marca.test.js) |
 | Bloqueio de login e limite por IP em memória | zeram ao reiniciar; vão para o banco |

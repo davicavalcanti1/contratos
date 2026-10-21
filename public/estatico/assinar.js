@@ -1,7 +1,7 @@
 // Tela de assinatura: identificar (código) → ler com a bula → assinar.
 // O servidor é quem decide se pode assinar; a tela só guia e explica.
 
-import { $, ErroApi, api, baixar, dataHora, esc, guardar, mostrarErro, rosetaSvg } from './comum.js'
+import { $, ErroApi, api, aplicarMarca, baixar, dataHora, esc, guardar, mostrarErro, rosetaSvg } from './comum.js'
 
 const token = decodeURIComponent(location.pathname.split('/assinar/')[1] || '')
 const base = `/api/assinar/${encodeURIComponent(token)}`
@@ -40,6 +40,7 @@ async function iniciar() {
     $('#emissor').textContent = 'Link de assinatura'
     return fim({ titulo: 'Este link não funciona', texto: e.message })
   }
+  aplicarMarca(info.marca)
   $('#emissor').textContent = `Enviado por ${info.organizacao}`
   $('#titulo').textContent = info.titulo
   document.title = `Assinar: ${info.titulo}`

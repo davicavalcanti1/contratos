@@ -21,6 +21,15 @@ Lexend; a bula fica no conteúdo das cláusulas. O painel e o site reaproveitam
 esses tokens. No desktop, a cláusula abre em duas colunas: o resumo à esquerda
 e o texto do contrato à direita.
 
+### Marca da organização (20/out/2026)
+
+A organização pode pôr logotipo, nome de exibição e cor de destaque na tela
+de assinatura e na do lote. A regra não muda: fundo branco, contornos finos.
+A cor entra só nas variáveis `--acao`, `--acao-forte` e `--acao-claro`
+(botões, progresso, links), e só é aceita com contraste de 4,5 com branco. O
+logotipo fica acima de "Enviado por", com 36 px de altura. O amarelo da bula
+e o PDF não mudam com a marca: o documento é do produto, a tela é da clínica.
+
 ## Site de apresentação: página de produto, branca e limpa
 
 Decidido em 16/out/2026 (Davi): o site **não** usa a cara de bula. É uma

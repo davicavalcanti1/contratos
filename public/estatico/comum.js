@@ -47,6 +47,29 @@ export function mostrarErro(el, e) {
   el.hidden = false
 }
 
+// Marca da organização: logotipo acima do "Enviado por" e a cor de destaque
+// no lugar do azul de ação. A casca continua branca.
+export function aplicarMarca(marca) {
+  if (!marca) return
+  if (/^#[0-9a-f]{6}$/i.test(marca.cor || '')) {
+    const r = document.documentElement.style
+    r.setProperty('--acao', marca.cor)
+    r.setProperty('--acao-forte', misturar(marca.cor, '#000000', 0.18))
+    r.setProperty('--acao-claro', misturar(marca.cor, '#ffffff', 0.88))
+  }
+  if (marca.logo_url && /^\/marca\/[\w.-]+$/.test(marca.logo_url)) {
+    const alvo = document.querySelector('.topo .dentro > div')
+    if (alvo && !alvo.querySelector('.logo-org')) {
+      alvo.prepend(Object.assign(document.createElement('img'), { src: marca.logo_url, alt: marca.nome || '', className: 'logo-org' }))
+    }
+  }
+}
+function misturar(a, b, p) {
+  const ca = parseInt(a.slice(1), 16), cb = parseInt(b.slice(1), 16)
+  const canal = (d) => Math.round(((ca >> d) & 255) * (1 - p) + ((cb >> d) & 255) * p)
+  return '#' + [16, 8, 0].map(d => canal(d).toString(16).padStart(2, '0')).join('')
+}
+
 // Armazenamento local pode não existir (aba privada, bloqueio): tudo em try.
 export const guardar = {
   ler(k) { try { return sessionStorage.getItem(k) } catch { return null } },

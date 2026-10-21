@@ -73,6 +73,14 @@ basta; não precisa de certificado ICP-Brasil do médico.
 
 ## O que foi acrescentado de funcionalidade nesta rodada
 
+- **Marca da organização (20/out):** em Dados da empresa, o administrador
+  define nome de exibição ("IMAGO" em vez da razão social), cor de destaque e
+  logotipo. A tela de assinatura e a do lote mostram o logotipo acima de
+  "Enviado por" e usam a cor no lugar do azul de ação; o e-mail do link e do
+  lembrete saem em nome da marca. A casca continua branca. A cor precisa de
+  contraste 4,5 com branco; o logotipo é reconhecido pelo conteúdo (PNG, JPG,
+  WebP, SVG sem script), vai para o mesmo armazenamento dos PDFs e sai por
+  `/marca/<arquivo>` (`src/plataforma/marca.js`, marca.test.js).
 - **Diretório de pessoas e "novo a partir deste" (20/out):** cada contrato
   gerado cadastra (ou atualiza) a parte no diretório da organização
   (`src/partes.js`, coleção `partes`, chave = CNPJ, CPF ou e-mail). A tela

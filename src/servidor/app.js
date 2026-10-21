@@ -28,7 +28,7 @@ const PAINEL = join(PUBLICO, 'painel')
 const COOKIE = 'cs_painel'
 const CSP = "default-src 'self'; img-src 'self' data: blob:; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
 
-export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes = null, dev = false, log = true, chaveDev = null }) {
+export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes = null, marca = null, dev = false, log = true, chaveDev = null }) {
   const app = express()
   app.disable('x-powered-by')
   // Atrás do proxy do EasyPanel: o IP real vem no X-Forwarded-For (é evidência
@@ -280,6 +280,11 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
   })
   admin.get('/empresa', (req, res) => res.json({ ...plataforma.resumoOrganizacao(plataforma.obterOrganizacao(req.orgId)), campos: plataforma.CAMPOS_ORGANIZACAO }))
   admin.put('/empresa', (req, res) => res.json(plataforma.atualizarOrganizacao(req.orgId, { dados: req.body?.dados || {} }, req.usuario)))
+  // Marca nas telas públicas e nos e-mails: nome de exibição, cor e logotipo.
+  admin.get('/marca', (req, res) => res.json(marca.publica(plataforma.obterOrganizacao(req.orgId))))
+  admin.put('/marca', (req, res) => res.json(marca.definir(req.orgId, req.body || {}, req.usuario)))
+  admin.post('/marca/logo', express.raw({ type: () => true, limit: '400kb' }), (req, res) => res.status(201).json(marca.definirLogo(req.orgId, req.body, req.usuario)))
+  admin.delete('/marca/logo', (req, res) => res.json(marca.removerLogo(req.orgId, req.usuario)))
   admin.get('/usuarios', (req, res) => res.json(plataforma.listarUsuarios(req.orgId)))
   admin.post('/usuarios', h(async (req, res) => res.status(201).json(await plataforma.convidar({ organizacaoId: req.orgId, ...pick(req.body, ['nome', 'email', 'papel']) }, req.usuario))))
   admin.patch('/usuarios/:id', (req, res) => res.json(plataforma.alterarUsuario(req.orgId, req.params.id, req.body || {}, req.usuario)))
@@ -475,6 +480,15 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     res.set('Content-Security-Policy', CSP)
     res.sendFile(join(raiz, arquivo))
   }
+  // Logotipo da organização nas telas públicas. O nome muda com o conteúdo, então o cache pode ser longo.
+  app.get('/marca/:arquivo', h(async (req, res) => {
+    const a = marca ? await marca.arquivoLogo(req.params.arquivo) : null
+    if (!a) return res.status(404).type('text/plain').send('Não encontrado.')
+    res.set('Content-Type', a.tipo)
+    res.set('Cache-Control', 'public, max-age=86400, immutable')
+    res.set('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'")
+    res.send(a.buffer)
+  }))
   app.get('/assinar/:token', pagina('assinar.html'))
   app.get('/lote/:token', pagina('lote.html'))
   app.get(['/v/:codigo', '/verificar'], pagina('verificar.html'))

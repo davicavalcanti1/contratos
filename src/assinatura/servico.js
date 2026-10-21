@@ -58,7 +58,9 @@ export const CONFIG_PADRAO = {
 // `carimbador`: ACT de carimbo do tempo (RFC 3161) — ver plugaveis/carimbo.js.
 // `icp`: verificador de PDF assinado com certificado — ver plugaveis/icp.js.
 // `partes`: diretório de quem já recebeu contrato (src/partes.js), preenchido a cada geração.
-export function criarServico({ repo, biblioteca, notificar, config = {}, agora = () => new Date(), aoEvento = () => {}, carimbador = null, icp = null, partes = null }) {
+// `marcaDe(organizacao)`: nome de exibição, cor e logotipo para as telas públicas e os e-mails (plataforma/marca.js).
+const SEM_MARCA = { nome: null, cor: null, logo_url: null }
+export function criarServico({ repo, biblioteca, notificar, config = {}, agora = () => new Date(), aoEvento = () => {}, carimbador = null, icp = null, partes = null, marcaDe = () => SEM_MARCA }) {
   const cfg = { ...CONFIG_PADRAO, ...config }
   const trilha = criarTrilha(repo, agora)
   const agoraIso = () => agora().toISOString()
@@ -77,6 +79,9 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     }
   }
   const signatarioPublico = (s) => ({ id: s.id, nome: s.nome, email: s.email, papel: s.papel, assinado_em: s.assinado_em || null })
+  // A marca é lida na hora: mudar no painel vale para quem abrir o link depois.
+  const marcaDa = (organizacaoId) => marcaDe(repo.obter('organizacoes', organizacaoId)) || SEM_MARCA
+  const nomeOrg = (c) => marcaDa(c.organizacao_id).nome || c.organizacao_nome
 
   // ── Organização: gerar, enviar, consultar ─────────────────────────────────
 
@@ -177,15 +182,16 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     const link = `${cfg.baseUrl}/assinar/${token}`
     const primeiro = s.nome.split(' ')[0]
     const ate = dataCurta(c.expira_em)
+    const org = nomeOrg(c)
     await notificar({
       para: s.email,
       canal: s.canal,
       assunto: lembrete
         ? `Lembrete: "${c.titulo}" espera a sua assinatura até ${ate}`
-        : `${c.organizacao_nome} enviou um contrato para você assinar`,
+        : `${org} enviou um contrato para você assinar`,
       texto: lembrete
-        ? `Olá, ${primeiro}.\n\nO "${c.titulo}", enviado por ${c.organizacao_nome}, ainda não foi assinado por você. O prazo termina em ${ate}${lembrete.dias === 1 ? ' (amanhã)' : ` (em ${lembrete.dias} dias)`}.\n\nAbra o link para ler e assinar:\n${link}\n\nEste link substitui o anterior. Por segurança, pediremos um código enviado a este e-mail.`
-        : `Olá, ${primeiro}.\n\n${c.organizacao_nome} enviou o "${c.titulo}" para a sua assinatura.\n\nAbra o link para ler e assinar:\n${link}\n\nPor segurança, pediremos um código enviado a este e-mail. O link vale até ${ate}.`,
+        ? `Olá, ${primeiro}.\n\nO "${c.titulo}", enviado por ${org}, ainda não foi assinado por você. O prazo termina em ${ate}${lembrete.dias === 1 ? ' (amanhã)' : ` (em ${lembrete.dias} dias)`}.\n\nAbra o link para ler e assinar:\n${link}\n\nEste link substitui o anterior. Por segurança, pediremos um código enviado a este e-mail.`
+        : `Olá, ${primeiro}.\n\n${org} enviou o "${c.titulo}" para a sua assinatura.\n\nAbra o link para ler e assinar:\n${link}\n\nPor segurança, pediremos um código enviado a este e-mail. O link vale até ${ate}.`,
       meta: { tipo: lembrete ? 'lembrete' : 'link', contrato_id: contratoId, signatario_id: s.id, link },
     })
     trilha.registrar(contratoId, lembrete ? 'lembrete.enviado' : 'link.enviado', { dados: { signatario_id: s.id, canal: s.canal, destino: mascararEmail(s.email), ...(lembrete ? { dias: lembrete.dias } : {}) } })
@@ -341,7 +347,8 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     const { s, c } = porToken(token)
     trilha.registrar(c.id, 'link.aberto', { ator: `signatario:${s.id}`, ...evidencia(ctx) })
     return {
-      organizacao: c.organizacao_nome,
+      organizacao: nomeOrg(c),
+      marca: marcaDa(c.organizacao_id),
       titulo: c.titulo,
       contrato_status: c.status,
       expira_em: c.expira_em,
@@ -424,7 +431,8 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     const { s, c } = comSessao(token, sessao)
     const todos = signatariosDe(c.id)
     return {
-      organizacao: c.organizacao_nome,
+      organizacao: nomeOrg(c),
+      marca: marcaDa(c.organizacao_id),
       titulo: c.titulo,
       contrato_status: c.status,
       expira_em: c.expira_em,
@@ -657,7 +665,8 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     trilha.registrar(`lote:${lote.id}`, 'link.aberto', { ator: 'assinante_lote', ...evidencia(ctx) })
     const itens = itensDoLote(lote)
     return {
-      organizacao: lote.organizacao_nome,
+      organizacao: marcaDa(lote.organizacao_id).nome || lote.organizacao_nome,
+      marca: marcaDa(lote.organizacao_id),
       lote: lote.nome,
       modelo: lote.modelo_titulo,
       total: itens.length,
@@ -699,6 +708,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     const a = lote.assinante
     return {
       organizacao: lote.organizacao_nome,
+      marca: marcaDa(lote.organizacao_id),
       lote: lote.nome,
       ...texto,
       clausulas: texto.clausulas.map(cl => ({ ...cl, critica: criticas.has(cl.chave), ciente_em: a.ciencias?.[cl.chave]?.em || null })),
