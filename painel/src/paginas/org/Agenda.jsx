@@ -83,7 +83,10 @@ export function Agenda() {
                     <div className="agenda-acao">
                       {x.aditivo_pendente
                         ? <small>aditivo em assinatura</small>
-                        : podeEscrever && <Link className="botao secundario pequeno" to={`/contratos/${x.id}#mudar`}>{x.tipo === 'vencimento' ? 'Prorrogar' : 'Reajustar'}</Link>}
+                        : podeEscrever && <>
+                          <Link className="botao secundario pequeno" to={`/contratos/${x.id}#mudar`}>{x.tipo === 'vencimento' ? 'Prorrogar' : 'Reajustar'}</Link>
+                          {x.tipo === 'vencimento' && <Link className="link-botao pequeno-link" to={`/contratos/novo?de=${x.id}`} title="Contrato novo com os mesmos dados">Renovar</Link>}
+                        </>}
                     </div>
                   </li>
                 ))}

@@ -2,11 +2,16 @@
 // diz, a cada mudança, quais campos ESTE contrato precisa (PJ pede CNPJ e
 // representante; PF pede CPF), o que falta e quem assina pela parte. A prévia
 // mostra o contrato montado, com as lacunas marcadas, antes de gerar.
+//
+// Chega preenchido de dois jeitos: ?de=<id> (novo a partir de um contrato
+// existente: mesmos dados, data de início em branco) e ?parte=<id> (alguém do
+// diretório de pessoas). Dentro do formulário, o grupo da parte tem uma busca
+// no diretório que preenche o grupo inteiro.
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../../api.js'
-import { Cabecalho, Campo, Carregando, Erro, plural, useAcao, useDados } from '../../comum.jsx'
+import { Cabecalho, Campo, Carregando, Erro, data, endereco, plural, useAcao, useDados } from '../../comum.jsx'
 import { useSessao } from '../../sessao.jsx'
 
 const GRUPOS = { contratado: 'Quem é contratado', colaborador: 'Colaborador', contrato: 'O contrato', termo: 'Condições do termo' }
@@ -26,6 +31,17 @@ const LARGURA_CAMPO = {
 }
 const PAPEL = { parte: 'Parte', representante: 'Representante legal', testemunha: 'Testemunha', interveniente: 'Interveniente' }
 
+// Endereço pode vir estruturado (de API, planilha ou contrato antigo); o
+// formulário edita texto, então ele entra já formatado. O motor aceita os dois.
+const planificar = (modelo, dados) => {
+  const copia = structuredClone(dados || {})
+  for (const v of modelo?.variaveis || []) {
+    if (v.tipo !== 'endereco') continue
+    const [g, k] = v.chave.split('.')
+    if (copia[g] && copia[g][k] && typeof copia[g][k] === 'object') copia[g][k] = endereco(copia[g][k])
+  }
+  return copia
+}
 const ler = (o, caminho) => caminho.split('.').reduce((x, k) => (x == null ? undefined : x[k]), o)
 function definir(o, caminho, v) {
   const copia = structuredClone(o)
@@ -46,10 +62,17 @@ const MASCARAS = {
 export function NovoContrato() {
   const { podeEscrever, org } = useSessao()
   const navegar = useNavigate()
+  const [params] = useSearchParams()
+  const deId = params.get('de')
+  const parteId = params.get('parte')
   const base = useDados(async () => {
-    const [modelos, conta] = await Promise.all([api('/org/modelos'), api('/org/conta')])
-    return { modelos, conta }
-  }, [org?.id])
+    const [modelos, conta, origem, parte] = await Promise.all([
+      api('/org/modelos'), api('/org/conta'),
+      deId ? api(`/org/contratos/${deId}`) : null,
+      parteId ? api(`/org/partes/${parteId}`) : null,
+    ])
+    return { modelos, conta, origem, parte }
+  }, [org?.id, deId, parteId])
   const [chave, setChave] = useState('')
   const [dados, setDados] = useState({})
   const [conferencia, setConferencia] = useState(null)
@@ -66,14 +89,36 @@ export function NovoContrato() {
   const [previa, setPrevia] = useState(null)
   const acao = useAcao()
 
+  const [avisoOrigem, setAvisoOrigem] = useState(null)
   useEffect(() => {
-    if (base.dados && !chave) {
-      setChave(base.dados.modelos[0]?.chave || '')
-      setPelaEmpresa(p => ({ ...p, nome: base.dados.conta.dados?.representante_nome || '' }))
+    if (!base.dados || chave) return
+    const { modelos, conta, origem, parte } = base.dados
+    let escolhido = modelos[0]?.chave || ''
+    let empresa = null
+    if (origem) {
+      // Mesmos dados do contrato de origem, menos a organização (vem do
+      // cadastro) e a data de início (é do contrato novo).
+      const { organizacao, ...resto } = structuredClone(origem.dados || {})
+      if (resto.contrato) delete resto.contrato.data_inicio
+      const modeloOrigem = modelos.find(m => m.chave === origem.modelo?.chave)
+      setDados(planificar(modeloOrigem, resto))
+      if (modeloOrigem) escolhido = modeloOrigem.chave
+      else setAvisoOrigem(`O modelo do contrato de origem ("${origem.modelo?.chave}") não está mais disponível. Escolha outro modelo; os dados preenchidos ficam.`)
+      // Quem assinou pela empresa no original: o representante cujo e-mail não é de nenhuma parte.
+      const daParte = new Set(Object.values(resto).flatMap(g => (g && typeof g === 'object' && g.email ? [String(g.email).toLowerCase()] : [])))
+      empresa = (origem.signatarios || []).find(s => s.papel === 'representante' && !daParte.has(String(s.email || '').toLowerCase())) || null
+    } else if (parte) {
+      const serve = (m) => m.variaveis.some(v => v.chave.startsWith(`${parte.grupo}.`))
+      escolhido = (modelos.find(m => m.chave === parte.ultimo_modelo && serve(m)) || modelos.find(serve))?.chave || escolhido
+      setDados(planificar(modelos.find(m => m.chave === escolhido), { [parte.grupo]: parte.dados || {} }))
     }
+    setChave(escolhido)
+    setPelaEmpresa(p => ({ ...p, nome: empresa?.nome || conta.dados?.representante_nome || '', email: empresa?.email || '', metodo: empresa?.metodo === 'icp' ? 'icp' : 'otp' }))
   }, [base.dados, chave])
 
   const modelo = base.dados?.modelos.find(m => m.chave === chave)
+  const origem = base.dados?.origem || null
+  const parte = base.dados?.parte || null
 
   // Confere com o motor a cada mudança (com uma pequena espera).
   const ultima = useRef(0)
@@ -117,6 +162,16 @@ export function NovoContrato() {
   const necessarios = new Set(conferencia?.necessarios || modelo?.variaveis.map(v => v.chave) || [])
   const visiveis = (modelo?.variaveis || []).filter(v => necessarios.has(v.chave))
   const grupos = [...new Set(visiveis.map(v => v.chave.split('.')[0]))]
+  // Grupos que descrevem uma parte (origem parte/fonte) ganham a busca no diretório.
+  const gruposParte = new Set((modelo?.variaveis || []).filter(v => ['parte', 'fonte'].includes(v.origem)).map(v => v.chave.split('.')[0]))
+  const preencherDoDiretorio = (g, p) => {
+    const chaves = new Set(modelo.variaveis.filter(v => v.chave.startsWith(`${g}.`)).map(v => v.chave.slice(g.length + 1)))
+    const novo = Object.fromEntries(Object.entries(p.dados || {}).filter(([k]) => chaves.has(k)))
+    if (chaves.has('tipo') && !novo.tipo && p.tipo) novo.tipo = p.tipo
+    setDados(d => ({ ...d, ...planificar(modelo, { [g]: novo }) }))
+    setSigsEditados(null)
+    setTocados(new Set())
+  }
   const daOrganizacao = (conferencia?.faltando || []).filter(f => f.variavel.startsWith('organizacao.'))
   const sigsParte = sigsEditados ?? (conferencia?.signatarios || []).map(s => ({ ...s }))
   // A empresa só assina se tiver e-mail: o nome vem pré-preenchido do cadastro e sozinho não decide nada.
@@ -158,6 +213,9 @@ export function NovoContrato() {
   return (
     <>
       <Cabecalho titulo="Novo contrato" sub="Escolha o modelo e preencha. O formulário mostra só o que este contrato precisa, e nada vai para assinatura com lacuna." />
+      {origem && <p className="aviso info">Preenchido a partir de <Link to={`/contratos/${origem.id}`}>{origem.titulo}{origem.referencia ? ` (ref. ${origem.referencia})` : ''}</Link>. Confira os dados e informe a data de início: o contrato novo nasce independente do anterior.</p>}
+      {parte && <p className="aviso info">Preenchido com o cadastro de <strong>{parte.nome}</strong>, do diretório de pessoas. O que você mudar aqui atualiza o diretório quando o contrato for gerado.</p>}
+      {avisoOrigem && <p className="aviso erro">{avisoOrigem}</p>}
       <form className="formulario-contrato" onSubmit={enviar} noValidate>
         <div className="coluna-form">
           <section className="cartao">
@@ -177,6 +235,7 @@ export function NovoContrato() {
             {grupos.map(g => (
               <fieldset className="form-secao" key={g}>
                 <legend><h2>{GRUPOS[g] || g}</h2>{DESCRICAO_GRUPO[g] && <p>{DESCRICAO_GRUPO[g]}</p>}</legend>
+                {gruposParte.has(g) && <BuscaDiretorio onEscolher={p => preencherDoDiretorio(g, p)} />}
                 <div className="campos">
                   {visiveis.filter(v => v.chave.startsWith(`${g}.`)).map(v => (
                     <CampoVariavel key={v.chave} v={v} valor={ler(dados, v.chave)} onMudar={val => mudar(v.chave, val)} problema={mostrarProblema(v.chave)} />
@@ -333,6 +392,48 @@ function CampoVariavel({ v, valor, onMudar, problema }) {
       <label htmlFor={id} title={v.rotulo}><span>{rotulo}{!obrig && <em className="opcional">{padrao !== undefined ? 'padrão' : 'opcional'}</em>}</span></label>
       {entrada}
       {problema ? <small className="erro-campo">{problema}</small> : padrao !== undefined && v.tipo !== 'enum' && <small>Em branco, fica {cap(padrao)}.</small>}
+    </div>
+  )
+}
+
+// Busca no diretório de pessoas (quem já recebeu contrato) e preenche o grupo
+// inteiro. Quem não está lá entra quando o contrato for gerado.
+function BuscaDiretorio({ onEscolher }) {
+  const [termo, setTermo] = useState('')
+  const [itens, setItens] = useState(null)
+  const [aberto, setAberto] = useState(false)
+  const ultima = useRef(0)
+  useEffect(() => {
+    const t = termo.trim()
+    if (t.length < 2) { setItens(null); return }
+    const n = ++ultima.current
+    const h = setTimeout(async () => {
+      try { const r = await api(`/org/partes?busca=${encodeURIComponent(t)}&limite=8`); if (n === ultima.current) setItens(r.itens) } catch { if (n === ultima.current) setItens([]) }
+    }, 250)
+    return () => clearTimeout(h)
+  }, [termo])
+  const escolher = (p) => { onEscolher(p); setTermo(''); setItens(null); setAberto(false) }
+  return (
+    <div className="busca-diretorio">
+      <label className="campo">
+        <span>Já tem contrato com esta pessoa? Busque no diretório</span>
+        <input type="search" placeholder="Nome, CPF, CNPJ ou e-mail" value={termo} autoComplete="off"
+          onChange={e => { setTermo(e.target.value); setAberto(true) }} onFocus={() => setAberto(true)} onBlur={() => setTimeout(() => setAberto(false), 150)} />
+      </label>
+      {aberto && itens && (
+        <ul className="busca-diretorio-lista" aria-label="Pessoas encontradas">
+          {itens.length === 0
+            ? <li className="busca-diretorio-vazio">Ninguém com "{termo.trim()}" no diretório ainda. Preencha abaixo: a pessoa entra no diretório quando o contrato for gerado.</li>
+            : itens.map(p => (
+              <li key={p.id}>
+                <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => escolher(p)}>
+                  <strong>{p.nome}</strong>
+                  <small>{[p.cnpj ? `CNPJ ${p.cnpj}` : p.cpf ? `CPF ${p.cpf}` : null, p.email, `${plural(p.contratos, 'contrato', 'contratos')}, último em ${data(p.ultimo_em)}`].filter(Boolean).join(' · ')}</small>
+                </button>
+              </li>
+            ))}
+        </ul>
+      )}
     </div>
   )
 }

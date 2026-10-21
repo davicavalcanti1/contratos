@@ -7,6 +7,7 @@ import { criarRepo } from '../src/armazenamento/repo.js'
 import { criarServico } from '../src/assinatura/servico.js'
 import { criarBibliotecaViva } from '../src/biblioteca.js'
 import { criarLotes } from '../src/lote/lotes.js'
+import { criarPartes } from '../src/partes.js'
 import { transporteCaixa } from '../src/notificacoes.js'
 import { criarAvisos } from '../src/plataforma/avisos.js'
 import { criarPlataforma } from '../src/plataforma/plataforma.js'
@@ -36,12 +37,13 @@ export async function subirServidor({ fetchWebhook, fetchIndices, agora, carimba
   const avisos = criarAvisos({ repo, notificar, config: { baseUrl: base }, log: { error() {} } })
   const aoEvento = (org, tipo, dados) => { webhooks.emitir(org, tipo, dados); avisos.aoEvento(org, tipo, dados) }
   const plataforma = criarPlataforma({ repo, notificar, config: { baseUrl: base } })
-  const servico = criarServico({ repo, biblioteca, notificar, config: { baseUrl: base }, aoEvento, carimbador, icp, ...(agora ? { agora } : {}) })
+  const partes = criarPartes({ repo, ...(agora ? { agora } : {}) })
+  const servico = criarServico({ repo, biblioteca, notificar, config: { baseUrl: base }, aoEvento, carimbador, icp, partes, ...(agora ? { agora } : {}) })
   const lotes = criarLotes({ repo, biblioteca, servico })
   const agenda = criarAgenda({ repo, servico, notificar, aoEvento, config: { baseUrl: base }, ...(agora ? { agora } : {}) })
   const indices = criarIndices({ fetchFn: fetchIndices || (async () => { throw new Error('sem rede no teste') }) })
   await plataforma.importarOrganizacoes({ org1: { api_key: CHAVE, dados: ORG } })
-  servidor.on('request', criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, dev: true, log: false, chaveDev: CHAVE }))
+  servidor.on('request', criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes, dev: true, log: false, chaveDev: CHAVE }))
 
   const api = (caminho, { metodo = 'GET', corpo, chave = CHAVE, sessao, cookie, cabecalhos = {} } = {}) =>
     fetch(base + caminho, {
@@ -65,7 +67,7 @@ export async function subirServidor({ fetchWebhook, fetchIndices, agora, carimba
     return r.headers.get('set-cookie').split(';')[0]
   }
 
-  return { servidor, base, repo, plataforma, servico, webhooks, avisos, lotes, agenda, recebidos, api, json, caixa, entrar, fechar: () => servidor.close() }
+  return { servidor, base, repo, plataforma, servico, webhooks, avisos, lotes, agenda, partes, recebidos, api, json, caixa, entrar, fechar: () => servidor.close() }
 }
 
 // Assina um contrato como o signatário faria pelo link.

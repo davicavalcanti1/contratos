@@ -28,7 +28,7 @@ const PAINEL = join(PUBLICO, 'painel')
 const COOKIE = 'cs_painel'
 const CSP = "default-src 'self'; img-src 'self' data: blob:; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
 
-export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, dev = false, log = true, chaveDev = null }) {
+export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes = null, dev = false, log = true, chaveDev = null }) {
   const app = express()
   app.disable('x-powered-by')
   // Atrás do proxy do EasyPanel: o IP real vem no X-Forwarded-For (é evidência
@@ -151,6 +151,11 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
       const p = req.query.para ? periodoPadrao(String(req.query.para)) : { de: String(req.query.de || ''), ate: String(req.query.ate || '') }
       res.json(await indices.acumulado(req.params.indice, p.de, p.ate))
     }))
+
+    // Diretório de partes: quem já recebeu contrato desta organização, para
+    // o próximo não ser digitado do zero. Só leitura: quem escreve é a geração.
+    r.get('/partes', (req, res) => res.json(partes.listar(org(req).id, req.query)))
+    r.get('/partes/:id', (req, res) => res.json(partes.obter(org(req).id, req.params.id)))
 
     const planilhaCrua = express.raw({ type: () => true, limit: '10mb' })
     r.post('/lotes/planilha', planilhaCrua, h(async (req, res) => {

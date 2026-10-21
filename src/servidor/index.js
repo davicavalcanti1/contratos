@@ -16,6 +16,7 @@ import { criarRepo } from '../armazenamento/repo.js'
 import { criarRepoSupabase } from '../armazenamento/supabase.js'
 import { criarServico } from '../assinatura/servico.js'
 import { criarBibliotecaViva } from '../biblioteca.js'
+import { criarPartes } from '../partes.js'
 import { criarLotes } from '../lote/lotes.js'
 import { lintModelo } from '../motor/linter.js'
 import { transporteCaixa } from '../notificacoes.js'
@@ -62,7 +63,8 @@ const carimbador = carimbadorDoAmbiente(process.env, { producao })
 const raizes = carregarRaizesOficiais()
 if (!producao && process.env.ICP_RAIZ_TESTE) raizes.push(new X509Certificate(readFileSync(process.env.ICP_RAIZ_TESTE)))
 const icp = criarVerificadorIcp({ raizes })
-const servico = criarServico({ repo, biblioteca, notificar, config: { baseUrl }, aoEvento, carimbador, icp })
+const partes = criarPartes({ repo })
+const servico = criarServico({ repo, biblioteca, notificar, config: { baseUrl }, aoEvento, carimbador, icp, partes })
 const lotes = criarLotes({ repo, biblioteca, servico })
 const agenda = criarAgenda({ repo, servico, notificar, aoEvento, config: { baseUrl } })
 const indices = criarIndices()
@@ -88,7 +90,7 @@ webhooks.iniciar()
 agenda.iniciar() // roda agora e de hora em hora
 // Carimbo que ficou pendente (ACT fora do ar) é tentado de novo a cada 10 min.
 if (carimbador) setInterval(() => servico.carimbarPendentes().catch(e => console.error('[carimbo]', e)), 10 * 60e3).unref()
-const app = criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, dev: !producao, chaveDev: producao ? null : CHAVE_DEV })
+const app = criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes, dev: !producao, chaveDev: producao ? null : CHAVE_DEV })
 
 // Escrita no Supabase que falhou (rede, chave) volta para a fila a cada 5 min.
 if (repo.reenfileirarFalhas) setInterval(() => { const n = repo.reenfileirarFalhas(); if (n) console.log(`[supabase] tentando de novo ${n} escrita(s)`) }, 5 * 60e3).unref()

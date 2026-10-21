@@ -58,6 +58,7 @@ export function Contrato() {
           : <button className="botao" onClick={() => acao.executar(() => baixar(`/org/contratos/${c.id}/arquivo?qual=original`, 'contrato.pdf'))}>PDF do contrato</button>}
         <button className="botao secundario" onClick={() => acao.executar(() => baixar(`/org/contratos/${c.id}/dossie?formato=pdf`, 'dossie.pdf'))}>Dossiê de provas</button>
         {c.pdf_final_sha256 && <button className="link-botao" onClick={() => acao.executar(() => baixar(`/org/contratos/${c.id}/arquivo?qual=original`, 'contrato.pdf'))}>PDF original</button>}
+        {podeEscrever && !c.origem && <Link className="link-botao" to={`/contratos/novo?de=${c.id}`} title="Abre o formulário já preenchido com os dados deste contrato">Novo a partir deste</Link>}
       </Cabecalho>
       <Erro erro={acao.erro} onFechar={acao.limparErro} />
       {aviso && <p className="aviso ok">{aviso}</p>}

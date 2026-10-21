@@ -73,6 +73,14 @@ basta; não precisa de certificado ICP-Brasil do médico.
 
 ## O que foi acrescentado de funcionalidade nesta rodada
 
+- **Diretório de pessoas e "novo a partir deste" (20/out):** cada contrato
+  gerado cadastra (ou atualiza) a parte no diretório da organização
+  (`src/partes.js`, coleção `partes`, chave = CNPJ, CPF ou e-mail). A tela
+  Pessoas lista e busca; "Novo contrato" de lá já chega preenchido
+  (`/contratos/novo?parte=`). No formulário, o grupo da parte tem uma busca no
+  diretório que preenche tudo. No detalhe do contrato e na agenda, "Novo a
+  partir deste" / "Renovar" abrem o formulário com os mesmos dados e a data
+  de início em branco (`?de=`). partes.test.js.
 - **Avisos e lembretes (20/out):** a organização recebe e-mail quando alguém
   assina (com quem falta), quando todos assinam, quando alguém recusa (com o
   motivo), um dia antes de o prazo vencer e quando vence

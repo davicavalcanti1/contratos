@@ -57,7 +57,8 @@ export const CONFIG_PADRAO = {
 // isto aos webhooks; o serviço não sabe que webhook existe.
 // `carimbador`: ACT de carimbo do tempo (RFC 3161) — ver plugaveis/carimbo.js.
 // `icp`: verificador de PDF assinado com certificado — ver plugaveis/icp.js.
-export function criarServico({ repo, biblioteca, notificar, config = {}, agora = () => new Date(), aoEvento = () => {}, carimbador = null, icp = null }) {
+// `partes`: diretório de quem já recebeu contrato (src/partes.js), preenchido a cada geração.
+export function criarServico({ repo, biblioteca, notificar, config = {}, agora = () => new Date(), aoEvento = () => {}, carimbador = null, icp = null, partes = null }) {
   const cfg = { ...CONFIG_PADRAO, ...config }
   const trilha = criarTrilha(repo, agora)
   const agoraIso = () => agora().toISOString()
@@ -115,6 +116,8 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       ator: `organizacao:${organizacaoId}`,
       dados: { modelo: r.contrato.modelo, conteudo_sha256: r.contrato.conteudo_sha256, pdf_original_sha256: pdfSha },
     })
+    // O diretório é reflexo dos contratos: falha nele nunca segura a geração.
+    if (partes) { try { partes.registrar({ organizacaoId, modelo, dados: dados || {}, contrato: { id: c.id, titulo: r.contrato.titulo } }) } catch (e) { console.error('[partes]', e) } }
     return resumoContrato(repo.obter('contratos', c.id))
   }
 
