@@ -65,6 +65,7 @@ export function NovoContrato() {
   const [params] = useSearchParams()
   const deId = params.get('de')
   const parteId = params.get('parte')
+  const modeloUrl = params.get('modelo')
   const base = useDados(async () => {
     const [modelos, conta, origem, parte] = await Promise.all([
       api('/org/modelos'), api('/org/conta'),
@@ -95,6 +96,7 @@ export function NovoContrato() {
     const { modelos, conta, origem, parte } = base.dados
     let escolhido = modelos[0]?.chave || ''
     let empresa = null
+    if (modeloUrl && modelos.some(m => m.chave === modeloUrl)) escolhido = modeloUrl
     if (origem) {
       // Mesmos dados do contrato de origem, menos a organização (vem do
       // cadastro) e a data de início (é do contrato novo).

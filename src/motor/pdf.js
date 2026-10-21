@@ -18,7 +18,9 @@ import { COR, faixaSeguranca, registrarFontes, roseta, rotulo } from './estilo-p
 const MARGEM = 64
 const QR = 46
 
-export function gerarPdf(contrato, { selo = null, assinaturas = null } = {}) {
+// `amostra`: texto para o rodapé no lugar do hash, quando o PDF é só o modelo
+// (campos entre « »), sem valor de contrato.
+export function gerarPdf(contrato, { selo = null, assinaturas = null, amostra = null } = {}) {
   return new Promise((resolve, reject) => {
     const rodape = selo ? QR + 22 : 16
     const doc = new PDFDocument({
@@ -64,7 +66,7 @@ export function gerarPdf(contrato, { selo = null, assinaturas = null } = {}) {
     for (const c of contrato.clausulas) {
       garantirEspaco(doc, 70)
       doc.moveDown(0.3)
-      rotulo(doc, `Cláusula ${c.numero}${c.critica ? '  ·  em destaque' : ''}`, MARGEM, doc.y, { largura })
+      rotulo(doc, `Cláusula ${c.numero}${c.critica ? '  ·  em destaque' : ''}${c.nota ? `  ·  ${c.nota}` : ''}`, MARGEM, doc.y, { largura })
       doc.moveDown(0.15)
       doc.font('serif-forte').fontSize(11.5).fillColor(COR.tinta).text(c.titulo, MARGEM, doc.y, { width: largura })
       doc.moveDown(0.35)
@@ -104,7 +106,7 @@ export function gerarPdf(contrato, { selo = null, assinaturas = null } = {}) {
       // Escrever abaixo da margem faria o pdfkit abrir página nova.
       doc.page.margins.bottom = 0
       faixaSeguranca(doc)
-      const linhaHash = `Página ${i + 1} de ${count}  ·  Conteúdo SHA-256 ${contrato.conteudo_sha256}`
+      const linhaHash = amostra ? `Página ${i + 1} de ${count}  ·  ${amostra}` : `Página ${i + 1} de ${count}  ·  Conteúdo SHA-256 ${contrato.conteudo_sha256}`
       if (!selo) {
         doc.font('mono').fontSize(6.5).fillColor(COR.tinta3)
           .text(linhaHash, MARGEM, doc.page.height - MARGEM + 8, { width: largura, align: 'center', lineBreak: false })

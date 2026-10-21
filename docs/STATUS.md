@@ -73,6 +73,15 @@ basta; não precisa de certificado ICP-Brasil do médico.
 
 ## O que foi acrescentado de funcionalidade nesta rodada
 
+- **Página de modelos para a organização (20/out):** menu Modelos: cada
+  modelo publicado com contagens (cláusulas, em destaque, campos, contratos
+  gerados) e, por dentro, o texto "em branco" com os campos entre « », as
+  condições de cada cláusula e parágrafo ("só quando…"), a bula, o que a
+  organização preenche, o que vem do cadastro, os parâmetros com padrão e
+  quem assina pela outra parte. "PDF de amostra" para o advogado da casa,
+  marcado como amostra no rodapé. "Novo contrato" já com o modelo escolhido
+  (`/contratos/novo?modelo=`). `GET /v1/modelos/:chave` e
+  `GET /v1/modelos/:chave/amostra.pdf` (modelos.test.js).
 - **Exportação completa da organização (20/out):** Dados da empresa →
   "Exportar tudo" (administrador; developer como suporte; `GET /v1/exportar`
   pela API, `?desde=AAAA-MM-DD` opcional): .zip escrito direto na resposta

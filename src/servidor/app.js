@@ -18,7 +18,8 @@ import { gerarPacote } from '../assinatura/pacote.js'
 import { ErroBiblioteca, acharModelo } from '../biblioteca.js'
 import { signatariosDaLinha } from '../lote/mapear.js'
 import { camposNecessarios, montarContrato } from '../motor/montar.js'
-import { humanizar } from '../motor/texto-modelo.js'
+import { humanizar, textoDoModelo } from '../motor/texto-modelo.js'
+import { gerarPdf } from '../motor/pdf.js'
 import { ErroNegocio } from '../assinatura/servico.js'
 import { ORG_DEMO } from '../plataforma/demonstracao.js'
 import { EVENTOS_WEBHOOK } from '../plataforma/webhooks.js'
@@ -85,6 +86,42 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
         signatarios_da_parte: m.signatarios_da_parte || [],
       })))
     })
+
+    // O modelo por dentro, para a organização ver antes de gerar: texto com
+    // «campos» e condições, o que ela preenche, quem assina. Aditivo e distrato
+    // não entram (nascem de um contrato). E um PDF de amostra para o advogado.
+    const modeloDaOrg = (req) => {
+      const m = acharModelo(biblioteca, exigirPublicado(req.params.chave))
+      if (m.derivado) throw new ErroNegocio(404, 'Este modelo nasce de um contrato assinado, não sozinho.')
+      return m
+    }
+    r.get('/modelos/:chave', (req, res) => {
+      const m = modeloDaOrg(req)
+      const defs = Object.fromEntries(m.variaveis.map(v => [v.chave, v]))
+      const texto = textoDoModelo(m, biblioteca.indice)
+      res.json({
+        chave: m.chave, versao: m.versao, titulo: m.titulo, descricao: m.descricao || '',
+        titulo_executivo: m.titulo_executivo !== false, lote: (m.signatarios_da_parte || []).length > 0, vida: !!m.vida,
+        variaveis: m.variaveis.filter(v => v.origem !== 'calculada').map(v => ({ chave: v.chave, rotulo: v.rotulo, tipo: v.tipo, origem: v.origem, obrigatoria: v.obrigatoria !== false && v.padrao === undefined, padrao: v.padrao ?? null, opcoes: v.opcoes || null })),
+        signatarios_da_parte: (m.signatarios_da_parte || []).map(sp => ({ papel: sp.papel, nome: defs[sp.nome]?.rotulo || sp.nome, email: defs[sp.email]?.rotulo || sp.email, condicao: sp.quando ? humanizar(sp.quando, defs) : null })),
+        texto, clausulas: texto.clausulas.length, criticas: texto.clausulas.filter(c => c.critica).length,
+        contratos_gerados: repo.listar('contratos', c => c.organizacao_id === org(req).id && c.modelo?.chave === m.chave).length,
+      })
+    })
+    r.get('/modelos/:chave/amostra.pdf', h(async (req, res) => {
+      const m = modeloDaOrg(req)
+      const t = textoDoModelo(m, biblioteca.indice)
+      const snapshot = {
+        modelo: { chave: m.chave, versao: m.versao }, titulo: t.titulo, preambulo: t.preambulo, fecho: t.fecho,
+        gerado_em: new Date().toISOString(), conteudo_sha256: '',
+        clausulas: t.clausulas.map((c, i) => ({
+          numero: i + 1, chave: c.chave, titulo: c.titulo, critica: c.critica, resumo: c.resumo, nota: c.condicao ? `só quando ${c.condicao}` : null,
+          paragrafos: c.paragrafos.map((p, j) => ({ numero: `${i + 1}.${j + 1}`, texto: `${p.condicao ? `[Só quando ${p.condicao}] ` : ''}${p.texto}` })),
+        })),
+      }
+      const { buffer } = await gerarPdf(snapshot, { amostra: `AMOSTRA do modelo ${m.chave} v${m.versao} · campos entre « » preenchidos a cada contrato · sem valor de contrato` })
+      enviarPdf(res, { buffer, nome: `amostra-${m.chave}.pdf` })
+    }))
 
     // Formulário dinâmico: dado o que já foi preenchido, quais campos este
     // contrato precisa, o que falta, o que está inválido e quem assina.

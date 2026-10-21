@@ -14,6 +14,8 @@ import { Empresa } from './paginas/org/Empresa.jsx'
 import { Lote } from './paginas/org/Lote.jsx'
 import { Leitura } from './paginas/org/Leitura.jsx'
 import { Lotes, NovoLote } from './paginas/org/Lotes.jsx'
+import { Modelo } from './paginas/org/Modelo.jsx'
+import { Modelos } from './paginas/org/Modelos.jsx'
 import { NovoContrato } from './paginas/org/NovoContrato.jsx'
 import { Pessoas } from './paginas/org/Pessoas.jsx'
 import { Usuarios } from './paginas/org/Usuarios.jsx'
@@ -103,6 +105,7 @@ function Moldura() {
               <p className="grupo-titulo" title={org.nome}>{org.nome}</p>
               <Item to="/inicio" icone="inicio">Visão geral</Item>
               <Item to="/contratos" icone="contratos">Contratos</Item>
+              <Item to="/modelos" icone="biblioteca">Modelos</Item>
               <Item to="/agenda" icone="agenda">Agenda</Item>
               <Item to="/lotes" icone="lotes">Lotes</Item>
               <Item to="/pessoas" icone="pessoas">Pessoas</Item>
@@ -153,6 +156,8 @@ function Moldura() {
               <Route path="/contratos" element={<Contratos />} />
               <Route path="/contratos/novo" element={<NovoContrato />} />
               <Route path="/contratos/:id" element={<Contrato />} />
+              <Route path="/modelos" element={<Modelos />} />
+              <Route path="/modelos/:chave" element={<Modelo />} />
               <Route path="/agenda" element={<Agenda />} />
               <Route path="/lotes" element={<Lotes />} />
               <Route path="/lotes/novo" element={<NovoLote />} />
