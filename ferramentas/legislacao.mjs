@@ -18,9 +18,7 @@ import { analisarCitacao, carregarLegislacao, DIR_PADRAO, indexarNorma } from '.
 const [cmd, ...args] = process.argv.slice(2)
 const dir = process.env.LEGISLACAO_DIR || DIR_PADRAO
 const catalogo = JSON.parse(readFileSync(join(dir, 'normas.json'), 'utf8'))
-const sha256 = (s) => createHash('sha256').update(String(s).replace(/
-/g, '
-')).digest('hex') // o git pode trocar LF por CRLF no Windows
+const sha256 = (s) => createHash('sha256').update(String(s).replace(/\r\n/g, '\n')).digest('hex') // o git pode trocar LF por CRLF no Windows
 const lerClausulas = () => JSON.parse(readFileSync(join(dir, '..', 'biblioteca', 'clausulas.json'), 'utf8'))
 const textoDoArtigo = (idx, num) => idx?.artigos.get(num)?.linhas.map(l => `${l.rotulo} ${l.texto}`).join('\n') || null
 
