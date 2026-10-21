@@ -84,4 +84,7 @@ Dizer isso abertamente é parte do posicionamento para escritórios e cartórios
 - [ ] Prazo de guarda do dossiê e o que acontece no encerramento da conta.
 - [ ] O selo público: o que pode aparecer sem violar a LGPD (proposta: nomes
       parciais, documentos mascarados, valores ocultos).
+- [ ] Revisar `/seguranca` (página pública de segurança e privacidade, 20/out):
+      bases legais citadas (art. 7º, V e VI), limite da exclusão pela guarda da
+      prova, canal do encarregado e prazo de guarda, que hoje remetem ao termo.
 - [ ] DPA padrão (organização = controladora, nós = operador), aproveitando o do ExameQR.

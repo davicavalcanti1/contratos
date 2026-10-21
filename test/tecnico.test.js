@@ -98,3 +98,14 @@ test('pacote de prova: zip com PDF assinado, original, dossiê (pdf e json) e LE
   // Outra organização não baixa.
   assert.equal((await A.api(`/v1/contratos/${c.id}/pacote.zip`, { chave: 'outra-chave' })).status, 401)
 })
+
+test('segurança e privacidade: página pública com CSP, linkada no site e no selo', async () => {
+  const r = await fetch(`${A.base}/seguranca`)
+  assert.equal(r.status, 200)
+  assert.match(r.headers.get('content-security-policy') || '', /default-src 'self'/)
+  const html = await r.text()
+  for (const t of ['O que guardamos de cada contrato', 'LGPD', 'SHA-256', 'Por quanto tempo', 'O que não fazemos', 'controladora', 'operador']) assert.ok(html.includes(t), t)
+  assert.doesNotMatch(html, /fonts\.googleapis/)
+  assert.match(await (await fetch(`${A.base}/`)).text(), /href="\/seguranca"/)
+  assert.match(await (await fetch(`${A.base}/verificar`)).text(), /href="\/seguranca#integridade"/)
+})

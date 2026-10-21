@@ -582,6 +582,8 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
   })
   // Site de apresentação.
   app.get('/', pagina('index.html'))
+  // Segurança e privacidade: o que o sistema faz hoje, em palavras simples.
+  app.get('/seguranca', pagina('seguranca.html'))
 
   // ── Desenvolvimento ───────────────────────────────────────────────────────
   if (dev) {

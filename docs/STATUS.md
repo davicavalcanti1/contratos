@@ -73,6 +73,13 @@ basta; não precisa de certificado ICP-Brasil do médico.
 
 ## O que foi acrescentado de funcionalidade nesta rodada
 
+- **Segurança e privacidade (20/out):** página pública `/seguranca`
+  (`public/seguranca.html`) dizendo o que o sistema faz hoje: o que guarda
+  de cada contrato, como prova que nada mudou, quem vê o quê, onde fica e
+  como protege, papéis e direitos da LGPD, retenção, o que não faz, o que o
+  produto não é, e como reportar um problema. Linkada no menu, no rodapé, na
+  seção de validade e no rodapé do selo. Dois pontos ficam para o termo de
+  uso (#12): o canal do encarregado de dados e o prazo exato de guarda.
 - **Página de modelos para a organização (20/out):** menu Modelos: cada
   modelo publicado com contagens (cláusulas, em destaque, campos, contratos
   gerados) e, por dentro, o texto "em branco" com os campos entre « », as
