@@ -12,6 +12,7 @@ import { transporteCaixa } from '../src/notificacoes.js'
 import { criarAvisos } from '../src/plataforma/avisos.js'
 import { criarDemonstracao } from '../src/plataforma/demonstracao.js'
 import { criarMarca } from '../src/plataforma/marca.js'
+import { criarMetricas } from '../src/plataforma/metricas.js'
 import { criarPlataforma } from '../src/plataforma/plataforma.js'
 import { criarWebhooks } from '../src/plataforma/webhooks.js'
 import { criarAgenda } from '../src/vida/agenda.js'
@@ -44,10 +45,11 @@ export async function subirServidor({ fetchWebhook, fetchIndices, agora, carimba
   const servico = criarServico({ repo, biblioteca, notificar, config: { baseUrl: base }, aoEvento, carimbador, icp, partes, marcaDe: marca.publica, ...(agora ? { agora } : {}) })
   const lotes = criarLotes({ repo, biblioteca, servico })
   const demonstracao = criarDemonstracao({ repo, servico, plataforma, marca, notificar, config: { baseUrl: base, dev: true }, ...(agora ? { agora } : {}) })
+  const metricas = criarMetricas({ repo, ...(agora ? { agora } : {}) })
   const agenda = criarAgenda({ repo, servico, notificar, aoEvento, config: { baseUrl: base }, ...(agora ? { agora } : {}) })
   const indices = criarIndices({ fetchFn: fetchIndices || (async () => { throw new Error('sem rede no teste') }) })
   await plataforma.importarOrganizacoes({ org1: { api_key: CHAVE, dados: ORG } })
-  servidor.on('request', criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes, marca, demonstracao, dev: true, log: false, chaveDev: CHAVE }))
+  servidor.on('request', criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes, marca, demonstracao, metricas, dev: true, log: false, chaveDev: CHAVE }))
 
   const api = (caminho, { metodo = 'GET', corpo, chave = CHAVE, sessao, cookie, cabecalhos = {} } = {}) =>
     fetch(base + caminho, {

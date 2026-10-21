@@ -390,7 +390,7 @@ async function recusar(ev) {
   const erro = $('#erro-recusar')
   erro.hidden = true
   try {
-    await comSessao('/recusar', { metodo: 'POST', corpo: { motivo: $('#motivo').value } })
+    await comSessao('/recusar', { metodo: 'POST', corpo: { motivo: $('#motivo').value, clausula: $('#recusa-clausula').value || null } })
     estado = await comSessao('/conteudo')
     telaFim()
   } catch (e) {
@@ -477,7 +477,11 @@ $('#btn-baixar-ler').addEventListener('click', async () => {
 })
 $('#btn-voltar-ler').addEventListener('click', () => { ir('ler') })
 $('#form-assinar').addEventListener('submit', assinar)
-$('#btn-abrir-recusa').addEventListener('click', () => { $('#form-recusar').hidden = false; $('#motivo').focus() })
+$('#btn-abrir-recusa').addEventListener('click', () => {
+  $('#recusa-clausula').innerHTML = '<option value="">Nenhuma em especial</option>' + estado.clausulas.map(c => `<option value="${esc(c.chave)}">Cláusula ${c.numero}: ${esc(c.titulo)}</option>`).join('')
+  $('#form-recusar').hidden = false
+  $('#motivo').focus()
+})
 $('#form-recusar').addEventListener('submit', recusar)
 $('#btn-baixar-icp').addEventListener('click', async () => {
   try { await baixar(await comSessao('/arquivo?qual=original'), 'contrato-para-assinar.pdf') } catch (er) { tratarErro(er) }

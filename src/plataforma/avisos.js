@@ -62,7 +62,7 @@ export function criarAvisos({ repo, notificar, config = {}, log = console }) {
       const s = d.signatario || {}
       return {
         assunto: `Recusado por ${primeiro(s.nome)}: ${c.titulo}`,
-        texto: `${s.nome} recusou o "${c.titulo}"${ref(c)}.\n\nMotivo informado: "${d.motivo || '—'}"\n\nEste contrato não pode mais ser assinado. Se fizer sentido, ajuste as condições e gere outro:\n${painel(c)}`,
+        texto: `${s.nome} recusou o "${c.titulo}"${ref(c)}.\n\nMotivo informado: "${d.motivo || '—'}"${d.clausula ? `\nCláusula apontada: ${d.clausula.numero} (${d.clausula.titulo}).` : ''}\n\nEste contrato não pode mais ser assinado. Se fizer sentido, ajuste as condições e gere outro:\n${painel(c)}`,
       }
     },
     'contrato.expirado'(c, d) {

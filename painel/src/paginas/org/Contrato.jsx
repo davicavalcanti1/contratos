@@ -111,7 +111,7 @@ function Pessoa({ s, c, podeReenviar, ocupado, onReenviar, onBaixarIcp }) {
       <div className="pessoa-texto">
         <strong>{s.nome}</strong>
         <span>{s.email} · {PAPEL[s.papel] || s.papel}{s.metodo === 'icp' ? ' · certificado ICP-Brasil' : ''}</span>
-        {s.recusa_motivo && <span className="pessoa-motivo">"{s.recusa_motivo}"</span>}
+        {s.recusa_motivo && <span className="pessoa-motivo">"{s.recusa_motivo}"{s.recusa_clausula && <small> · cláusula {s.recusa_clausula.numero}, {s.recusa_clausula.titulo.replace(/^D[aoe]s? /, '')}</small>}</span>}
         {s.certificado && <span>Certificado de {s.certificado.nome} · <button className="link-botao pequeno-link" onClick={onBaixarIcp}>PDF assinado por ele</button></span>}
       </div>
       <div className="pessoa-estado">
@@ -248,7 +248,7 @@ const EVENTO = {
   'clausula.duvida': (d) => `perguntou sobre a cláusula ${d.numero}: "${d.pergunta}"`,
   'clausula.resposta': (d) => `Dúvida da cláusula ${d.numero} respondida${d.por ? ` por ${d.por}` : ''}`,
   'assinatura.aceita': (d) => `assinou${d.metodo === 'icp_brasil' ? ' com certificado ICP-Brasil' : ''}${d.nome_digitado ? ` como "${d.nome_digitado}"` : ''}${d.ciencias ? `, com ${plural(d.ciencias, 'ciência', 'ciências')}` : ''}`,
-  'assinatura.recusada': (d) => `recusou${d.motivo ? `: "${d.motivo}"` : ''}`,
+  'assinatura.recusada': (d) => `recusou${d.motivo ? `: "${d.motivo}"` : ''}${d.numero ? ` (cláusula ${d.numero})` : ''}`,
   'icp.recusado': (d) => `tentou assinar com certificado e não foi aceito${d.motivo ? ` (${d.motivo})` : ''}`,
   'documento.selado': (d) => `Documento selado${d.codigo_verificacao ? `, código ${d.codigo_verificacao}` : ''}`,
   'documento.carimbado': (d) => `Carimbo do tempo aplicado${d.act ? ` por ${d.act}` : ''}`,

@@ -73,6 +73,16 @@ basta; não precisa de certificado ICP-Brasil do médico.
 
 ## O que foi acrescentado de funcionalidade nesta rodada
 
+- **Painel de leitura e recusas (20/out):** tela Leitura (organização) e
+  Plataforma → Leitura (todas as organizações ou uma; a demonstração do site
+  fica de fora por padrão): funil de quem recebeu, abriu, confirmou o código,
+  leu até o fim e assinou; tempo mediano do envio à assinatura e de leitura
+  por pessoa; por cláusula, tempo mediano visível (informado pelo navegador,
+  só para comparar), ciências, dúvidas e recusas; lista de recusas com
+  motivo. A recusa agora pode apontar a cláusula que pesou (campo opcional
+  na tela de recusar), e isso vai para o signatário, a trilha, o aviso e o
+  dossiê. Tudo é calculado da trilha; nada é guardado à parte
+  (`src/plataforma/metricas.js`, metricas.test.js).
 - **"Tenho uma dúvida" na cláusula (20/out):** na tela de assinatura, toda
   cláusula tem "Tenho uma dúvida sobre esta cláusula"; a pergunta vai para a
   trilha (`clausula.duvida`), quem enviou recebe e-mail e vê o cartão

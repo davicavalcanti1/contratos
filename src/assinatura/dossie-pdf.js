@@ -87,7 +87,7 @@ export function gerarDossiePdf(d) {
         s.evidencias ? `IP ${s.evidencias.ip || '—'} · ${s.evidencias.user_agent || '—'}${s.evidencias.geo ? ` · local ${s.evidencias.geo.lat}, ${s.evidencias.geo.lng} (±${s.evidencias.geo.precisao_m ?? '?'} m)` : ''}` : null,
         s.evidencias?.certificado ? `Certificado ICP-Brasil: ${s.evidencias.certificado.nome}, série ${s.evidencias.certificado.serial}; cadeia ${s.evidencias.certificado.cadeia.join(' > ')}` : null,
         s.evidencias?.certificado ? `PDF assinado com o certificado: SHA-256 ${s.evidencias.certificado.sha256}. Revogação ${s.evidencias.certificado.revogacao}` : null,
-        s.recusa_motivo ? `Recusou em ${dataHora(s.recusado_em)}: "${s.recusa_motivo}"` : null,
+        s.recusa_motivo ? `Recusou em ${dataHora(s.recusado_em)}: "${s.recusa_motivo}"${s.recusa_clausula ? ` · cláusula apontada: ${s.recusa_clausula.numero} (${s.recusa_clausula.titulo})` : ''}` : null,
       ].filter(Boolean).forEach(l => doc.text(l, { width: W }))
       doc.moveDown(0.6)
     }

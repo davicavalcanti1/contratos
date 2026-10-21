@@ -253,7 +253,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       signatarios: signatariosDe(c.id).map(s => ({
         id: s.id, ordem: s.ordem, nome: s.nome, email: s.email, papel: s.papel, status: s.status, metodo: s.metodo || 'otp',
         certificado: s.evidencias?.certificado ? { nome: s.evidencias.certificado.nome, emissor: s.evidencias.certificado.emissor, serial: s.evidencias.certificado.serial } : null,
-        assinado_em: s.assinado_em || null, recusado_em: s.recusado_em || null, recusa_motivo: s.recusa_motivo || null,
+        assinado_em: s.assinado_em || null, recusado_em: s.recusado_em || null, recusa_motivo: s.recusa_motivo || null, recusa_clausula: s.recusa_clausula || null,
       })),
       // Para o painel contar a história: quem fez, de onde, e o essencial do
       // que aconteceu (sem os blocos grandes, que ficam no dossiê).
@@ -314,7 +314,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
         id: s.id, ordem: s.ordem, nome: s.nome, email: s.email, cpf: s.cpf, papel: s.papel, canal: s.canal,
         status: s.status, identificado_em: s.identificado_em || null, leitura_completa_em: s.leitura_completa_em || null,
         ciencias: s.ciencias, assinado_em: s.assinado_em || null, nome_digitado: s.nome_digitado || null,
-        evidencias: s.evidencias || null, recusado_em: s.recusado_em || null, recusa_motivo: s.recusa_motivo || null,
+        evidencias: s.evidencias || null, recusado_em: s.recusado_em || null, recusa_motivo: s.recusa_motivo || null, recusa_clausula: s.recusa_clausula || null,
       })),
       duvidas: duvidasDe(c.id).map(publicoDuvida),
       eventos,
@@ -587,16 +587,19 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     }
   }
 
-  function recusar(token, sessao, { motivo } = {}, ctx = {}) {
+  // `clausula` (opcional): a que pesou na decisão. Vai para o painel de leitura.
+  function recusar(token, sessao, { motivo, clausula } = {}, ctx = {}) {
     const { s, c } = comSessao(token, sessao)
     exigirEmAssinatura(c, s)
     const m = String(motivo || '').trim()
     if (m.length < 3) throw new ErroNegocio(400, 'Conte em poucas palavras por que está recusando.')
+    const cl = clausula ? c.snapshot.clausulas.find(x => x.chave === clausula) : null
+    const apontada = cl ? { chave: cl.chave, numero: cl.numero, titulo: cl.titulo } : null
     const em = agoraIso()
-    repo.atualizar('signatarios', s.id, { status: 'recusado', recusado_em: em, recusa_motivo: m })
+    repo.atualizar('signatarios', s.id, { status: 'recusado', recusado_em: em, recusa_motivo: m, recusa_clausula: apontada })
     repo.atualizar('contratos', c.id, { status: 'recusado', recusado_em: em })
-    trilha.registrar(c.id, 'assinatura.recusada', { ator: `signatario:${s.id}`, dados: { motivo: m }, ...evidencia(ctx) })
-    avisar(repo.obter('contratos', c.id), 'contrato.recusado', { signatario: signatarioPublico(repo.obter('signatarios', s.id)), motivo: m })
+    trilha.registrar(c.id, 'assinatura.recusada', { ator: `signatario:${s.id}`, dados: { motivo: m, clausula: apontada?.chave || null, numero: apontada?.numero || null }, ...evidencia(ctx) })
+    avisar(repo.obter('contratos', c.id), 'contrato.recusado', { signatario: signatarioPublico(repo.obter('signatarios', s.id)), motivo: m, clausula: apontada })
     return { recusado_em: em }
   }
 

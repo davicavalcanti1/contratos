@@ -12,6 +12,7 @@ import { Contratos } from './paginas/org/Contratos.jsx'
 import { Agenda } from './paginas/org/Agenda.jsx'
 import { Empresa } from './paginas/org/Empresa.jsx'
 import { Lote } from './paginas/org/Lote.jsx'
+import { Leitura } from './paginas/org/Leitura.jsx'
 import { Lotes, NovoLote } from './paginas/org/Lotes.jsx'
 import { NovoContrato } from './paginas/org/NovoContrato.jsx'
 import { Pessoas } from './paginas/org/Pessoas.jsx'
@@ -47,6 +48,7 @@ const ICONES = {
   agenda: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
   lotes: 'M4 5h16v14H4zM4 10h16M10 5v14',
   pessoas: 'M3 5h18v14H3zM6.5 15.5a2.5 2.5 0 015 0M9 9.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3M14 9.5h4M14 13.5h4',
+  leitura: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 15a3 3 0 100-6 3 3 0 000 6z',
   empresa: 'M4 21V7l8-4 8 4v14M9 21v-6h6v6M9 10h.01M15 10h.01',
   usuarios: 'M16 19v-1a4 4 0 00-8 0v1M12 11a3 3 0 100-6 3 3 0 000 6zM20 19v-1a3 3 0 00-2-2.8M16 5.2a3 3 0 010 5.6',
   chaves: 'M14 10a4 4 0 10-3.5 3.97L13 11.5l1 1 1-1 1 1 2-2v-2zM9 15l-5 5v-3l2-2',
@@ -91,6 +93,7 @@ function Moldura() {
               <Item to="/plataforma" icone="organizacoes" end>Organizações</Item>
               <Item to="/plataforma/biblioteca" icone="biblioteca">Biblioteca</Item>
               <Item to="/plataforma/interessados" icone="interessados">Interessados</Item>
+              <Item to="/plataforma/leitura" icone="leitura">Leitura</Item>
               <Item to="/plataforma/saude" icone="saude">Saúde</Item>
               <Item to="/plataforma/auditoria" icone="auditoria">Auditoria</Item>
             </div>
@@ -103,6 +106,7 @@ function Moldura() {
               <Item to="/agenda" icone="agenda">Agenda</Item>
               <Item to="/lotes" icone="lotes">Lotes</Item>
               <Item to="/pessoas" icone="pessoas">Pessoas</Item>
+              <Item to="/leitura" icone="leitura">Leitura</Item>
               {ehAdmin && <>
                 <p className="grupo-titulo grupo-titulo-sub">Administração</p>
                 <Item to="/empresa" icone="empresa">Dados da empresa</Item>
@@ -154,6 +158,7 @@ function Moldura() {
               <Route path="/lotes/novo" element={<NovoLote />} />
               <Route path="/lotes/:id" element={<Lote />} />
               <Route path="/pessoas" element={<Pessoas />} />
+              <Route path="/leitura" element={<Leitura />} />
             </>}
             {ehAdmin && <>
               <Route path="/empresa" element={<Empresa />} />
@@ -169,6 +174,7 @@ function Moldura() {
               <Route path="/plataforma/biblioteca/clausulas/:chave" element={<EditorClausula />} />
               <Route path="/plataforma/saude" element={<Saude />} />
               <Route path="/plataforma/interessados" element={<Interessados />} />
+              <Route path="/plataforma/leitura" element={<Leitura plataforma />} />
               <Route path="/plataforma/auditoria" element={<Auditoria />} />
             </>}
             <Route path="*" element={<p className="vazio">Esta página não existe ou seu papel não dá acesso a ela. <NavLink to={inicio}>Voltar ao início</NavLink></p>} />
