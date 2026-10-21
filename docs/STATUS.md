@@ -1,6 +1,6 @@
 # Status do projeto
 
-> Atualizado em 17/out/2026, fim do dia. Este arquivo é o ponto de retomada:
+> Atualizado em 20/out/2026. Este arquivo é o ponto de retomada:
 > o que está pronto, o que foi decidido e o que vem a seguir.
 
 ## Onde estamos
@@ -24,7 +24,7 @@ página por página**, com foco em funcionalidade e design, nesta ordem:
 | 11 | Plataforma: biblioteca (modelos e cláusulas no banco) | ✅ pronto | `735ed7c` |
 | 12 | `/dev` | ⏭ depois (issue #10) | |
 
-123 testes passando (`npm test`).
+127 testes passando (`npm test`).
 
 ### Leitura de prontidão (17/out, fim do dia)
 
@@ -72,6 +72,15 @@ basta; não precisa de certificado ICP-Brasil do médico.
   tem mais modo escuro: sempre claro.
 
 ## O que foi acrescentado de funcionalidade nesta rodada
+
+- **Avisos e lembretes (20/out):** a organização recebe e-mail quando alguém
+  assina (com quem falta), quando todos assinam, quando alguém recusa (com o
+  motivo), um dia antes de o prazo vencer e quando vence
+  (`src/plataforma/avisos.js`, pelo mesmo gancho dos webhooks; vai a quem
+  enviou e aos administradores). A agenda lembra o signatário 3 e 1 dia antes
+  de o link expirar, com link novo, e expira os vencidos sem depender de
+  alguém abrir o contrato (avisos.test.js). Veio do estudo de onde melhorar:
+  [ESTUDO-2026-10-20.md](ESTUDO-2026-10-20.md), que é a fila de trabalho.
 
 - **Biblioteca viva (17/out):** cláusulas e modelos moram no armazenamento
   (coleções `clausulas` e `modelos`), semeados dos arquivos de `biblioteca/` na

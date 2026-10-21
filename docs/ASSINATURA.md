@@ -36,6 +36,29 @@ O servidor recusa a assinatura sem **todos** estes pontos, e não só a tela:
 O conteúdo do contrato **só aparece depois do código**: ele tem CPF, endereço e
 valores, e o link pode ter sido encaminhado.
 
+## Lembretes e avisos (20/out/2026)
+
+A agenda (`src/vida/agenda.js`), que roda de hora em hora, cuida do que
+acontece quando ninguém faz nada:
+
+- **Lembrete ao signatário** 3 dias e 1 dia antes de o link expirar, com um
+  link novo (o anterior deixa de valer). Contrato recém-enviado (menos de 24 h)
+  não recebe; quem confirmou o código nas últimas 2 h também não, porque o
+  link novo derrubaria a leitura em andamento; na ordem sequencial, só quem
+  está na vez; o representante do lote fica de fora (o lembrete dele é o
+  "Lembrar" da tela do lote). Cada lembrete entra na trilha como
+  `lembrete.enviado`.
+- **Expiração sem acesso**: a checagem de prazo era preguiçosa (só quando
+  alguém abria o contrato); agora a agenda expira os vencidos e avisa.
+
+E a organização fica sabendo por e-mail (`src/plataforma/avisos.js`), pelo
+mesmo gancho dos webhooks: **assinou** (dizendo quem ainda falta),
+**assinado por todos** (código e selo), **recusou** (com o motivo), **expira
+amanhã** (junto do último lembrete) e **expirou** (quem não assinou). Recebe
+quem enviou pelo painel (`enviado_por` no contrato) mais os administradores
+ativos; enviado pela API, os emissores também. Leitor e usuário inativo nunca
+recebem. Testes em `test/avisos.test.js`.
+
 ## O selo
 
 Quando o último signatário assina, o sistema gera o **PDF final**: o mesmo
@@ -98,5 +121,5 @@ a Fase 4.
 | Banco (hoje, JSON em disco) | mesma interface de `src/armazenamento/repo.js`, com Postgres; append-only vira trigger |
 | Carimbo do tempo ACT ICP-Brasil sobre o hash final | Fase 6. Sem ele, os horários são do nosso servidor |
 | Cadastro de organizações, usuários e chaves | Fase 4 |
-| Aviso à organização quando alguém recusa | webhooks de saída, Fase 4 |
+| Aviso à organização quando alguém assina, recusa ou o prazo vence | **feito em 20/out**: e-mail a quem enviou e aos administradores (`src/plataforma/avisos.js`) |
 | Limitador de tentativas em memória (zera ao reiniciar) | vai para o banco junto com o resto |

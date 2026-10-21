@@ -1,4 +1,8 @@
-// Agenda do contrato vivo: roda ao subir o servidor e de hora em hora.
+// Agenda: roda ao subir o servidor e de hora em hora.
+//
+// Contratos em assinatura: expira os vencidos e lembra quem ainda não assinou
+// (3 e 1 dia antes de expirar, com link novo), avisando a organização no
+// último lembrete (contrato.expirando).
 //
 // Para cada contrato assinado com vigência, olha o que está devido HOJE
 // (vida.js → alertasDevidos) e:
@@ -44,9 +48,49 @@ export function criarAgenda({ repo, servico, notificar, aoEvento = () => {}, ago
     }
   }
 
+  // Contratos ainda em assinatura: expira quem passou do prazo e lembra quem
+  // falta assinar 3 dias e 1 dia antes de expirar (link novo; quem está lendo
+  // agora e o representante do lote ficam de fora, ver lembrarSignatario).
+  // No último lembrete a organização também é avisada. Cada marco é guardado
+  // no contrato: a agenda roda de hora em hora e não repete.
+  const DIA = 864e5
+  const MARCOS = [3, 1]
+  async function lembrarPendentes() {
+    const feitos = []
+    servico.expirarVencidos()
+    const agoraMs = agora().getTime()
+    for (const c of repo.listar('contratos', x => servico.EM_ASSINATURA.has(x.status) && x.expira_em && x.enviado_em)) {
+      const restam = (new Date(c.expira_em).getTime() - agoraMs) / DIA
+      if (restam <= 0 || agoraMs - new Date(c.enviado_em).getTime() < DIA) continue // recém-enviado: o link ainda é a novidade
+      const enviados = new Set(c.lembretes_enviados || [])
+      const marco = MARCOS.find(m => restam <= m && !enviados.has(`${m}:${c.expira_em}`))
+      if (!marco) continue
+      for (const m of MARCOS) if (restam <= m) enviados.add(`${m}:${c.expira_em}`)
+      repo.atualizar('contratos', c.id, { lembretes_enviados: [...enviados] })
+      const dias = Math.max(1, Math.ceil(restam))
+      const pendentes = servico.pendentesDe(c)
+      const lembrados = []
+      for (const s of pendentes) {
+        if (await servico.lembrarSignatario(c.id, s.id, { dias })) lembrados.push({ id: s.id, nome: s.nome, email: s.email })
+      }
+      if (restam <= 1) {
+        try {
+          aoEvento(c.organizacao_id, 'contrato.expirando', {
+            contrato: { id: c.id, titulo: c.titulo, status: c.status, referencia: c.referencia || null, codigo_verificacao: null },
+            expira_em: c.expira_em, dias,
+            faltam: pendentes.map(s => ({ id: s.id, nome: s.nome, email: s.email, papel: s.papel })),
+            lembrados,
+          })
+        } catch (e) { console.error('[agenda]', e) }
+      }
+      feitos.push({ contrato_id: c.id, tipo: 'lembrete', chave: `lembrete:${marco}:${c.expira_em}`, dias, lembrados: lembrados.length })
+    }
+    return feitos
+  }
+
   async function executar() {
     const hoje = hojeBr(agora())
-    const feitos = []
+    const feitos = await lembrarPendentes()
     for (const c of repo.listar('contratos', x => x.status === 'assinado' && x.vida)) {
       const enviados = new Set(c.alertas_enviados || [])
       for (const a of alertasDevidos(c.vida, hoje)) {

@@ -43,6 +43,8 @@ Roda ao subir o servidor e de hora em hora.
 
 | Quando | O que acontece |
 |---|---|
+| 3 e 1 dia antes de o link de assinatura expirar | lembrete ao signatário com link novo (`lembrete.enviado` na trilha); no último, e-mail à organização + webhook `contrato.expirando` |
+| passou do prazo de assinatura | status **expirado** + e-mail à organização + webhook `contrato.expirado` (antes só acontecia quando alguém abria o contrato) |
 | 30 e 7 dias antes do término | e-mail para quem administra ou emite + webhook `contrato.vencendo` |
 | 30 dias antes do aniversário de reajuste | e-mail + webhook `contrato.reajuste_devido` |
 | passou do término | status **encerrado** + evento na trilha + webhook `contrato.encerrado` |

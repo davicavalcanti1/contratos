@@ -117,7 +117,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
       res.status(201).json(await servico.gerar({ organizacaoId: org(req).id, organizacao: dados(req), modelo, dados: d, referencia }))
     }))
     r.get('/contratos/:id', (req, res) => res.json(servico.consultar(req.params.id, org(req).id)))
-    r.post('/contratos/:id/enviar', h(async (req, res) => res.json(await servico.enviar(req.params.id, org(req).id, req.body))))
+    r.post('/contratos/:id/enviar', h(async (req, res) => res.json(await servico.enviar(req.params.id, org(req).id, req.body, { ator: req.acesso.ator }))))
     r.post('/contratos/:id/signatarios/:sid/reenviar', h(async (req, res) => res.json(await servico.reenviar(req.params.id, org(req).id, req.params.sid))))
     r.post('/contratos/:id/cancelar', (req, res) => res.json(servico.cancelar(req.params.id, org(req).id, req.body?.motivo)))
     r.get('/contratos/:id/arquivo', h(async (req, res) => enviarPdf(res, await servico.arquivo(req.params.id, org(req).id, req.query.qual))))

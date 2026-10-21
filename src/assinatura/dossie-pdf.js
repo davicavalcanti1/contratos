@@ -11,6 +11,7 @@ const ROTULOS = {
   'contrato.gerado': 'Contrato gerado',
   'contrato.enviado': 'Enviado para assinatura',
   'link.enviado': 'Link enviado',
+  'lembrete.enviado': 'Lembrete enviado ao signatário',
   'link.aberto': 'Link aberto',
   'otp.enviado': 'Código enviado',
   'otp.falhou': 'Código incorreto',
@@ -142,6 +143,7 @@ function detalhe(e) {
     case 'carimbo.pendente': return `Motivo: ${d.motivo}`
     case 'assinatura.recusada': return `Motivo: "${d.motivo}"`
     case 'otp.enviado': case 'link.enviado': return `Destino: ${d.destino}`
+    case 'lembrete.enviado': return `Destino: ${d.destino}${d.dias ? ` · ${d.dias} dia(s) antes de expirar` : ''}`
     case 'contrato.gerado': return `Conteúdo ${d.conteudo_sha256} · PDF original ${d.pdf_original_sha256}`
     case 'documento.selado': return `Código ${d.codigo_verificacao} · PDF final ${d.pdf_final_sha256}`
     case 'contrato.enviado': return `Ordem ${d.ordem} · ${d.signatarios.map(s => s.nome).join(', ')}`

@@ -195,6 +195,7 @@ const EVENTO = {
   'contrato.gerado': () => 'Contrato gerado',
   'contrato.enviado': (d) => `Enviado para assinatura${d.ordem === 'sequencial' ? ', um de cada vez' : ''}${d.expira_em ? `, vale até ${data(d.expira_em.slice(0, 10))}` : ''}`,
   'link.enviado': (d) => `Link enviado${d.destino ? ` para ${d.destino}` : ''}`,
+  'lembrete.enviado': (d) => `Lembrete enviado${d.destino ? ` para ${d.destino}` : ''}${d.dias ? `, ${plural(d.dias, 'dia', 'dias')} antes de expirar` : ''}`,
   'link.aberto': () => 'abriu o link',
   'otp.enviado': (d) => `pediu o código${d.destino ? ` (${d.destino})` : ''}`,
   'otp.falhou': (d) => `errou o código${d.tentativa ? ` (tentativa ${d.tentativa})` : ''}`,

@@ -19,6 +19,7 @@ import { criarBibliotecaViva } from '../biblioteca.js'
 import { criarLotes } from '../lote/lotes.js'
 import { lintModelo } from '../motor/linter.js'
 import { transporteCaixa } from '../notificacoes.js'
+import { criarAvisos } from '../plataforma/avisos.js'
 import { criarPlataforma } from '../plataforma/plataforma.js'
 import { criarWebhooks } from '../plataforma/webhooks.js'
 import { X509Certificate } from 'node:crypto'
@@ -48,6 +49,12 @@ for (const m of biblioteca.publicados) {
 }
 const notificar = transporteCaixa(repo)
 const webhooks = criarWebhooks({ repo, producao })
+const avisos = criarAvisos({ repo, notificar, config: { baseUrl } })
+// Um acontecimento, dois ouvintes: webhook para quem integra, e-mail para quem emitiu.
+const aoEvento = (org, tipo, dados) => {
+  try { webhooks.emitir(org, tipo, dados) } catch (e) { console.error('[webhooks]', e) }
+  avisos.aoEvento(org, tipo, dados)
+}
 const plataforma = criarPlataforma({ repo, notificar, config: { baseUrl } })
 const carimbador = carimbadorDoAmbiente(process.env, { producao })
 // ICP-Brasil: as raízes oficiais do ITI (certs/icp-brasil). Fora de produção,
@@ -55,9 +62,9 @@ const carimbador = carimbadorDoAmbiente(process.env, { producao })
 const raizes = carregarRaizesOficiais()
 if (!producao && process.env.ICP_RAIZ_TESTE) raizes.push(new X509Certificate(readFileSync(process.env.ICP_RAIZ_TESTE)))
 const icp = criarVerificadorIcp({ raizes })
-const servico = criarServico({ repo, biblioteca, notificar, config: { baseUrl }, aoEvento: webhooks.emitir, carimbador, icp })
+const servico = criarServico({ repo, biblioteca, notificar, config: { baseUrl }, aoEvento, carimbador, icp })
 const lotes = criarLotes({ repo, biblioteca, servico })
-const agenda = criarAgenda({ repo, servico, notificar, aoEvento: webhooks.emitir, config: { baseUrl } })
+const agenda = criarAgenda({ repo, servico, notificar, aoEvento, config: { baseUrl } })
 const indices = criarIndices()
 
 if (process.env.ORGANIZACOES_ARQUIVO) await plataforma.importarOrganizacoes(JSON.parse(readFileSync(process.env.ORGANIZACOES_ARQUIVO, 'utf8')))

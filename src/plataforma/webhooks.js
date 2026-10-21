@@ -24,6 +24,7 @@ export const EVENTOS_WEBHOOK = {
   'contrato.assinado': 'Contrato assinado por todos (selado)',
   'signatario.assinou': 'Uma pessoa assinou',
   'contrato.recusado': 'Contrato recusado',
+  'contrato.expirando': 'Prazo de assinatura termina em 1 dia e ainda faltam assinaturas',
   'contrato.expirado': 'Prazo de assinatura vencido',
   'contrato.cancelado': 'Contrato cancelado',
   'contrato.aditado': 'Termo aditivo assinado (prazo, valor ou objeto mudou)',

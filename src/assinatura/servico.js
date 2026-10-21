@@ -127,7 +127,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
   // `interno`: só o módulo de lote marca um signatário com canal 'lote'. Esse
   // signatário não recebe link por contrato — assina todos de uma vez pelo
   // link do lote. Pela API pública, todo signatário é 'email'.
-  async function enviar(id, organizacaoId, { signatarios, ordem = 'paralela', prazo_dias } = {}, { interno = false } = {}) {
+  async function enviar(id, organizacaoId, { signatarios, ordem = 'paralela', prazo_dias } = {}, { interno = false, ator = null } = {}) {
     const c = contratoDaOrg(id, organizacaoId)
     if (c.status !== 'gerado') throw new ErroNegocio(409, `Contrato está "${c.status}" — só se envia um contrato recém-gerado.`)
     if (!['paralela', 'sequencial'].includes(ordem)) throw new ErroNegocio(400, 'ordem deve ser "paralela" ou "sequencial".')
@@ -148,7 +148,9 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       ciencias: {},
     }))
     const dias = Number(prazo_dias) > 0 ? Number(prazo_dias) : cfg.prazoDias
-    repo.atualizar('contratos', c.id, { status: 'enviado', ordem, enviado_em: agoraIso(), expira_em: depois(dias * 864e5) })
+    // Quem enviou recebe os avisos (assinou, recusou, expirou). Pela API fica a chave.
+    const enviado_por = !ator ? null : ator.tipo === 'chave_api' ? { chave_api: ator.id } : { usuario_id: ator.id, nome: ator.nome || null, email: ator.email || null }
+    repo.atualizar('contratos', c.id, { status: 'enviado', ordem, enviado_em: agoraIso(), expira_em: depois(dias * 864e5), enviado_por })
 
     const lista = signatariosDe(c.id)
     trilha.registrar(c.id, 'contrato.enviado', {
@@ -163,21 +165,47 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     return { contrato: resumoContrato(repo.obter('contratos', c.id)), links }
   }
 
-  // Novo token a cada envio: reenviar INVALIDA o link anterior.
-  async function notificarSignatario(contratoId, s) {
+  // Novo token a cada envio: reenviar INVALIDA o link anterior. Com
+  // `lembrete`, a mensagem é a de quem ainda não assinou e o prazo está perto.
+  async function notificarSignatario(contratoId, s, { lembrete = null } = {}) {
     const c = repo.obter('contratos', contratoId)
     const { token, hash } = novoToken()
     repo.atualizar('signatarios', s.id, { token_hash: hash, status: s.status === 'aguardando' ? 'notificado' : s.status, notificado_em: agoraIso() })
     const link = `${cfg.baseUrl}/assinar/${token}`
+    const primeiro = s.nome.split(' ')[0]
+    const ate = dataCurta(c.expira_em)
     await notificar({
       para: s.email,
       canal: s.canal,
-      assunto: `${c.organizacao_nome} enviou um contrato para você assinar`,
-      texto: `Olá, ${s.nome.split(' ')[0]}.\n\n${c.organizacao_nome} enviou o "${c.titulo}" para a sua assinatura.\n\nAbra o link para ler e assinar:\n${link}\n\nPor segurança, pediremos um código enviado a este e-mail. O link vale até ${dataCurta(c.expira_em)}.`,
-      meta: { tipo: 'link', contrato_id: contratoId, signatario_id: s.id, link },
+      assunto: lembrete
+        ? `Lembrete: "${c.titulo}" espera a sua assinatura até ${ate}`
+        : `${c.organizacao_nome} enviou um contrato para você assinar`,
+      texto: lembrete
+        ? `Olá, ${primeiro}.\n\nO "${c.titulo}", enviado por ${c.organizacao_nome}, ainda não foi assinado por você. O prazo termina em ${ate}${lembrete.dias === 1 ? ' (amanhã)' : ` (em ${lembrete.dias} dias)`}.\n\nAbra o link para ler e assinar:\n${link}\n\nEste link substitui o anterior. Por segurança, pediremos um código enviado a este e-mail.`
+        : `Olá, ${primeiro}.\n\n${c.organizacao_nome} enviou o "${c.titulo}" para a sua assinatura.\n\nAbra o link para ler e assinar:\n${link}\n\nPor segurança, pediremos um código enviado a este e-mail. O link vale até ${ate}.`,
+      meta: { tipo: lembrete ? 'lembrete' : 'link', contrato_id: contratoId, signatario_id: s.id, link },
     })
-    trilha.registrar(contratoId, 'link.enviado', { dados: { signatario_id: s.id, canal: s.canal, destino: mascararEmail(s.email) } })
+    trilha.registrar(contratoId, lembrete ? 'lembrete.enviado' : 'link.enviado', { dados: { signatario_id: s.id, canal: s.canal, destino: mascararEmail(s.email), ...(lembrete ? { dias: lembrete.dias } : {}) } })
     return link
+  }
+
+  // Lembrete automático (agenda): só a quem ainda pode assinar e não está
+  // lendo agora (o link novo derrubaria a sessão aberta).
+  async function lembrarSignatario(contratoId, signatarioId, { dias } = {}) {
+    const c = checarExpiracao(repo.obter('contratos', contratoId))
+    if (!c || !EM_ASSINATURA.has(c.status)) return null
+    const s = repo.obter('signatarios', signatarioId)
+    if (!s || s.contrato_id !== c.id || ['assinado', 'recusado'].includes(s.status) || s.canal === 'lote') return null
+    if (c.ordem === 'sequencial' && !vezDe(c, s)) return null
+    if (s.identificado_em && agora().getTime() - new Date(s.identificado_em).getTime() < cfg.sessaoHoras * 3600e3) return null
+    return notificarSignatario(c.id, s, { lembrete: { dias } })
+  }
+
+  // Expira quem passou do prazo sem ninguém abrir (a checagem é preguiçosa).
+  function expirarVencidos() {
+    const vencidos = repo.listar('contratos', c => EM_ASSINATURA.has(c.status) && c.expira_em && c.expira_em < agoraIso())
+    vencidos.forEach(checarExpiracao)
+    return vencidos.length
   }
 
   async function reenviar(id, organizacaoId, signatarioId) {
@@ -475,7 +503,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       ...evidencia(ctx),
     })
 
-    avisar(repo.obter('contratos', c.id), 'signatario.assinou', { signatario: signatarioPublico(repo.obter('signatarios', s.id)) })
+    avisar(repo.obter('contratos', c.id), 'signatario.assinou', { signatario: signatarioPublico(repo.obter('signatarios', s.id)), faltam: pendentesDe(c).map(signatarioPublico) })
     await posAssinatura(c, s)
     return { assinado_em: em, contrato_status: repo.obter('contratos', c.id).status }
   }
@@ -517,7 +545,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       dados: { metodo: 'icp_brasil', titular: v.certificado.nome, emissor: v.certificado.emissor, serial: v.certificado.serial, cadeia: v.cadeia, arquivo_sha256: certificado.sha256, ciencias: Object.keys(s.ciencias || {}).length },
       ...evidencia(ctx),
     })
-    avisar(repo.obter('contratos', c.id), 'signatario.assinou', { signatario: signatarioPublico(repo.obter('signatarios', s.id)), metodo: 'icp_brasil' })
+    avisar(repo.obter('contratos', c.id), 'signatario.assinou', { signatario: signatarioPublico(repo.obter('signatarios', s.id)), metodo: 'icp_brasil', faltam: pendentesDe(c).map(signatarioPublico) })
     await posAssinatura(c, s)
     return { assinado_em: em, contrato_status: repo.obter('contratos', c.id).status, certificado: { nome: v.certificado.nome, emissor: v.certificado.emissor } }
   }
@@ -754,7 +782,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
         dados: { metodo: 'otp_email_lote', via_lote: lote.id, contratos_assinados_juntos: pendentes.length, nome_digitado: nome, ciencias: criticasDoContrato.length, geo: geoLimpa },
         ...evidencia(ctx),
       })
-      avisar(repo.obter('contratos', c.id), 'signatario.assinou', { signatario: signatarioPublico(repo.obter('signatarios', s.id)), via_lote: lote.id })
+      avisar(repo.obter('contratos', c.id), 'signatario.assinou', { signatario: signatarioPublico(repo.obter('signatarios', s.id)), via_lote: lote.id, faltam: pendentesDe(c).map(signatarioPublico) })
       await posAssinatura(repo.obter('contratos', c.id), repo.obter('signatarios', s.id))
       assinados.push(c.id)
     }
@@ -998,7 +1026,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     if (c && EM_ASSINATURA.has(c.status) && c.expira_em && c.expira_em < agoraIso()) {
       repo.atualizar('contratos', c.id, { status: 'expirado' })
       trilha.registrar(c.id, 'contrato.expirado', { dados: { expira_em: c.expira_em } })
-      avisar(repo.obter('contratos', c.id), 'contrato.expirado')
+      avisar(repo.obter('contratos', c.id), 'contrato.expirado', { faltam: pendentesDe(c).map(signatarioPublico) })
       return repo.obter('contratos', c.id)
     }
     return c
@@ -1007,6 +1035,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
   function signatariosDe(contratoId) {
     return repo.listar('signatarios', s => s.contrato_id === contratoId).sort((a, b) => a.ordem - b.ordem)
   }
+  const pendentesDe = (c) => signatariosDe(c.id).filter(s => !['assinado', 'recusado'].includes(s.status))
 
   function vezDe(c, s) {
     return signatariosDe(c.id).filter(x => x.ordem < s.ordem).every(x => x.status === 'assinado')
@@ -1041,6 +1070,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     config: cfg, trilha,
     gerar, enviar, reenviar, cancelar, consultar, listarContratos, arquivo, dossie, gerarDerivado, derivadosDe, encerrarPorDistrato,
     abrir, solicitarCodigo, validarCodigo, conteudo, darCiencia, registrarLeitura, assinar, assinarComIcp, arquivoIcp, recusar, arquivoDoSignatario,
+    lembrarSignatario, expirarVencidos, pendentesDe,
     verificar, conferirHash,
     carimbarContrato, carimbarPendentes, aguardarCarimbos, arquivoCarimbo,
     convidarAssinanteLote, abrirLote, solicitarCodigoLote, validarCodigoLote, conteudoLote,
