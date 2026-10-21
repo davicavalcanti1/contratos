@@ -123,6 +123,8 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     r.post('/contratos/:id/enviar', h(async (req, res) => res.json(await servico.enviar(req.params.id, org(req).id, req.body, { ator: req.acesso.ator }))))
     r.post('/contratos/:id/signatarios/:sid/reenviar', h(async (req, res) => res.json(await servico.reenviar(req.params.id, org(req).id, req.params.sid))))
     r.post('/contratos/:id/cancelar', (req, res) => res.json(servico.cancelar(req.params.id, org(req).id, req.body?.motivo)))
+    // Responder a dúvida que o signatário fez numa cláusula.
+    r.post('/contratos/:id/duvidas/:did/responder', h(async (req, res) => res.json(await servico.responder(req.params.id, org(req).id, req.params.did, req.body || {}, req.acesso.ator, ctx(req)))))
     r.get('/contratos/:id/arquivo', h(async (req, res) => enviarPdf(res, await servico.arquivo(req.params.id, org(req).id, req.query.qual))))
     r.get('/contratos/:id/assinaturas/:sid/arquivo', h(async (req, res) => enviarPdf(res, await servico.arquivoIcp(req.params.id, org(req).id, req.params.sid))))
     // Token RFC 3161, para o perito: openssl ts -verify -data <pdf assinado> -in <este arquivo> -CAfile <cadeia da ACT>
@@ -432,6 +434,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
   assinar.post('/leitura', (req, res) => res.json(servico.registrarLeitura(req.params.token, sess(req), req.body, ctx(req))))
   assinar.post('/assinar', h(async (req, res) => res.json(await servico.assinar(req.params.token, sess(req), req.body, ctx(req)))))
   assinar.post('/recusar', (req, res) => res.json(servico.recusar(req.params.token, sess(req), req.body, ctx(req))))
+  assinar.post('/duvida', (req, res) => res.status(201).json(servico.perguntar(req.params.token, sess(req), req.body, ctx(req))))
   assinar.get('/arquivo', h(async (req, res) => enviarPdf(res, await servico.arquivoDoSignatario(req.params.token, sess(req), req.query.qual))))
   // Assinatura ICP-Brasil: o PDF do contrato, assinado com o certificado de quem assina.
   assinar.post('/icp', express.raw({ type: () => true, limit: '20mb' }), h(async (req, res) => res.json(await servico.assinarComIcp(req.params.token, sess(req), req.body, ctx(req)))))

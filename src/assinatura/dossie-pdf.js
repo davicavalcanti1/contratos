@@ -17,6 +17,8 @@ const ROTULOS = {
   'otp.falhou': 'Código incorreto',
   'otp.validado': 'Identidade confirmada por código',
   'clausula.ciencia': 'Ciência de cláusula em destaque',
+  'clausula.duvida': 'Dúvida sobre cláusula',
+  'clausula.resposta': 'Resposta à dúvida',
   'documento.lido_ate_o_fim': 'Leitura até o fim',
   'assinatura.aceita': 'Assinou',
   'assinatura.recusada': 'Recusou',
@@ -90,6 +92,19 @@ export function gerarDossiePdf(d) {
       doc.moveDown(0.6)
     }
 
+    if (d.duvidas?.length) {
+      secao(doc, 'Dúvidas e respostas')
+      doc.font('sans').fontSize(8).fillColor(COR.tinta2).text('O signatário perguntou antes de assinar; a resposta explica, e o texto do contrato prevalece.', { width: W })
+      doc.moveDown(0.4)
+      for (const q of d.duvidas) {
+        if (doc.y > doc.page.height - M - 80) doc.addPage()
+        doc.font('sans-forte').fontSize(8.5).fillColor(COR.tinta).text(`Cláusula ${q.numero} (${q.titulo}) · ${nomes[`signatario:${q.signatario_id}`] || 'signatário'} · ${dataHora(q.em)}`, M, doc.y, { width: W })
+        doc.font('serif').fontSize(9.5).fillColor(COR.tinta).text(`Pergunta: "${q.pergunta}"`, { width: W })
+        doc.font('sans').fontSize(8.5).fillColor(q.resposta ? COR.tinta : COR.tinta3).text(q.resposta ? `Resposta${q.respondida_por ? ` de ${q.respondida_por}` : ''}, ${dataHora(q.respondida_em)}: ${q.resposta}` : 'Sem resposta até a emissão deste dossiê.', { width: W })
+        doc.moveDown(0.5)
+      }
+    }
+
     secao(doc, 'Trilha de eventos')
     doc.font('sans').fontSize(8).fillColor(COR.tinta2)
       .text('Cada evento guarda o hash do anterior. Alterar, remover ou reordenar um evento quebra a corrente a partir dele.', { width: W })
@@ -142,6 +157,8 @@ function detalhe(e) {
     case 'documento.carimbado': return `${d.act}${d.icp_brasil ? ' (ICP-Brasil)' : ' (fora da ICP-Brasil)'} · ${dataHora(d.gen_time)} · série ${d.serial}`
     case 'carimbo.pendente': return `Motivo: ${d.motivo}`
     case 'assinatura.recusada': return `Motivo: "${d.motivo}"`
+    case 'clausula.duvida': return `Cláusula ${d.numero}: "${d.pergunta}"`
+    case 'clausula.resposta': return `Cláusula ${d.numero}${d.por ? `, por ${d.por}` : ''}: "${d.resposta}"`
     case 'otp.enviado': case 'link.enviado': return `Destino: ${d.destino}`
     case 'lembrete.enviado': return `Destino: ${d.destino}${d.dias ? ` · ${d.dias} dia(s) antes de expirar` : ''}`
     case 'contrato.gerado': return `Conteúdo ${d.conteudo_sha256} · PDF original ${d.pdf_original_sha256}`

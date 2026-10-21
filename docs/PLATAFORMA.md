@@ -110,6 +110,7 @@ Configurados no painel (Webhooks). Eventos:
 |---|---|
 | `contrato.assinado` | todos assinaram; o contrato foi selado |
 | `signatario.assinou` | uma pessoa assinou (inclusive a empresa, pelo lote) |
+| `signatario.duvida` | uma pessoa perguntou sobre uma cláusula antes de assinar |
 | `contrato.recusado` | alguém recusou, com o motivo |
 | `contrato.expirando` | falta 1 dia para o prazo vencer e ainda faltam assinaturas |
 | `contrato.expirado` | o prazo venceu |

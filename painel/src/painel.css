@@ -760,3 +760,16 @@ button.numero:hover { border-color: var(--acao); }
 /* O campo da cor é um span dentro do rótulo: escapa da regra que corta o texto dos rótulos. */
 .campos .campo > .cor-campo { display: flex; white-space: normal; overflow: visible; text-overflow: clip; }
 .cor-campo input[type="text"] { width: 100%; }
+
+/* ── Dúvidas do signatário (detalhe do contrato) ─────────────────────── */
+.duvidas-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.duvida-cartao { border: 1px solid var(--borda); border-radius: 12px; padding: 12px 14px; }
+.duvida-meta { margin: 0 0 6px; font-size: 13px; color: var(--tinta-3); }
+.duvida-cartao blockquote { margin: 0; padding: 2px 0 2px 12px; border-left: 3px solid var(--linha); font-size: 14.5px; }
+.duvida-resposta { margin-top: 10px; background: var(--acao-claro); border-radius: 10px; padding: 10px 12px; }
+.duvida-resposta small { color: var(--tinta-2); font-size: 12.5px; }
+.duvida-resposta p { margin: 4px 0 0; font-size: 14.5px; }
+.duvida-form { margin-top: 10px; display: grid; gap: 8px; }
+.duvida-form textarea { width: 100%; min-height: 76px; padding: 10px 12px; font: 14.5px/1.5 var(--sans); border: 1.5px solid var(--borda); border-radius: 10px; background: var(--folha); color: var(--tinta); resize: vertical; }
+.duvida-form textarea:focus { border-color: var(--acao); outline: none; box-shadow: 0 0 0 3px var(--acao-claro); }
+.nota.urgente { color: var(--erro); font-weight: 600; }

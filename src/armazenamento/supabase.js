@@ -24,7 +24,7 @@ import { randomUUID } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const COLECOES = ['contratos', 'signatarios', 'eventos', 'sessoes', 'caixa', 'lotes', 'planilhas', 'mapeamentos', 'organizacoes', 'usuarios', 'convites', 'chaves_api', 'webhooks', 'entregas', 'auditoria', 'clausulas', 'modelos', 'partes', 'interessados']
+const COLECOES = ['contratos', 'signatarios', 'eventos', 'sessoes', 'caixa', 'lotes', 'planilhas', 'mapeamentos', 'organizacoes', 'usuarios', 'convites', 'chaves_api', 'webhooks', 'entregas', 'auditoria', 'clausulas', 'modelos', 'partes', 'interessados', 'duvidas']
 const SO_ANEXA = new Set(['eventos', 'auditoria'])
 const PAGINA = 1000
 const TENTATIVAS = 4

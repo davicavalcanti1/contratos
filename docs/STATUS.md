@@ -73,6 +73,15 @@ basta; não precisa de certificado ICP-Brasil do médico.
 
 ## O que foi acrescentado de funcionalidade nesta rodada
 
+- **"Tenho uma dúvida" na cláusula (20/out):** na tela de assinatura, toda
+  cláusula tem "Tenho uma dúvida sobre esta cláusula"; a pergunta vai para a
+  trilha (`clausula.duvida`), quem enviou recebe e-mail e vê o cartão
+  "Dúvidas do signatário" no detalhe do contrato, responde ali, e a resposta
+  volta por e-mail e na tela da pessoa (que confere sozinha a cada 30 s).
+  Perguntar não trava a assinatura. Pergunta e resposta entram no dossiê
+  (seção própria no PDF) e no webhook `signatario.duvida`. É a versão mais
+  honesta da assinatura consciente: a pessoa não assina sem entender, e a
+  empresa prova que explicou (duvidas.test.js).
 - **Demonstração real pelo site (20/out):** o visitante deixa nome e e-mail
   (clínica e WhatsApp opcionais) em `/#experimentar` e recebe um contrato de
   exemplo de verdade, da organização "Clínica Exemplo" (criada sozinha no

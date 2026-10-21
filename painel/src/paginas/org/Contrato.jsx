@@ -84,6 +84,7 @@ export function Contrato() {
             {podeCancelar && <p className="cartao-rodape"><button className="link-botao perigo" onClick={cancelar}>Cancelar este contrato</button></p>}
           </section>
 
+          <Duvidas c={c} podeEscrever={podeEscrever} onRespondida={recarregar} />
           <Vigencia c={c} />
           <Ligados c={c} />
           {podeEscrever && <div id="mudar"><AcoesVida c={c} onGerado={(d) => navegar(`/contratos/${d.id}`)} /></div>}
@@ -118,6 +119,46 @@ function Pessoa({ s, c, podeReenviar, ocupado, onReenviar, onBaixarIcp }) {
         {podeReenviar && <button className="link-botao pequeno-link" disabled={ocupado} onClick={onReenviar}>Reenviar link</button>}
       </div>
     </li>
+  )
+}
+
+// Dúvidas que o signatário fez nas cláusulas, e a resposta de quem enviou.
+function Duvidas({ c, podeEscrever, onRespondida }) {
+  const [textos, setTextos] = useState({})
+  const acao = useAcao()
+  const lista = c.duvidas || []
+  if (lista.length === 0) return null
+  const abertas = lista.filter(d => !d.resposta).length
+  const responder = (d) => acao.executar(async () => {
+    await api(`/org/contratos/${c.id}/duvidas/${d.id}/responder`, { metodo: 'POST', corpo: { resposta: textos[d.id] || '' } })
+    setTextos(t => ({ ...t, [d.id]: '' }))
+    onRespondida()
+  })
+  return (
+    <section className="cartao" id="duvidas">
+      <div className="cartao-topo">
+        <h2>Dúvidas do signatário</h2>
+        <span className={`nota${abertas ? ' urgente' : ''}`}>{abertas ? plural(abertas, 'sem resposta', 'sem resposta') : 'todas respondidas'}</span>
+      </div>
+      <Erro erro={acao.erro} onFechar={acao.limparErro} />
+      <ul className="duvidas-lista">
+        {lista.map(d => (
+          <li key={d.id} className="duvida-cartao">
+            <p className="duvida-meta"><strong>Cláusula {d.numero}</strong> · {d.titulo.replace(/^D[aoe]s? /, '')} · {d.signatario_nome || 'signatário'} · {dataHora(d.em)}</p>
+            <blockquote>{d.pergunta}</blockquote>
+            {d.resposta
+              ? <div className="duvida-resposta"><small>Resposta{d.respondida_por ? ` de ${d.respondida_por}` : ''}, {dataHora(d.respondida_em)}</small><p>{d.resposta}</p></div>
+              : podeEscrever
+                ? <form className="duvida-form" onSubmit={e => { e.preventDefault(); responder(d) }}>
+                  <textarea value={textos[d.id] || ''} onChange={e => setTextos(t => ({ ...t, [d.id]: e.target.value }))} placeholder="Explique em palavras simples. A resposta vai por e-mail e aparece na tela da pessoa; fica no dossiê." maxLength={2000} required />
+                  <div className="acoes"><button className="botao pequeno" disabled={acao.ocupado || !(textos[d.id] || '').trim()}>{acao.ocupado ? 'Enviando…' : 'Responder'}</button></div>
+                </form>
+                : <p className="nota">Sem resposta ainda.</p>}
+          </li>
+        ))}
+      </ul>
+      <p className="nota">A resposta explica, não altera o contrato: o texto assinado é o que vale. Se a dúvida mostrar que algo precisa mudar, cancele e gere outro.</p>
+    </section>
   )
 }
 
@@ -204,6 +245,8 @@ const EVENTO = {
   'otp.validado': () => 'confirmou a identidade',
   'clausula.ciencia': (d, cl) => `deu ciência na cláusula ${d.numero ?? cl?.numero ?? ''}${cl?.titulo ? `, ${cl.titulo.replace(/^D[aoe]s? /, '').toLowerCase()}` : ''}`,
   'documento.lido_ate_o_fim': () => 'leu até o fim',
+  'clausula.duvida': (d) => `perguntou sobre a cláusula ${d.numero}: "${d.pergunta}"`,
+  'clausula.resposta': (d) => `Dúvida da cláusula ${d.numero} respondida${d.por ? ` por ${d.por}` : ''}`,
   'assinatura.aceita': (d) => `assinou${d.metodo === 'icp_brasil' ? ' com certificado ICP-Brasil' : ''}${d.nome_digitado ? ` como "${d.nome_digitado}"` : ''}${d.ciencias ? `, com ${plural(d.ciencias, 'ciência', 'ciências')}` : ''}`,
   'assinatura.recusada': (d) => `recusou${d.motivo ? `: "${d.motivo}"` : ''}`,
   'icp.recusado': (d) => `tentou assinar com certificado e não foi aceito${d.motivo ? ` (${d.motivo})` : ''}`,
@@ -219,7 +262,7 @@ const EVENTO = {
   'distrato.assinado': (d) => `Distrato assinado${d.data_encerramento ? `: vale até ${data(d.data_encerramento)}` : ''}`,
   'contrato.encerrado': () => 'Encerrado no fim do prazo',
 }
-const MARCOS = new Set(['contrato.gerado', 'contrato.enviado', 'assinatura.aceita', 'assinatura.recusada', 'documento.selado', 'contrato.cancelado', 'contrato.expirado', 'contrato.aditado', 'contrato.distratado', 'contrato.encerrado'])
+const MARCOS = new Set(['contrato.gerado', 'contrato.enviado', 'clausula.duvida', 'clausula.resposta', 'assinatura.aceita', 'assinatura.recusada', 'documento.selado', 'contrato.cancelado', 'contrato.expirado', 'contrato.aditado', 'contrato.distratado', 'contrato.encerrado'])
 
 function Historico({ c }) {
   const [tudo, setTudo] = useState(false)

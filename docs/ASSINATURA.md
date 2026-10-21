@@ -36,6 +36,20 @@ O servidor recusa a assinatura sem **todos** estes pontos, e não só a tela:
 O conteúdo do contrato **só aparece depois do código**: ele tem CPF, endereço e
 valores, e o link pode ter sido encaminhado.
 
+## Dúvida antes de assinar (20/out/2026)
+
+Toda cláusula tem "Tenho uma dúvida sobre esta cláusula". A pergunta entra na
+trilha (`clausula.duvida`), a organização recebe e-mail e responde no detalhe
+do contrato (`POST /v1/contratos/:id/duvidas/:did/responder`); a resposta
+entra na trilha (`clausula.resposta`), vai por e-mail e aparece na tela da
+pessoa, que confere sozinha a cada 30 s. Quem já saiu da tela recebe um link
+novo (o anterior deixa de valer); quem confirmou o código nas últimas 2 h só
+recebe o aviso. Perguntar não trava nada: a tela de assinar mostra quantas
+dúvidas estão sem resposta e deixa a pessoa decidir. Pergunta e resposta vão
+para o dossiê, com seção própria no PDF. Limites: 3 a 1000 caracteres, até 10
+sem resposta por signatário; resposta até 2000. Rotas do signatário:
+`POST /api/assinar/:token/duvida` `{ clausula, pergunta }`.
+
 ## Lembretes e avisos (20/out/2026)
 
 A agenda (`src/vida/agenda.js`), que roda de hora em hora, cuida do que

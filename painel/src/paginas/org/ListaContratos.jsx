@@ -33,6 +33,7 @@ export function ListaContratos({ itens }) {
               <div className="lista-contratos-m-rodape">
                 <Situacao valor={c.status} />
                 {nota && <small className={nota.urgente ? 'urgente' : ''}>{nota.texto}</small>}
+                {c.duvidas_abertas > 0 && <small className="urgente">{plural(c.duvidas_abertas, 'dúvida sem resposta', 'dúvidas sem resposta')}</small>}
                 {total > 0 && <small>{feitas} de {total} {total === 1 ? 'assinatura' : 'assinaturas'}</small>}
                 <small>{dataHora(c.criado_em)}</small>
               </div>
@@ -58,7 +59,7 @@ export function ListaContratos({ itens }) {
                       <small>{feitas} de {total}</small>
                     </>}
                   </td>
-                  <td><Situacao valor={c.status} />{nota && <><br /><small className={nota.urgente ? 'urgente' : ''}>{nota.texto}</small></>}</td>
+                  <td><Situacao valor={c.status} />{nota && <><br /><small className={nota.urgente ? 'urgente' : ''}>{nota.texto}</small></>}{c.duvidas_abertas > 0 && <><br /><small className="urgente">{plural(c.duvidas_abertas, 'dúvida sem resposta', 'dúvidas sem resposta')}</small></>}</td>
                   <td><small>{dataHora(c.criado_em)}</small></td>
                 </tr>
               )

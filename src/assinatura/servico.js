@@ -259,6 +259,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       // que aconteceu (sem os blocos grandes, que ficam no dossiê).
       eventos: trilha.listar(c.id).map(e => ({ seq: e.seq, tipo: e.tipo, em: e.em, ator: e.ator, ip: e.ip || null, dados: resumoEvento(e.dados) })),
       clausulas: (c.snapshot?.clausulas || []).map(cl => ({ chave: cl.chave, numero: cl.numero, titulo: cl.titulo, critica: !!cl.critica })),
+      duvidas: duvidasDe(c.id).map(d => ({ ...publicoDuvida(d), signatario_nome: repo.obter('signatarios', d.signatario_id)?.nome || null })),
     }
   }
 
@@ -281,6 +282,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       itens: todos.slice((pag - 1) * lim, pag * lim).map(({ c, sigs }) => ({
         ...resumoContrato(c),
         signatarios: sigs.map(s => ({ id: s.id, nome: s.nome, email: s.email, papel: s.papel, status: s.status })),
+        duvidas_abertas: repo.listar('duvidas', d => d.contrato_id === c.id && !d.resposta).length,
       })),
     }
   }
@@ -314,6 +316,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
         ciencias: s.ciencias, assinado_em: s.assinado_em || null, nome_digitado: s.nome_digitado || null,
         evidencias: s.evidencias || null, recusado_em: s.recusado_em || null, recusa_motivo: s.recusa_motivo || null,
       })),
+      duvidas: duvidasDe(c.id).map(publicoDuvida),
       eventos,
       snapshot: c.snapshot,
     }
@@ -444,6 +447,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       clausulas: c.snapshot.clausulas.map(cl => ({
         chave: cl.chave, numero: cl.numero, titulo: cl.titulo, paragrafos: cl.paragrafos,
         resumo: cl.resumo, critica: cl.critica, ciente_em: s.ciencias?.[cl.chave]?.em || null,
+        duvidas: duvidasDe(c.id, s.id).filter(d => d.clausula === cl.chave).map(publicoDuvida),
       })),
       signatario: {
         nome: s.nome, papel: PAPEIS[s.papel], status: s.status, metodo: s.metodo || 'otp',
@@ -599,6 +603,77 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
   async function arquivoDoSignatario(token, sessao, qual) {
     const { c } = comSessao(token, sessao)
     return lerPdf(c, qual)
+  }
+
+  // ── Dúvida sobre a cláusula ───────────────────────────────────────────────
+  // A pessoa pergunta na própria tela, antes de assinar. Quem enviou recebe
+  // e-mail (avisos) e responde no painel; a resposta volta por e-mail e na
+  // tela. Perguntar não trava a assinatura: quem decide se espera é a pessoa.
+  // Pergunta e resposta entram na trilha e no dossiê: é a prova de que ela
+  // não assinou sem entender, e de que a empresa explicou.
+
+  const duvidasDe = (contratoId, signatarioId = null) =>
+    repo.listar('duvidas', d => d.contrato_id === contratoId && (!signatarioId || d.signatario_id === signatarioId)).sort((a, b) => a.em.localeCompare(b.em))
+  const publicoDuvida = (d) => ({
+    id: d.id, signatario_id: d.signatario_id, clausula: d.clausula, numero: d.numero, titulo: d.titulo, pergunta: d.pergunta, em: d.em,
+    resposta: d.resposta || null, respondida_em: d.respondida_em || null, respondida_por: d.respondida_por?.nome || null,
+  })
+
+  function perguntar(token, sessao, { clausula, pergunta } = {}, ctx = {}) {
+    const { s, c } = comSessao(token, sessao)
+    exigirEmAssinatura(c, s)
+    const cl = c.snapshot.clausulas.find(x => x.chave === clausula)
+    if (!cl) throw new ErroNegocio(404, 'Cláusula não está neste contrato.')
+    const p = String(pergunta || '').trim().replace(/\s+/g, ' ')
+    if (p.length < 3) throw new ErroNegocio(400, 'Escreva a sua dúvida em poucas palavras.')
+    if (p.length > 1000) throw new ErroNegocio(400, 'Dúvida longa demais: até 1000 caracteres.')
+    if (repo.listar('duvidas', d => d.signatario_id === s.id && !d.resposta).length >= 10) throw new ErroNegocio(429, 'Você já tem 10 dúvidas sem resposta. Espere a resposta de quem enviou o contrato.')
+    const d = repo.inserir('duvidas', {
+      contrato_id: c.id, organizacao_id: c.organizacao_id, signatario_id: s.id,
+      clausula: cl.chave, numero: cl.numero, titulo: cl.titulo, pergunta: p, em: agoraIso(),
+      resposta: null, respondida_em: null, respondida_por: null,
+    })
+    trilha.registrar(c.id, 'clausula.duvida', { ator: `signatario:${s.id}`, dados: { duvida_id: d.id, clausula: cl.chave, numero: cl.numero, pergunta: p }, ...evidencia(ctx) })
+    avisar(c, 'signatario.duvida', { signatario: signatarioPublico(s), duvida: publicoDuvida(d) })
+    return publicoDuvida(d)
+  }
+
+  async function responder(contratoId, organizacaoId, duvidaId, { resposta } = {}, ator = null, ctx = {}) {
+    const c = contratoDaOrg(contratoId, organizacaoId)
+    const d = repo.obter('duvidas', duvidaId)
+    if (!d || d.contrato_id !== c.id) throw new ErroNegocio(404, 'Dúvida não encontrada.')
+    if (d.resposta) throw new ErroNegocio(409, 'Esta dúvida já foi respondida.')
+    const r = String(resposta || '').trim()
+    if (r.length < 2) throw new ErroNegocio(400, 'Escreva a resposta.')
+    if (r.length > 2000) throw new ErroNegocio(400, 'Resposta longa demais: até 2000 caracteres.')
+    const em = agoraIso()
+    const por = ator?.id && ator.tipo !== 'chave_api' ? { usuario_id: ator.id, nome: ator.nome || null } : { chave_api: ator?.id || null, nome: null }
+    repo.atualizar('duvidas', d.id, { resposta: r, respondida_em: em, respondida_por: por })
+    trilha.registrar(c.id, 'clausula.resposta', {
+      ator: por.usuario_id ? `usuario:${por.usuario_id}` : `organizacao:${organizacaoId}`,
+      dados: { duvida_id: d.id, clausula: d.clausula, numero: d.numero, pergunta: d.pergunta, resposta: r, por: por.nome },
+      ...evidencia(ctx),
+    })
+    const s = repo.obter('signatarios', d.signatario_id)
+    if (s && s.canal !== 'lote' && EM_ASSINATURA.has(c.status) && !['assinado', 'recusado'].includes(s.status)) {
+      // Quem está lendo agora recebe a resposta na tela; quem saiu recebe um
+      // link novo (o anterior deixa de valer, como no reenvio).
+      const lendoAgora = s.identificado_em && agora().getTime() - new Date(s.identificado_em).getTime() < cfg.sessaoHoras * 3600e3
+      let link = null
+      if (!lendoAgora) {
+        const { token, hash } = novoToken()
+        repo.atualizar('signatarios', s.id, { token_hash: hash })
+        link = `${cfg.baseUrl}/assinar/${token}`
+      }
+      await notificar({
+        para: s.email, canal: s.canal,
+        assunto: `Resposta à sua dúvida: ${c.titulo}`,
+        texto: `Olá, ${s.nome.split(' ')[0]}.\n\n${nomeOrg(c)} respondeu à sua pergunta sobre a cláusula ${d.numero} (${d.titulo}):\n\n"${d.pergunta}"\n\nResposta${por.nome ? ` de ${por.nome}` : ''}:\n${r}\n\n${link ? `Abra o link para continuar a leitura e assinar (ele substitui o anterior):\n${link}` : 'A resposta também aparece na tela do contrato, que continua aberta para você.'}\n\nA resposta explica; o que vale é o texto do contrato.`,
+        meta: { tipo: 'resposta', contrato_id: c.id, signatario_id: s.id, duvida_id: d.id, link },
+      })
+      if (link) trilha.registrar(c.id, 'link.enviado', { dados: { signatario_id: s.id, canal: s.canal, destino: mascararEmail(s.email), motivo: 'resposta' } })
+    }
+    return publicoDuvida(repo.obter('duvidas', d.id))
   }
 
   // ── Representante da empresa assinando um lote ────────────────────────────
@@ -1087,6 +1162,7 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
     gerar, enviar, reenviar, cancelar, consultar, listarContratos, arquivo, dossie, gerarDerivado, derivadosDe, encerrarPorDistrato,
     abrir, solicitarCodigo, validarCodigo, conteudo, darCiencia, registrarLeitura, assinar, assinarComIcp, arquivoIcp, recusar, arquivoDoSignatario,
     lembrarSignatario, expirarVencidos, pendentesDe,
+    perguntar, responder, duvidasDe,
     verificar, conferirHash,
     carimbarContrato, carimbarPendentes, aguardarCarimbos, arquivoCarimbo,
     convidarAssinanteLote, abrirLote, solicitarCodigoLote, validarCodigoLote, conteudoLote,

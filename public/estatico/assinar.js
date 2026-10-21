@@ -129,6 +129,7 @@ async function carregarConteudo() {
   atualizarProgresso()
   ir('ler')
   observarLeitura()
+  vigiarRespostas()
 }
 
 function desenharDocumento() {
@@ -141,7 +142,7 @@ function desenharDocumento() {
         <p class="cl-num" aria-hidden="true">Cláusula ${c.numero}${c.critica ? ' <span class="destaque">Em destaque</span>' : ''}</p>
         <h3 id="cl-${esc(c.chave)}"><span class="sr">Cláusula ${c.numero}: </span>${esc(c.titulo)}${c.critica ? '<span class="sr"> (em destaque)</span>' : ''}</h3>
         ${c.resumo ? `<p class="bula"><span class="rotulo">Em palavras simples</span><mark>${esc(c.resumo)}</mark></p>` : ''}
-        <div class="texto-juridico">${c.resumo ? '<p class="rotulo">Texto do contrato</p>' : ''}${c.paragrafos.map(p => `<p><span class="pnum">${esc(p.numero)}</span>${esc(p.texto)}</p>`).join('')}</div>
+        <div class="texto-juridico">${c.resumo ? '<p class="rotulo">Texto do contrato</p>' : ''}${c.paragrafos.map(p => `<p><span class="pnum">${esc(p.numero)}</span>${esc(p.texto)}</p>`).join('')}<div class="duvida" data-duvida="${esc(c.chave)}">${blocoDuvida(c)}</div></div>
         ${c.critica ? `<div class="ciencia">${botaoCiencia(c)}</div>` : ''}
       </section>`)
   }
@@ -152,6 +153,70 @@ function desenharDocumento() {
 function botaoCiencia(c) {
   if (c.ciente_em) return `<span class="ciente">Você confirmou que entendeu, ${esc(dataHora(c.ciente_em))}</span>`
   return `<button class="botao secundario" data-ciencia="${esc(c.chave)}">Li e entendi esta cláusula</button>`
+}
+
+// ── Dúvida sobre a cláusula ─────────────────────────────────────────────────
+// Vai para quem enviou o contrato, que responde por e-mail e aqui mesmo.
+// Perguntar não trava nada: a pessoa decide se espera a resposta.
+const duvidaAberta = new Set()
+function blocoDuvida(c) {
+  const lista = (c.duvidas || []).map(d => `
+    <div class="duvida-item">
+      <p class="pergunta"><span class="rotulo">Sua dúvida, ${esc(dataHora(d.em))}</span>${esc(d.pergunta)}</p>
+      ${d.resposta
+        ? `<p class="resposta"><span class="rotulo">Resposta${d.respondida_por ? ` de ${esc(d.respondida_por)}` : ''}, ${esc(dataHora(d.respondida_em))}</span>${esc(d.resposta)}</p>`
+        : '<p class="aguardando">Enviada. Quem mandou o contrato vai responder por e-mail e aqui mesmo.</p>'}
+    </div>`).join('')
+  if (duvidaAberta.has(c.chave)) {
+    return `${lista}<form class="form-duvida">
+      <label class="campo"><span>O que ficou em dúvida nesta cláusula?</span><textarea required minlength="3" maxlength="1000" rows="3" placeholder="Ex.: a multa vale se eu precisar sair por doença?"></textarea></label>
+      <div class="acoes-duvida"><button class="botao secundario pequeno" type="submit">Enviar pergunta</button><button type="button" class="link-botao" data-cancelar-duvida>Cancelar</button></div>
+      <small>A resposta explica; o que vale é o texto do contrato.</small>
+    </form>`
+  }
+  const pode = ['enviado', 'parcialmente_assinado'].includes(estado.contrato_status) && !['assinado', 'recusado'].includes(estado.signatario.status)
+  return `${lista}${pode ? `<button type="button" class="link-botao duvida-abrir" data-abrir-duvida>${lista ? 'Outra dúvida' : 'Tenho uma dúvida sobre esta cláusula'}</button>` : ''}`
+}
+function redesenharDuvida(chave) {
+  const c = estado.clausulas.find(x => x.chave === chave)
+  const caixa = document.querySelector(`.duvida[data-duvida="${CSS.escape(chave)}"]`)
+  if (c && caixa) caixa.innerHTML = blocoDuvida(c)
+}
+async function enviarDuvida(form) {
+  const chave = form.closest('.duvida').dataset.duvida
+  const btn = form.querySelector('button[type=submit]')
+  btn.disabled = true
+  try {
+    const d = await comSessao('/duvida', { metodo: 'POST', corpo: { clausula: chave, pergunta: form.querySelector('textarea').value } })
+    const c = estado.clausulas.find(x => x.chave === chave)
+    c.duvidas = [...(c.duvidas || []), d]
+    duvidaAberta.delete(chave)
+    redesenharDuvida(chave)
+    vigiarRespostas()
+  } catch (e) {
+    btn.disabled = false
+    tratarErro(e)
+  }
+}
+// Enquanto houver pergunta sem resposta, confere a cada 30 s se a resposta chegou.
+let vigia = null
+function vigiarRespostas() {
+  const pendente = estado?.clausulas.some(c => (c.duvidas || []).some(d => !d.resposta))
+  if (!pendente) { clearInterval(vigia); vigia = null; return }
+  if (vigia) return
+  vigia = setInterval(async () => {
+    try {
+      const novo = await comSessao('/conteudo')
+      for (const c of novo.clausulas) {
+        const atual = estado.clausulas.find(x => x.chave === c.chave)
+        if (!atual) continue
+        const antes = JSON.stringify(atual.duvidas || [])
+        atual.duvidas = c.duvidas || []
+        if (JSON.stringify(atual.duvidas) !== antes) redesenharDuvida(c.chave)
+      }
+      vigiarRespostas()
+    } catch { /* tenta de novo no próximo ciclo */ }
+  }, 30_000)
 }
 
 async function darCiencia(btn) {
@@ -233,10 +298,12 @@ async function enviarLeitura() {
 // ── 3. Assinar ──────────────────────────────────────────────────────────────
 function telaAssinar() {
   const criticas = estado.clausulas.filter(c => c.critica).length
+  const semResposta = estado.clausulas.reduce((n, c) => n + (c.duvidas || []).filter(d => !d.resposta).length, 0)
   const linhas = [
     ['Contrato', estado.titulo],
     ['Enviado por', estado.organizacao],
     ['Cláusulas em destaque', `${criticas} confirmadas por você`],
+    ...(semResposta ? [['Dúvidas', `${semResposta} sem resposta. Você pode assinar mesmo assim, ou esperar.`]] : []),
     ...estado.outros.map(o => [o.papel, `${o.nome}: ${rotuloStatus(o.status)}`]),
   ]
   $('#resumo-assinatura').innerHTML = linhas.map(([k, v]) => `<li><span>${esc(k)}</span><span>${esc(v)}</span></li>`).join('')
@@ -383,7 +450,20 @@ $('#codigo').addEventListener('input', e => {
   e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6)
   if (e.target.value.length === 6) $('#form-codigo').requestSubmit()
 })
-$('#documento').addEventListener('click', e => { const b = e.target.closest('[data-ciencia]'); if (b) darCiencia(b) })
+$('#documento').addEventListener('click', e => {
+  const b = e.target.closest('[data-ciencia]')
+  if (b) return darCiencia(b)
+  const abrir = e.target.closest('[data-abrir-duvida]')
+  if (abrir) {
+    const k = abrir.closest('.duvida').dataset.duvida
+    duvidaAberta.add(k)
+    redesenharDuvida(k)
+    return document.querySelector(`.duvida[data-duvida="${CSS.escape(k)}"] textarea`)?.focus()
+  }
+  const cancelar = e.target.closest('[data-cancelar-duvida]')
+  if (cancelar) { const k = cancelar.closest('.duvida').dataset.duvida; duvidaAberta.delete(k); redesenharDuvida(k) }
+})
+$('#documento').addEventListener('submit', e => { const f = e.target.closest('.form-duvida'); if (f) { e.preventDefault(); enviarDuvida(f) } })
 const irAte = (chave) => document.querySelector(`.clausula[data-chave="${CSS.escape(chave)}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 $('#btn-ir-assinar').addEventListener('click', () => {
   const acao = $('#btn-ir-assinar').dataset.acao

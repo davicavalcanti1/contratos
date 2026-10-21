@@ -23,6 +23,7 @@ import { ErroNegocio } from '../assinatura/servico.js'
 export const EVENTOS_WEBHOOK = {
   'contrato.assinado': 'Contrato assinado por todos (selado)',
   'signatario.assinou': 'Uma pessoa assinou',
+  'signatario.duvida': 'Uma pessoa perguntou sobre uma cláusula antes de assinar',
   'contrato.recusado': 'Contrato recusado',
   'contrato.expirando': 'Prazo de assinatura termina em 1 dia e ainda faltam assinaturas',
   'contrato.expirado': 'Prazo de assinatura vencido',

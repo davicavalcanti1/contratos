@@ -42,7 +42,7 @@ export function VisaoGeral() {
 
   return (
     <>
-      <Cabecalho titulo={`${saudacao()}, ${primeiroNome}`} sub={vazio ? 'Vamos gerar o primeiro contrato?' : resumoDoDia({ aguardando: aguardando.total, expirando: expirando.length, problemas: problemas.total })}>
+      <Cabecalho titulo={`${saudacao()}, ${primeiroNome}`} sub={vazio ? 'Vamos gerar o primeiro contrato?' : resumoDoDia({ aguardando: aguardando.total, expirando: expirando.length, problemas: problemas.total, duvidas: aguardando.itens.reduce((n, x) => n + (x.duvidas_abertas || 0), 0) })}>
         {podeEscrever && <>
           <Link className="botao" to="/contratos/novo">Novo contrato</Link>
           <Link className="botao secundario" to="/lotes">Lote pela planilha</Link>
@@ -186,9 +186,10 @@ export function VisaoGeral() {
   )
 }
 
-function resumoDoDia({ aguardando, expirando, problemas }) {
+function resumoDoDia({ aguardando, expirando, problemas, duvidas }) {
   const partes = []
   if (aguardando) partes.push(`${plural(aguardando, 'contrato aguarda', 'contratos aguardam')} assinatura`)
+  if (duvidas) partes.push(`${plural(duvidas, 'dúvida espera', 'dúvidas esperam')} resposta`)
   if (expirando) partes.push(`${expirando} ${expirando === 1 ? 'expira' : 'expiram'} em até 3 dias`)
   if (problemas) partes.push(`${plural(problemas, 'precisa', 'precisam')} de uma decisão sua`)
   return partes.length ? partes.join(' · ') : 'Tudo em dia por aqui.'
@@ -204,6 +205,7 @@ function ItemPendente({ c }) {
       <span className="lista-atencao-meta">
         {assinaram} de {c.signatarios.length} {c.signatarios.length === 1 ? 'assinatura' : 'assinaturas'}
         {faltam.length > 0 && <> · falta {faltam.join(', ')}</>}
+        {c.duvidas_abertas > 0 && <> · <span className="urgente">{plural(c.duvidas_abertas, 'dúvida sem resposta', 'dúvidas sem resposta')}</span></>}
       </span>
       <span className={`prazo${dias != null && dias <= 3 ? ' urgente' : ''}`}>
         {dias == null ? '' : dias < 0 ? 'expirado' : dias === 0 ? 'expira hoje' : `expira em ${plural(dias, 'dia', 'dias')}`}

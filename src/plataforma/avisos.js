@@ -45,6 +45,13 @@ export function criarAvisos({ repo, notificar, config = {}, log = console }) {
         texto: `${s.nome}${s.papel ? ` (${PAPEL[s.papel] || s.papel})` : ''} assinou o "${c.titulo}"${ref(c)}${d.via_lote ? ', pelo lote' : ''}.\n\nFalta${faltam.length > 1 ? 'm' : ''}: ${lista(faltam)}.\n\nAcompanhe no painel:\n${painel(c)}`,
       }
     },
+    'signatario.duvida'(c, d) {
+      const s = d.signatario || {}, q = d.duvida || {}
+      return {
+        assunto: `Dúvida de ${primeiro(s.nome)} na cláusula ${q.numero}: ${c.titulo}`,
+        texto: `${s.nome} ainda não assinou o "${c.titulo}"${ref(c)} e perguntou sobre a cláusula ${q.numero} (${q.titulo}):\n\n"${q.pergunta}"\n\nResponda no painel: a pessoa recebe a resposta por e-mail e na própria tela, e pergunta e resposta ficam no dossiê.\n${painel(c)}#duvidas`,
+      }
+    },
     'contrato.assinado'(c, d) {
       return {
         assunto: `Assinado por todos: ${c.titulo}`,
