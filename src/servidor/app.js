@@ -14,6 +14,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { gerarDossiePdf } from '../assinatura/dossie-pdf.js'
+import { gerarPacote } from '../assinatura/pacote.js'
 import { ErroBiblioteca, acharModelo } from '../biblioteca.js'
 import { signatariosDaLinha } from '../lote/mapear.js'
 import { camposNecessarios, montarContrato } from '../motor/montar.js'
@@ -26,7 +27,8 @@ const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const PUBLICO = join(RAIZ, 'public')
 const PAINEL = join(PUBLICO, 'painel')
 const COOKIE = 'cs_painel'
-const CSP = "default-src 'self'; img-src 'self' data: blob:; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+// Fontes e estilos vêm do próprio sistema (public/estatico/fontes): nada de terceiro na tela de quem assina.
+const CSP = "default-src 'self'; img-src 'self' data: blob:; style-src 'self'; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
 
 export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes = null, marca = null, dev = false, log = true, chaveDev = null }) {
   const app = express()
@@ -134,6 +136,14 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
       const d = servico.dossie(req.params.id, org(req).id)
       if (req.query.formato === 'pdf') return enviarPdf(res, { buffer: await gerarDossiePdf(d), nome: `dossie-${d.contrato.id}.pdf` })
       res.json(d)
+    }))
+    // Pacote de prova: tudo que o perito precisa num .zip, com LEIA-ME de conferência.
+    r.get('/contratos/:id/pacote.zip', h(async (req, res) => {
+      const { buffer, nome } = await gerarPacote({ servico, contratoId: req.params.id, organizacaoId: org(req).id, baseUrl: servico.config.baseUrl })
+      res.set('Content-Type', 'application/zip')
+      res.set('Content-Disposition', `attachment; filename="${nome}"`)
+      res.set('Cache-Control', 'no-store')
+      res.send(buffer)
     }))
 
     // Contrato vivo: aditivo e distrato nascem de um contrato assinado.
@@ -492,6 +502,8 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
   app.get('/assinar/:token', pagina('assinar.html'))
   app.get('/lote/:token', pagina('lote.html'))
   app.get(['/v/:codigo', '/verificar'], pagina('verificar.html'))
+  // Fontes: nome fixo e conteúdo estável, cache de um ano.
+  app.use('/estatico/fontes', express.static(join(PUBLICO, 'estatico', 'fontes'), { maxAge: '1y', immutable: true }))
   app.use('/estatico', express.static(join(PUBLICO, 'estatico'), { maxAge: dev ? 0 : '1h' }))
 
   // Painel (React, build do Vite em public/painel). Qualquer rota que não seja

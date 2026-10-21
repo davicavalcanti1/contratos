@@ -345,7 +345,10 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
 
   function abrir(token, ctx = {}) {
     const { s, c } = porToken(token)
-    trilha.registrar(c.id, 'link.aberto', { ator: `signatario:${s.id}`, ...evidencia(ctx) })
+    // Uma abertura por hora por signatário na trilha: scanner de e-mail,
+    // recarregar a página ou voltar da sessão não viram dezenas de "abriu".
+    const ultima = trilha.listar(c.id).filter(e => e.tipo === 'link.aberto' && e.ator === `signatario:${s.id}`).at(-1)
+    if (!ultima || agora().getTime() - new Date(ultima.em).getTime() >= 3600e3) trilha.registrar(c.id, 'link.aberto', { ator: `signatario:${s.id}`, ...evidencia(ctx) })
     return {
       organizacao: nomeOrg(c),
       marca: marcaDa(c.organizacao_id),

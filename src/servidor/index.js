@@ -2,7 +2,7 @@
 //
 //   PORT                 porta (padrão 3000)
 //   BASE_URL             URL pública, usada nos links, no QR e nos convites (padrão http://localhost:PORT)
-//   DADOS_DIR            onde ficam as coleções JSON e os PDFs (padrão ./dados), quando NÃO há Supabase
+//   DADOS_DIR            sem Supabase: coleções JSON e PDFs; com Supabase: o diário de escritas pendentes (padrão ./dados)
 //   SUPABASE_URL         https://<ref>.supabase.co — liga o armazenamento no Supabase (Postgres + Storage)
 //   SUPABASE_KEY         chave service_role do projeto (nunca a anon, nunca no front)
 //   ORGANIZACOES_ARQUIVO opcional: importa organizações no formato antigo { id: { api_key, dados } }
@@ -38,7 +38,7 @@ const baseUrl = (process.env.BASE_URL || `http://localhost:${porta}`).replace(/\
 // Com SUPABASE_URL, tudo mora no Supabase e a memória é só a cópia de trabalho;
 // sem, JSON em disco (desenvolvimento e testes).
 const repo = process.env.SUPABASE_URL
-  ? await criarRepoSupabase({ url: process.env.SUPABASE_URL, chave: process.env.SUPABASE_KEY })
+  ? await criarRepoSupabase({ url: process.env.SUPABASE_URL, chave: process.env.SUPABASE_KEY, diario: process.env.DADOS_DIR || join(process.cwd(), 'dados') })
   : criarRepo({ dir: process.env.DADOS_DIR || join(process.cwd(), 'dados') })
 
 // A biblioteca mora no armazenamento (semeada dos arquivos na primeira vez) e

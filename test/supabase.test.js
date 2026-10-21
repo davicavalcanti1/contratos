@@ -4,6 +4,9 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { criarRepoSupabase } from '../src/armazenamento/supabase.js'
 
 // Supabase falso: uma tabela em memória e um bucket em memória.
@@ -134,4 +137,36 @@ test('arquivos: sobem para o bucket, não se sobrescrevem, e descem numa nova in
   const repo2 = await criarRepoSupabase(opcoes(falso))
   assert.ok((await repo2.lerArquivo('c1-original.pdf')).equals(pdf), 'desce do Storage')
   assert.equal(await repo2.lerArquivo('nao-existe.pdf'), null)
+})
+
+test('diário em disco: escrita que não chegou sobrevive à queda do processo e é refeita na subida seguinte', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'cs-diario-'))
+  const bom = supabaseFalso()
+  const repo0 = await criarRepoSupabase(opcoes(bom, { diario: dir }))
+  repo0.inserir('contratos', { id: 'c0', titulo: 'Chegou' })
+  await repo0.aguardar()
+  assert.deepEqual(JSON.parse(readFileSync(join(dir, 'fila-supabase.json'), 'utf8')), [], 'escrita confirmada sai do diário')
+
+  const teimoso = supabaseFalso({ falharVezes: 99 })
+  const repo = await criarRepoSupabase(opcoes(teimoso, { diario: dir }))
+  repo.inserir('contratos', { id: 'c9', titulo: 'Perdido?' })
+  repo.salvarArquivo('c9-original.pdf', Buffer.from('%PDF-1.4 c9'))
+  await repo.aguardar()
+  assert.equal(repo.falhas.length, 2)
+  assert.equal(repo.noDiario, 2)
+  const diario = JSON.parse(readFileSync(join(dir, 'fila-supabase.json'), 'utf8'))
+  assert.deepEqual(diario.map(d => d.tipo), ['gravar', 'arquivo'])
+  assert.ok(existsSync(join(dir, 'pendentes', 'c9-original.pdf')), 'o arquivo espera em disco, não só na memória')
+
+  // "Queda": nova instância, mesmo diário, rede de volta.
+  const repo2 = await criarRepoSupabase(opcoes(bom, { diario: dir }))
+  assert.equal(repo2.recuperadas, 2)
+  assert.equal(repo2.obter('contratos', 'c9').titulo, 'Perdido?', 'a memória já sobe com o que estava no diário')
+  await repo2.aguardar()
+  assert.equal(bom.linhas.get('contratos/c9').dados.titulo, 'Perdido?')
+  assert.ok(bom.bucket.get('c9-original.pdf').equals(Buffer.from('%PDF-1.4 c9')))
+  assert.equal(repo2.noDiario, 0)
+  assert.deepEqual(JSON.parse(readFileSync(join(dir, 'fila-supabase.json'), 'utf8')), [])
+  assert.ok(!existsSync(join(dir, 'pendentes', 'c9-original.pdf')), 'arquivo entregue sai da pasta de pendentes')
+  rmSync(dir, { recursive: true, force: true })
 })

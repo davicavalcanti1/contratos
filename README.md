@@ -3,7 +3,7 @@
 SaaS de contratos, multi-tenant e independente: modelos inteligentes, contrato
 gerado a partir dos dados da empresa e assinatura com validade jurídica.
 
-> **Fase atual: refação página por página + armazenamento no Supabase.** As seis fases do plano estão feitas; o banco agora pode ser o Supabase (Postgres + Storage), ainda sem e-mail real. Onde paramos: [docs/STATUS.md](docs/STATUS.md).
+> **Fase atual: refação página por página + armazenamento no Supabase.** As seis fases do plano estão feitas; o banco agora pode ser o Supabase (Postgres + Storage), ainda sem e-mail real. Onde paramos: [docs/STATUS.md](docs/STATUS.md). Operação e backup: [docs/OPERACAO.md](docs/OPERACAO.md).
 > Origem: o módulo de contratos do ExameQR (`exam-qr-system`), generalizado.
 
 ## Rodar
@@ -12,7 +12,7 @@ gerado a partir dos dados da empresa e assinatura com validade jurídica.
 npm install
 npm run build             # compila o painel (React)
 npm start                 # http://localhost:3000/painel  (e-mails de teste em /dev)
-npm test                  # 127 testes: site, motor, assinatura, lote, plataforma, webhooks, vida, carimbo, ICP-Brasil, painel, HTTP
+npm test                  # 140 testes: site, motor, assinatura, lote, plataforma, webhooks, vida, carimbo, ICP-Brasil, painel, HTTP
 npm run lint:modelos      # linter jurídico em todos os modelos da biblioteca
 npm run exemplos          # gera saida/*.pdf a partir de exemplos/*.json
 ```

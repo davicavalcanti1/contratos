@@ -24,7 +24,7 @@ página por página**, com foco em funcionalidade e design, nesta ordem:
 | 11 | Plataforma: biblioteca (modelos e cláusulas no banco) | ✅ pronto | `735ed7c` |
 | 12 | `/dev` | ⏭ depois (issue #10) | |
 
-127 testes passando (`npm test`).
+140 testes passando (`npm test`).
 
 ### Leitura de prontidão (17/out, fim do dia)
 
@@ -73,6 +73,17 @@ basta; não precisa de certificado ICP-Brasil do médico.
 
 ## O que foi acrescentado de funcionalidade nesta rodada
 
+- **Bloco técnico (20/out):** fontes servidas pelo próprio sistema
+  (`public/estatico/fontes/`, CSP sem Google: nada de terceiro na tela de
+  quem assina); `link.aberto` registrado no máximo uma vez por hora por
+  signatário (scanner de e-mail não enche a trilha); diário em disco das
+  escritas pendentes do Supabase (`DADOS_DIR/fila-supabase.json`), refeitas
+  na subida seguinte se o processo cair; CI no GitHub Actions
+  (`.github/workflows/testes.yml`); backup e restauração do Supabase
+  (`ferramentas/backup.mjs`); pacote de prova em .zip com LEIA-ME de
+  conferência (`GET /v1/contratos/:id/pacote.zip`, botão no detalhe);
+  ferramentas de screenshot e semeadura dentro do repo (`ferramentas/`);
+  runbook em [OPERACAO.md](OPERACAO.md).
 - **Marca da organização (20/out):** em Dados da empresa, o administrador
   define nome de exibição ("IMAGO" em vez da razão social), cor de destaque e
   logotipo. A tela de assinatura e a do lote mostram o logotipo acima de
@@ -163,12 +174,14 @@ servidor local são criados por um roteiro de semeadura (um assinado, dois
 aguardando, um recusado, um só gerado) que vive fora do repo; ver a nota no
 fim.
 
-### Ferramentas de trabalho (fora do repo)
+### Ferramentas de trabalho (`ferramentas/`)
 
-Durante a refação usamos um checador de layout com `puppeteer-core` e o
-Chrome local: tira screenshot em 390 e 1440 px, com ou sem preferência
-escura, faz login, preenche e clica, e acusa vazamento horizontal, erros de
-console e requisições falhas. Ele e o roteiro de semeadura ficaram no
-scratchpad da sessão do Claude Code (`ferramentas/shot.mjs`, `semear.mjs`).
-Se forem úteis de novo, vale trazê-los para `ferramentas/` no repo, com
-`puppeteer-core` como devDependency.
+- `shot.mjs <url> <nome> [--widths=390,1440] [--login=email:senha] [--el=seletor] [--type=sel=texto]`:
+  screenshot com o Chrome local (`puppeteer-core`, devDependency), acusando
+  vazamento horizontal, erros de console e requisições falhas. Sai em
+  `ferramentas/shots/` (ignorado pelo git).
+- `fluxo-assinar.mjs <link> <prefixo> [--assinar]`: percorre a tela de
+  assinatura e fotografa cada etapa.
+- `semear.mjs [url]`: cria no servidor local um contrato assinado, dois
+  aguardando, um recusado e um só gerado.
+- `backup.mjs`: backup e restauração do Supabase (ver OPERACAO.md).

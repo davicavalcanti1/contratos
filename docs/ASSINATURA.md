@@ -106,7 +106,10 @@ a Fase 4.
 - Token do link, código e sessão são guardados **só como hash**.
 - `Referrer-Policy: no-referrer` e `<meta name="referrer">`: o token está na
   URL e não pode vazar para fontes ou recursos externos. CSP restrita, sem
-  inline, sem iframe.
+  inline, sem iframe e **sem terceiro**: as fontes vêm do próprio sistema
+  (`public/estatico/fontes/`), então nem o IP de quem assina sai daqui.
+- `link.aberto` entra na trilha no máximo uma vez por hora por signatário:
+  scanner de e-mail e recarregar a página não viram dezenas de "abriu".
 - O log mascara `/assinar/<token>` (o stdout vai para o EasyPanel, lição do ExameQR).
 - `trust proxy` ligado: o IP registrado é o do signatário, não o do proxy.
 - Limite de 20 pedidos/validações de código por IP a cada 10 min.
