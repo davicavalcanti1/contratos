@@ -36,6 +36,7 @@ export function textoDoModelo(modelo, indice, { chaves = null, contagem = null }
       contratos: contagem?.get(c.chave) ?? null,
       paragrafos: paragrafosDe(c).map(p => ({ texto: rotular(p.texto), condicao: frase(p.quando) })),
       resumo: c.resumo_simples ? rotular(c.resumo_simples) : null,
+      base_legal: c.base_legal || null,
     })
   }
   return {

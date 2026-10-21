@@ -53,6 +53,17 @@ Restaurar num projeto novo (depois de aplicar `supabase/migrations/`):
 SUPABASE_URL=… SUPABASE_KEY=… node ferramentas/backup.mjs --restaurar backup/registros-2026-10-20-03-00.json backup/arquivos
 ```
 
+## Legislação (de vez em quando)
+
+```bash
+node ferramentas/legislacao.mjs atualizar
+```
+
+Rebaixa de github.com/ctresb/leis as normas de `legislacao/normas.json` e
+avisa se algum artigo citado numa cláusula mudou de texto: aí alguém relê a
+cláusula. Commitar os `.md` e o `fontes.json` (a data da coleta vai na bula).
+Ver [LEGISLACAO.md](LEGISLACAO.md).
+
 ## Quando quebra
 
 | Sintoma | Causa provável | O que fazer |

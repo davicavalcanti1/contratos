@@ -4,7 +4,7 @@
 
 import { Link, useParams } from 'react-router-dom'
 import { api, baixar } from '../../api.js'
-import { Cabecalho, Carregando, Erro, plural, useAcao, useDados } from '../../comum.jsx'
+import { Cabecalho, Carregando, Erro, Fundamentos, plural, useAcao, useDados } from '../../comum.jsx'
 import { useSessao } from '../../sessao.jsx'
 
 const TIPO = { texto: 'texto', cpf: 'CPF', cnpj: 'CNPJ', moeda: 'valor em reais', numero: 'número', percentual: 'percentual', data: 'data', email: 'e-mail', booleano: 'sim ou não', enum: 'escolha', endereco: 'endereço' }
@@ -54,6 +54,7 @@ export function Modelo() {
                   {c.resumo && <p className="bula"><span className="rotulo">Em palavras simples</span><mark><ComCampos texto={c.resumo} /></mark></p>}
                   <div className="texto-juridico">
                     {c.paragrafos.map((p, j) => <p key={j}>{p.condicao && <span className="condicao">Só quando {p.condicao}: </span>}<ComCampos texto={p.texto} /></p>)}
+                    <Fundamentos itens={c.fundamentos} />
                   </div>
                 </article>
               ))}

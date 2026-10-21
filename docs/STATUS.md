@@ -1,6 +1,6 @@
 # Status do projeto
 
-> Atualizado em 20/out/2026. Este arquivo é o ponto de retomada:
+> Atualizado em 21/out/2026. Este arquivo é o ponto de retomada:
 > o que está pronto, o que foi decidido e o que vem a seguir.
 
 ## Onde estamos
@@ -73,6 +73,18 @@ basta; não precisa de certificado ICP-Brasil do médico.
 
 ## O que foi acrescentado de funcionalidade nesta rodada
 
+- **Legislação local e "o que diz a lei" na bula (21/out):** `legislacao/`
+  guarda o texto compilado das dez normas federais que as cláusulas citam
+  (baixado de github.com/ctresb/leis por `ferramentas/legislacao.mjs`), e
+  `src/legislacao/` indexa por artigo e lê a `base_legal` como o redator
+  escreve ("CPC art. 784, III e §4º"). Embaixo de cada cláusula, na tela de
+  assinatura e nas prévias do painel, um bloco fechado mostra o artigo com a
+  fonte e a data da coleta. O editor de cláusula mostra o artigo enquanto o
+  revisor digita. O linter reprova artigo que não existe ou revogado e avisa
+  cláusula sem base legal. As seis cláusulas sem base legal receberam
+  citações (a revisar pelo advogado, #11). Ver [LEGISLACAO.md](LEGISLACAO.md).
+  Próximo passo natural: o gerador público de contratos (ver ESTUDO), que usa
+  isso como diferencial contra modelos soltos da internet.
 - **Segurança e privacidade (20/out):** página pública `/seguranca`
   (`public/seguranca.html`) dizendo o que o sistema faz hoje: o que guarda
   de cada contrato, como prova que nada mudou, quem vê o quê, onde fica e
@@ -239,3 +251,5 @@ fim.
 - `semear.mjs [url]`: cria no servidor local um contrato assinado, dois
   aguardando, um recusado e um só gerado.
 - `backup.mjs`: backup e restauração do Supabase (ver OPERACAO.md).
+- `legislacao.mjs atualizar | conferir | ver "CC art. 598"`: baixa as normas do
+  catálogo, confere as citações das cláusulas e mostra o que a bula vai mostrar.

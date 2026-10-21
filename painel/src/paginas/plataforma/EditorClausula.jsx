@@ -5,7 +5,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../../api.js'
-import { Cabecalho, Campo, Carregando, Erro, plural, useAcao, useDados } from '../../comum.jsx'
+import { Cabecalho, Campo, Carregando, Erro, Fundamentos, plural, useAcao, useDados } from '../../comum.jsx'
 
 const VAZIA = { chave: '', categoria: '', titulo: '', paragrafos: [{ texto: '' }], resumo_simples: '', critica: false, base_legal: '' }
 
@@ -22,6 +22,13 @@ export function EditorClausula() {
   const [aviso, setAviso] = useState(null)
   const [aplicar, setAplicar] = useState([])
   const acao = useAcao()
+  // A base legal resolvida na legislação local: o artigo aparece na prévia
+  // enquanto o revisor digita, e o que não resolve é dito na hora.
+  const [leg, setLeg] = useState(null)
+  useEffect(() => {
+    const t = setTimeout(() => api(`/plataforma/biblioteca/legislacao?citacao=${encodeURIComponent(c?.base_legal || '')}`).then(setLeg).catch(() => setLeg(null)), 350)
+    return () => clearTimeout(t)
+  }, [c?.base_legal])
 
   useEffect(() => {
     if (!base.dados) return
@@ -70,8 +77,9 @@ export function EditorClausula() {
               <Campo rotulo="Título" classe="c-6" dica='Como aparece no contrato: "Do foro", "Da confidencialidade".'><input value={c.titulo} onChange={e => set('titulo', e.target.value)} /></Campo>
               <Campo rotulo="Chave" classe="c-3" dica={nova ? 'Sem espaços: sigilo_prontuario' : 'Não muda.'}><input value={c.chave} disabled={!nova} onChange={e => set('chave', e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '_'))} /></Campo>
               <Campo rotulo="Categoria" classe="c-3" dica="Agrupa na biblioteca: prazo, preco, foro…"><input value={c.categoria} onChange={e => set('categoria', e.target.value)} /></Campo>
-              <Campo rotulo="Base legal (opcional)" classe="c-12" dica="Ex.: CC art. 593; CLT art. 442-B. Vai no dossiê."><input value={c.base_legal} onChange={e => set('base_legal', e.target.value)} /></Campo>
+              <Campo rotulo="Base legal" classe="c-12" dica={`Ex.: CC art. 593; CLT art. 442-B; Lei 13.709/2018 arts. 7º, V e 46. A bula mostra o texto do artigo e o dossiê registra a citação. Normas disponíveis: ${(leg?.normas || []).map(n => n.sigla).join(', ') || '…'}.`}><input value={c.base_legal} onChange={e => set('base_legal', e.target.value)} /></Campo>
             </div>
+            {leg?.problemas?.length > 0 && <p className="aviso info fund-problemas">{leg.problemas.join('; ')}. O que não resolve não aparece na bula, e artigo inexistente reprova o modelo no linter.</p>}
           </fieldset>
 
           <fieldset className="form-secao">
@@ -116,7 +124,7 @@ export function EditorClausula() {
                 <p className="cl-num">Cláusula N{c.critica && <span className="destaque">Em destaque</span>}</p>
                 <h3>{c.titulo || 'Título da cláusula'}</h3>
                 {c.resumo_simples && <p className="bula"><span className="rotulo">Em palavras simples</span><mark>{c.resumo_simples}</mark></p>}
-                <div className="texto-juridico">{c.paragrafos.map((p, i) => <p key={i}><span className="pnum">N.{i + 1}</span>{p.quando && <span className="condicao">condicional </span>}{p.texto || '…'}</p>)}</div>
+                <div className="texto-juridico">{c.paragrafos.map((p, i) => <p key={i}><span className="pnum">N.{i + 1}</span>{p.quando && <span className="condicao">condicional </span>}{p.texto || '…'}</p>)}<Fundamentos itens={leg?.itens} aberto /></div>
                 {c.critica && <div className="ciencia"><button type="button" className="botao secundario" disabled>Li e entendi esta cláusula</button></div>}
               </article>
             </div>

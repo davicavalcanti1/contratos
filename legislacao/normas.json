@@ -1,0 +1,17 @@
+{
+  "_comentario": "Catálogo curado das normas que as cláusulas citam. Cada uma é baixada de github.com/ctresb/leis (texto compilado, domínio público) por `node ferramentas/legislacao.mjs atualizar`. Para citar uma norma nova numa cláusula, acrescente-a aqui e rode o comando. `fontes.json` é gerado: diz de onde veio cada arquivo e quando.",
+  "repositorio": "https://github.com/ctresb/leis",
+  "raiz_bruta": "https://raw.githubusercontent.com/ctresb/leis/main/",
+  "normas": [
+    { "sigla": "CC", "arquivo": "cc.md", "nome": "Código Civil", "titulo": "Lei nº 10.406/2002", "tipo": "lei", "numero": "10406", "ano": 2002, "caminho": "federal/leis-ordinarias/2002/lei-10406-2002-01-10.md" },
+    { "sigla": "CPC", "arquivo": "cpc.md", "nome": "Código de Processo Civil", "titulo": "Lei nº 13.105/2015", "tipo": "lei", "numero": "13105", "ano": 2015, "caminho": "federal/leis-ordinarias/2015/lei-13105-2015-03-16.md" },
+    { "sigla": "CLT", "arquivo": "clt.md", "nome": "Consolidação das Leis do Trabalho", "titulo": "Decreto-Lei nº 5.452/1943", "tipo": "decreto-lei", "numero": "5452", "ano": 1943, "caminho": "federal/decretos-lei/1943/del-5452-1943-05-01.md" },
+    { "sigla": "CDC", "arquivo": "cdc.md", "nome": "Código de Defesa do Consumidor", "titulo": "Lei nº 8.078/1990", "tipo": "lei", "numero": "8078", "ano": 1990, "caminho": "federal/leis-ordinarias/1990/lei-8078-1990-09-11.md" },
+    { "sigla": "CP", "arquivo": "cp.md", "nome": "Código Penal", "titulo": "Decreto-Lei nº 2.848/1940", "tipo": "decreto-lei", "numero": "2848", "ano": 1940, "caminho": "federal/decretos-lei/1940/del-2848-1940-12-07.md" },
+    { "sigla": "LGPD", "arquivo": "lgpd.md", "nome": "Lei Geral de Proteção de Dados Pessoais", "titulo": "Lei nº 13.709/2018", "tipo": "lei", "numero": "13709", "ano": 2018, "caminho": "federal/leis-ordinarias/2018/lei-13709-2018-08-14.md" },
+    { "sigla": "MP 2.200-2", "arquivo": "mp-2200-2.md", "nome": "ICP-Brasil e documentos eletrônicos", "titulo": "Medida Provisória nº 2.200-2/2001", "tipo": "mp", "numero": "2200-2", "ano": 2001, "caminho": "federal/medidas-provisorias/2001/mpv-2200-2-2001-08-24.md" },
+    { "sigla": "Lei 14.063", "arquivo": "lei-14063.md", "nome": "Assinaturas eletrônicas", "titulo": "Lei nº 14.063/2020", "tipo": "lei", "numero": "14063", "ano": 2020, "caminho": "federal/leis-ordinarias/2020/lei-14063-2020-09-23.md" },
+    { "sigla": "Lei 10.192", "arquivo": "lei-10192.md", "nome": "Reajuste de contratos (Plano Real)", "titulo": "Lei nº 10.192/2001", "tipo": "lei", "numero": "10192", "ano": 2001, "caminho": "federal/leis-ordinarias/2001/lei-10192-2001-02-14.md" },
+    { "sigla": "Lei 9.279", "arquivo": "lei-9279.md", "nome": "Propriedade industrial", "titulo": "Lei nº 9.279/1996", "tipo": "lei", "numero": "9279", "ano": 1996, "caminho": "federal/leis-ordinarias/1996/lei-9279-1996-05-14.md" }
+  ]
+}

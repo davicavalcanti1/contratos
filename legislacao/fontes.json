@@ -1,0 +1,116 @@
+{
+  "normas": {
+    "cc.md": {
+      "url": "https://raw.githubusercontent.com/ctresb/leis/main/federal/leis-ordinarias/2002/lei-10406-2002-01-10.md",
+      "urn": "urn:lex:br:federal:lei:2002-01-10;10406",
+      "fonte": "https://normas.leg.br/?urn=urn:lex:br:federal:lei:2002-01-10;10406",
+      "versao_texto": "compilada (texto vigente)",
+      "coletado_em": "2026-10-13",
+      "revogada": false,
+      "artigos": 1008,
+      "sha256": "be0cd7d8a1eaacb21cb64f07086929db91f43ad3149b3c721cd33873d328c32c",
+      "atualizado_em": "2026-10-21"
+    },
+    "cpc.md": {
+      "url": "https://raw.githubusercontent.com/ctresb/leis/main/federal/leis-ordinarias/2015/lei-13105-2015-03-16.md",
+      "urn": "urn:lex:br:federal:lei:2015-03-16;13105",
+      "fonte": "https://normas.leg.br/?urn=urn:lex:br:federal:lei:2015-03-16;13105",
+      "versao_texto": "compilada (texto vigente)",
+      "coletado_em": "2026-10-13",
+      "revogada": false,
+      "artigos": 1000,
+      "sha256": "cf2fe53d8451a51461d16d7a0bc2721a16c569d6c1a716d509de9f6227b2ff02",
+      "atualizado_em": "2026-10-21"
+    },
+    "clt.md": {
+      "url": "https://raw.githubusercontent.com/ctresb/leis/main/federal/decretos-lei/1943/del-5452-1943-05-01.md",
+      "urn": "urn:lex:br:federal:decreto.lei:1943-05-01;5452",
+      "fonte": "https://normas.leg.br/?urn=urn:lex:br:federal:decreto.lei:1943-05-01;5452",
+      "versao_texto": "compilada (texto vigente)",
+      "coletado_em": "2026-10-13",
+      "revogada": false,
+      "artigos": 922,
+      "sha256": "7eee0da3b620a17fbd7b34a0eb9adc967c4fb6650d1acba37469d247f88f4600",
+      "atualizado_em": "2026-10-21"
+    },
+    "cdc.md": {
+      "url": "https://raw.githubusercontent.com/ctresb/leis/main/federal/leis-ordinarias/1990/lei-8078-1990-09-11.md",
+      "urn": "urn:lex:br:federal:lei:1990-09-11;8078",
+      "fonte": "https://normas.leg.br/?urn=urn:lex:br:federal:lei:1990-09-11;8078",
+      "versao_texto": "compilada (texto vigente)",
+      "coletado_em": "2026-10-13",
+      "revogada": false,
+      "artigos": 131,
+      "sha256": "fc47a9f4f9647c0bc86ab9399165653c70c0042d5b749b0558c6691a002b7d69",
+      "atualizado_em": "2026-10-21"
+    },
+    "cp.md": {
+      "url": "https://raw.githubusercontent.com/ctresb/leis/main/federal/decretos-lei/1940/del-2848-1940-12-07.md",
+      "urn": "urn:lex:br:federal:decreto.lei:1940-12-07;2848",
+      "fonte": "https://normas.leg.br/?urn=urn:lex:br:federal:decreto.lei:1940-12-07;2848",
+      "versao_texto": "compilada (texto vigente)",
+      "coletado_em": "2026-10-13",
+      "revogada": false,
+      "artigos": 431,
+      "sha256": "5f108f6c6664ac570149bfde1591885f76eae15cb5d80d6d2aac87deb826993b",
+      "atualizado_em": "2026-10-21"
+    },
+    "lgpd.md": {
+      "url": "https://raw.githubusercontent.com/ctresb/leis/main/federal/leis-ordinarias/2018/lei-13709-2018-08-14.md",
+      "urn": "urn:lex:br:federal:lei:2018-08-14;13709",
+      "fonte": "https://normas.leg.br/?urn=urn:lex:br:federal:lei:2018-08-14;13709",
+      "versao_texto": "compilada (texto vigente)",
+      "coletado_em": "2026-10-13",
+      "revogada": false,
+      "artigos": 80,
+      "sha256": "72d32431037ce85955c6f959f50f11d10971a8ec36f93cdae5ee3459ec66a4dd",
+      "atualizado_em": "2026-10-21"
+    },
+    "mp-2200-2.md": {
+      "url": "https://raw.githubusercontent.com/ctresb/leis/main/federal/medidas-provisorias/2001/mpv-2200-2-2001-08-24.md",
+      "urn": "urn:lex:br:federal:medida.provisoria:2001-08-24;2200-2",
+      "fonte": "https://www2.camara.leg.br/legin/fed/medpro/2001/medidaprovisoria-2200-2-24-agosto-2001-391394-normaatualizada-pe.html",
+      "versao_texto": "compilada",
+      "coletado_em": "2026-10-15",
+      "revogada": false,
+      "artigos": 20,
+      "sha256": "8be514dbe810a87c5c8b179ba77bd51c810dfef929f9029368ae6991b729659e",
+      "atualizado_em": "2026-10-21"
+    },
+    "lei-14063.md": {
+      "url": "https://raw.githubusercontent.com/ctresb/leis/main/federal/leis-ordinarias/2020/lei-14063-2020-09-23.md",
+      "urn": "urn:lex:br:federal:lei:2020-09-23;14063",
+      "fonte": "https://normas.leg.br/?urn=urn:lex:br:federal:lei:2020-09-23;14063",
+      "versao_texto": "original",
+      "coletado_em": "2026-10-13",
+      "revogada": false,
+      "artigos": 20,
+      "sha256": "d5c858d37303f32d832c91f823d36ce6e9e20e8bed6875f0deaf6bd77b087604",
+      "atualizado_em": "2026-10-21"
+    },
+    "lei-10192.md": {
+      "url": "https://raw.githubusercontent.com/ctresb/leis/main/federal/leis-ordinarias/2001/lei-10192-2001-02-14.md",
+      "urn": "urn:lex:br:federal:lei:2001-02-14;10192",
+      "fonte": "https://normas.leg.br/?urn=urn:lex:br:federal:lei:2001-02-14;10192",
+      "versao_texto": "compilada (texto vigente)",
+      "coletado_em": "2026-10-13",
+      "revogada": false,
+      "artigos": 18,
+      "sha256": "c8ce2b9b1965a3991c19ff9446b9d05a79971d4706135be4f9fd64061ef1d414",
+      "atualizado_em": "2026-10-21"
+    },
+    "lei-9279.md": {
+      "url": "https://raw.githubusercontent.com/ctresb/leis/main/federal/leis-ordinarias/1996/lei-9279-1996-05-14.md",
+      "urn": "urn:lex:br:federal:lei:1996-05-14;9279",
+      "fonte": "https://normas.leg.br/?urn=urn:lex:br:federal:lei:1996-05-14;9279",
+      "versao_texto": "compilada (texto vigente)",
+      "coletado_em": "2026-10-13",
+      "revogada": false,
+      "artigos": 248,
+      "sha256": "232176eedbbd78c90d7dae06a7926d8e014169db80d5c079c873e3fa9fed716d",
+      "atualizado_em": "2026-10-21"
+    }
+  },
+  "repositorio": "https://github.com/ctresb/leis",
+  "atualizado_em": "2026-10-21"
+}

@@ -135,7 +135,8 @@
     "paragrafos": [
       "Fornecer ao CONTRATADO as informações e o acesso necessários à execução dos serviços.",
       "Efetuar os pagamentos nos prazos e condições deste contrato."
-    ]
+    ],
+    "base_legal": "CC arts. 422 e 597"
   },
   {
     "chave": "autonomia",
@@ -170,7 +171,8 @@
       "As partes manterão sigilo sobre as informações não públicas a que tiverem acesso em razão deste contrato, durante a vigência e por 2 (dois) anos após o seu término.",
       "Não é confidencial a informação que já era pública, que se tornou pública sem culpa da parte ou cuja divulgação seja exigida por lei ou ordem judicial."
     ],
-    "resumo_simples": "O que uma parte souber da outra por causa deste contrato fica em sigilo, até 2 anos depois de ele acabar."
+    "resumo_simples": "O que uma parte souber da outra por causa deste contrato fica em sigilo, até 2 anos depois de ele acabar.",
+    "base_legal": "CC art. 422; Lei 9.279/1996 art. 195, XI"
   },
   {
     "chave": "protecao_dados",
@@ -238,7 +240,8 @@
     "paragrafos": [
       "As notificações relativas a este contrato serão feitas por escrito, valendo como tal a mensagem enviada aos endereços eletrônicos indicados na qualificação das partes, que se obrigam a mantê-los atualizados."
     ],
-    "resumo_simples": "Avisos oficiais deste contrato chegam pelo e-mail de cada parte. Cada um mantém o seu atualizado."
+    "resumo_simples": "Avisos oficiais deste contrato chegam pelo e-mail de cada parte. Cada um mantém o seu atualizado.",
+    "base_legal": "CC art. 107; MP 2.200-2/2001 art. 10"
   },
   {
     "chave": "assinatura_eletronica",
@@ -293,7 +296,8 @@
       "Este termo estabelece as obrigações do COLABORADOR quanto ao sigilo das informações da EMPRESA e ao tratamento dos dados pessoais a que tiver acesso em razão de suas funções.",
       "Este termo não altera salário, jornada nem qualquer outra condição do contrato de trabalho."
     ],
-    "resumo_simples": "Este termo trata de sigilo e de dados pessoais. Não muda salário, horário nem outra condição do trabalho."
+    "resumo_simples": "Este termo trata de sigilo e de dados pessoais. Não muda salário, horário nem outra condição do trabalho.",
+    "base_legal": "CLT arts. 444 e 468; Lei 13.709/2018 art. 6º"
   },
   {
     "chave": "col_sigilo",
@@ -343,7 +347,8 @@
     "paragrafos": [
       "No término do contrato de trabalho, o COLABORADOR devolverá os equipamentos, documentos e materiais da EMPRESA e apagará as cópias de informações confidenciais que estejam em seu poder."
     ],
-    "resumo_simples": "Ao sair da empresa, devolve-se tudo o que é dela e apagam-se as cópias de informações confidenciais."
+    "resumo_simples": "Ao sair da empresa, devolve-se tudo o que é dela e apagam-se as cópias de informações confidenciais.",
+    "base_legal": "CC arts. 579 e 582; Lei 13.709/2018 arts. 15 e 16"
   },
   {
     "chave": "col_descumprimento",
@@ -439,7 +444,8 @@
       "Permanecem inalteradas e em pleno vigor as demais cláusulas e condições do contrato original, que as partes ratificam.",
       "Este termo passa a integrar o contrato original para todos os efeitos."
     ],
-    "resumo_simples": "Tudo o que não foi mudado aqui continua valendo como estava."
+    "resumo_simples": "Tudo o que não foi mudado aqui continua valendo como estava.",
+    "base_legal": "CC art. 472"
   },
   {
     "chave": "dis_objeto",

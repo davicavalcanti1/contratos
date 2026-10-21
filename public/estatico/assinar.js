@@ -142,7 +142,7 @@ function desenharDocumento() {
         <p class="cl-num" aria-hidden="true">Cláusula ${c.numero}${c.critica ? ' <span class="destaque">Em destaque</span>' : ''}</p>
         <h3 id="cl-${esc(c.chave)}"><span class="sr">Cláusula ${c.numero}: </span>${esc(c.titulo)}${c.critica ? '<span class="sr"> (em destaque)</span>' : ''}</h3>
         ${c.resumo ? `<p class="bula"><span class="rotulo">Em palavras simples</span><mark>${esc(c.resumo)}</mark></p>` : ''}
-        <div class="texto-juridico">${c.resumo ? '<p class="rotulo">Texto do contrato</p>' : ''}${c.paragrafos.map(p => `<p><span class="pnum">${esc(p.numero)}</span>${esc(p.texto)}</p>`).join('')}<div class="duvida" data-duvida="${esc(c.chave)}">${blocoDuvida(c)}</div></div>
+        <div class="texto-juridico">${c.resumo ? '<p class="rotulo">Texto do contrato</p>' : ''}${c.paragrafos.map(p => `<p><span class="pnum">${esc(p.numero)}</span>${esc(p.texto)}</p>`).join('')}${blocoFundamentos(c)}<div class="duvida" data-duvida="${esc(c.chave)}">${blocoDuvida(c)}</div></div>
         ${c.critica ? `<div class="ciencia">${botaoCiencia(c)}</div>` : ''}
       </section>`)
   }
@@ -158,6 +158,25 @@ function botaoCiencia(c) {
 // ── Dúvida sobre a cláusula ─────────────────────────────────────────────────
 // Vai para quem enviou o contrato, que responde por e-mail e aqui mesmo.
 // Perguntar não trava nada: a pessoa decide se espera a resposta.
+// "O que diz a lei": o artigo citado na base legal da cláusula, fechado por
+// padrão. Ajuda a entender; o que vale continua sendo o texto do contrato.
+const dataCurta = (iso) => (iso ? String(iso).slice(0, 10).split('-').reverse().join('/') : '')
+const rotuloLinha = (a, l) => l.tipo === 'caput' ? `Art. ${a.numero}${/^\d$/.test(a.numero) ? 'º' : '.'}` : l.tipo === 'alinea' ? `${l.rotulo})` : l.tipo === 'item' ? `${l.rotulo}.` : l.rotulo
+function blocoFundamentos(c) {
+  const itens = (c.fundamentos || []).filter(f => f.artigos?.length || f.norma)
+  if (!itens.length) return ''
+  return `<details class="fundamento">
+    <summary><span class="rotulo">O que diz a lei</span><span class="fund-citacoes">${itens.map(f => esc(f.rotulo)).join(' · ')}</span></summary>
+    <div class="fund-corpo">${itens.map(f => `
+      <div class="fund-item">
+        <p class="fund-norma">${esc(f.norma ? `${f.norma.nome} (${f.norma.titulo})` : f.rotulo)}${f.observacao ? ` <span class="fund-obs">${esc(f.observacao)}</span>` : ''}</p>
+        ${f.artigos.map(a => `<div class="fund-artigo${a.revogado ? ' revogado' : ''}">${a.linhas.map(l => `<p class="${esc(l.tipo)}"><span class="fund-rotulo">${esc(rotuloLinha(a, l))}</span>${esc(l.texto)}${l.nota ? `<small class="fund-nota">${esc(l.nota)}</small>` : ''}</p>`).join('')}</div>`).join('')}
+        ${f.norma?.fonte ? `<p class="fund-fonte"><a href="${esc(f.norma.fonte)}" target="_blank" rel="noopener noreferrer">Texto compilado na fonte oficial</a> · coletado em ${esc(dataCurta(f.norma.coletado_em))}. Vale a publicação no Diário Oficial.</p>` : ''}
+      </div>`).join('')}
+    </div>
+  </details>`
+}
+
 const duvidaAberta = new Set()
 function blocoDuvida(c) {
   const lista = (c.duvidas || []).map(d => `

@@ -11,6 +11,7 @@
 
 import QRCode from 'qrcode'
 import { acharModelo } from '../biblioteca.js'
+import { legislacaoPadrao } from '../legislacao/legislacao.js'
 import { aplicarPadroes, montarContrato } from '../motor/montar.js'
 import { gerarPdf } from '../motor/pdf.js'
 import { textoDoModelo } from '../motor/texto-modelo.js'
@@ -60,7 +61,7 @@ export const CONFIG_PADRAO = {
 // `partes`: diretório de quem já recebeu contrato (src/partes.js), preenchido a cada geração.
 // `marcaDe(organizacao)`: nome de exibição, cor e logotipo para as telas públicas e os e-mails (plataforma/marca.js).
 const SEM_MARCA = { nome: null, cor: null, logo_url: null }
-export function criarServico({ repo, biblioteca, notificar, config = {}, agora = () => new Date(), aoEvento = () => {}, carimbador = null, icp = null, partes = null, marcaDe = () => SEM_MARCA }) {
+export function criarServico({ repo, biblioteca, notificar, config = {}, agora = () => new Date(), aoEvento = () => {}, carimbador = null, icp = null, partes = null, marcaDe = () => SEM_MARCA, legislacao = legislacaoPadrao() }) {
   const cfg = { ...CONFIG_PADRAO, ...config }
   const trilha = criarTrilha(repo, agora)
   const agoraIso = () => agora().toISOString()
@@ -447,6 +448,8 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       clausulas: c.snapshot.clausulas.map(cl => ({
         chave: cl.chave, numero: cl.numero, titulo: cl.titulo, paragrafos: cl.paragrafos,
         resumo: cl.resumo, critica: cl.critica, ciente_em: s.ciencias?.[cl.chave]?.em || null,
+        // "O que diz a lei": resolvido na hora a partir da base legal gravada no snapshot.
+        fundamentos: legislacao && cl.base_legal ? legislacao.fundamentos(cl.base_legal) : [],
         duvidas: duvidasDe(c.id, s.id).filter(d => d.clausula === cl.chave).map(publicoDuvida),
       })),
       signatario: {

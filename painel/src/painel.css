@@ -816,3 +816,8 @@ button.numero:hover { border-color: var(--acao); }
 .documento.compacto .cl-num .condicao { margin-left: 8px; font: 500 12px var(--sans); color: var(--tinta-2); background: var(--superficie); border: 1px solid var(--borda); border-radius: 999px; padding: 2px 8px; }
 .documento.compacto .texto-juridico .condicao { font: 500 12.5px var(--sans); color: var(--acao-forte); }
 .documento.compacto .var { font: 600 .9em var(--sans); color: var(--acao-forte); background: var(--acao-claro); border-radius: 4px; padding: 0 5px; white-space: nowrap; }
+.documento.compacto .fundamento { margin: 10px 0 0; }
+.documento.compacto .texto-juridico .fund-artigo p { font-size: 13.5px; }
+.documento.compacto .texto-juridico .fund-norma { font-size: 13px; }
+.documento.compacto .texto-juridico .fund-fonte { font-size: 12px; }
+.fund-problemas { margin: 6px 0 0; }

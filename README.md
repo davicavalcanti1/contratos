@@ -48,7 +48,8 @@ que falta e onde resolver**, em vez de mandar lacuna para assinatura.
 | `src/motor/tipos.js` | tipos de variável: CPF/CNPJ com dígito, moeda com extenso, data, endereço, enum… |
 | `src/motor/regras.js` | regras declarativas (`eq`, `in`, `gte`, `e`/`ou`/`nao`) |
 | `src/motor/montar.js` | modelo + dados → contrato numerado, com `faltando`/`invalidos` e hash do conteúdo |
-| `src/motor/linter.js` | confere o modelo em **todas** as combinações de regras antes de publicar |
+| `src/motor/linter.js` | confere o modelo em **todas** as combinações de regras antes de publicar, e que cada base legal aponta para artigo que existe |
+| `legislacao/` + `src/legislacao/` | o texto compilado das normas que as cláusulas citam (de [ctresb/leis](https://github.com/ctresb/leis)), indexado por artigo: é o "o que diz a lei" da bula. `node ferramentas/legislacao.mjs atualizar` rebaixa |
 | `src/motor/pdf.js` | PDF com cláusula crítica em destaque (CDC 54 §4º); na via final, QR + código em cada página e página de assinaturas |
 | `src/assinatura/` | serviço de assinatura (código, sessão, bula, selo), trilha encadeada, dossiê em PDF |
 | `src/lote/` | planilha (CSV/XLSX do Excel brasileiro), mapeamento de colunas, prévia, lote e progresso |
@@ -79,3 +80,4 @@ cláusula, mas **não passou por advogado**. Ver `docs/VALIDADE-JURIDICA.md` §6
 | [docs/PLATAFORMA.md](docs/PLATAFORMA.md) | Fase 4: papéis, contas, planos, API, webhooks e painel |
 | [docs/VIDA.md](docs/VIDA.md) | Fase 5: vigência, agenda, reajuste pelo índice, aditivo e distrato |
 | [docs/PLUGAVEIS.md](docs/PLUGAVEIS.md) | Fase 6: carimbo do tempo, assinatura ICP-Brasil, e o ZapSign adiado |
+| [docs/LEGISLACAO.md](docs/LEGISLACAO.md) | Legislação local: como o redator cita, onde "o que diz a lei" aparece, como atualizar |

@@ -10,14 +10,17 @@
 import { TIPOS } from './tipos.js'
 import { avaliar, camposDaRegra, validarRegra } from './regras.js'
 import { indexarBiblioteca, paragrafosDe, placeholdersDe } from './montar.js'
+import { legislacaoPadrao } from '../legislacao/legislacao.js'
 
 export const CATEGORIAS_OBRIGATORIAS = ['partes', 'objeto', 'preco', 'prazo', 'foro', 'assinatura_eletronica', 'protecao_dados']
 export const CATEGORIAS_UNICAS = ['prazo', 'foro', 'assinatura_eletronica']
 const LIMITE_COMBINACOES = 512
 const EMBUTIDAS = new Set(['sistema.data_geracao'])
 
-export function lintModelo(modelo, biblioteca) {
+export function lintModelo(modelo, biblioteca, { legislacao } = {}) {
   const idx = biblioteca instanceof Map ? biblioteca : indexarBiblioteca(biblioteca)
+  // `legislacao: null` desliga a conferência (testes do motor puro).
+  const leg = legislacao === undefined ? legislacaoPadrao() : legislacao
   const graves = [], avisos = []
   const grave = (msg, onde) => graves.push({ msg, onde })
   const aviso = (msg, onde) => avisos.push({ msg, onde })
@@ -44,6 +47,15 @@ export function lintModelo(modelo, biblioteca) {
     const c = idx.get(`${b.clausula}@${b.versao}`)
     if (!c) { grave('cláusula não existe na biblioteca', onde); return }
     blocos.push({ b, c })
+
+    // Base legal: a bula mostra "o que diz a lei" a partir dela. Artigo que não
+    // existe ou norma revogada é grave; norma que não está baixada é aviso.
+    if (!c.base_legal) aviso('sem base legal — a bula não terá "o que diz a lei" nesta cláusula', onde)
+    else if (leg) {
+      for (const item of leg.resolver(c.base_legal)) {
+        for (const p of item.problemas) (/não está na legislação local|não foi baixado/.test(p) ? aviso : grave)(`base legal: ${p}`, onde)
+      }
+    }
 
     const textos = [c.titulo, c.resumo_simples || '']
     paragrafosDe(c).forEach((p, j) => {

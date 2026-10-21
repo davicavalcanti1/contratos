@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../../api.js'
-import { Cabecalho, Campo, Carregando, Erro, plural, useAcao, useDados } from '../../comum.jsx'
+import { Cabecalho, Campo, Carregando, Erro, Fundamentos, plural, useAcao, useDados } from '../../comum.jsx'
 
 const cap = (s) => String(s ?? '').replace(/^./, c => c.toUpperCase())
 const ORIGEM_ROTULO = { manual: 'preenchido ao gerar', parte: 'dado da outra parte', parametro: 'parâmetro da empresa', fonte: 'vem da planilha/base', organizacao: 'cadastro da empresa', calculada: 'calculada pelo sistema' }
@@ -228,7 +228,7 @@ export function EditorModelo() {
                         <p className="cl-num">Cláusula {c.numero}{c.critica && <span className="destaque">Em destaque</span>}</p>
                         <h3>{c.titulo}</h3>
                         {c.resumo && <p className="bula"><span className="rotulo">Em palavras simples</span><mark>{marcar(c.resumo, previa.rotulos)}</mark></p>}
-                        <div className="texto-juridico">{c.paragrafos.map(p => <p key={p.numero}><span className="pnum">{p.numero}</span>{marcar(p.texto, previa.rotulos)}</p>)}</div>
+                        <div className="texto-juridico">{c.paragrafos.map(p => <p key={p.numero}><span className="pnum">{p.numero}</span>{marcar(p.texto, previa.rotulos)}</p>)}<Fundamentos itens={c.fundamentos} /></div>
                       </article>
                     ))}
                   </div>

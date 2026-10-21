@@ -11,7 +11,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../../api.js'
-import { Cabecalho, Campo, Carregando, Erro, data, endereco, plural, useAcao, useDados } from '../../comum.jsx'
+import { Cabecalho, Campo, Carregando, data, endereco, Erro, Fundamentos, plural, useAcao, useDados } from '../../comum.jsx'
 import { useSessao } from '../../sessao.jsx'
 
 const GRUPOS = { contratado: 'Quem é contratado', colaborador: 'Colaborador', contrato: 'O contrato', termo: 'Condições do termo' }
@@ -352,6 +352,7 @@ function Previa({ previa }) {
             {c.resumo && <p className="bula"><span className="rotulo">Em palavras simples</span><mark>{marcar(c.resumo)}</mark></p>}
             <div className="texto-juridico">
               {c.paragrafos.map(p => <p key={p.numero}><span className="pnum">{p.numero}</span>{marcar(p.texto)}</p>)}
+              <Fundamentos itens={c.fundamentos} />
             </div>
           </article>
         ))}

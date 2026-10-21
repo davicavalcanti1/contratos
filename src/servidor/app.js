@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url'
 import { gerarDossiePdf } from '../assinatura/dossie-pdf.js'
 import { gerarPacote } from '../assinatura/pacote.js'
 import { ErroBiblioteca, acharModelo } from '../biblioteca.js'
+import { legislacaoPadrao } from '../legislacao/legislacao.js'
 import { signatariosDaLinha } from '../lote/mapear.js'
 import { camposNecessarios, montarContrato } from '../motor/montar.js'
 import { humanizar, textoDoModelo } from '../motor/texto-modelo.js'
@@ -32,8 +33,10 @@ const COOKIE = 'cs_painel'
 // Fontes e estilos vêm do próprio sistema (public/estatico/fontes): nada de terceiro na tela de quem assina.
 const CSP = "default-src 'self'; img-src 'self' data: blob:; style-src 'self'; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
 
-export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes = null, marca = null, demonstracao = null, metricas = null, exportacao = null, dev = false, log = true, chaveDev = null }) {
+export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes = null, marca = null, demonstracao = null, metricas = null, exportacao = null, legislacao = legislacaoPadrao(), dev = false, log = true, chaveDev = null }) {
   const app = express()
+  // Cada cláusula com "o que diz a lei" (texto do artigo citado na base legal), para as prévias e a demonstração.
+  const comFundamentos = (clausulas) => clausulas.map(c => ({ ...c, fundamentos: legislacao && c.base_legal ? legislacao.fundamentos(c.base_legal) : [] }))
   app.disable('x-powered-by')
   // Atrás do proxy do EasyPanel: o IP real vem no X-Forwarded-For (é evidência
   // da assinatura) e o https no X-Forwarded-Proto (decide o cookie Secure).
@@ -104,7 +107,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
         titulo_executivo: m.titulo_executivo !== false, lote: (m.signatarios_da_parte || []).length > 0, vida: !!m.vida,
         variaveis: m.variaveis.filter(v => v.origem !== 'calculada').map(v => ({ chave: v.chave, rotulo: v.rotulo, tipo: v.tipo, origem: v.origem, obrigatoria: v.obrigatoria !== false && v.padrao === undefined, padrao: v.padrao ?? null, opcoes: v.opcoes || null })),
         signatarios_da_parte: (m.signatarios_da_parte || []).map(sp => ({ papel: sp.papel, nome: defs[sp.nome]?.rotulo || sp.nome, email: defs[sp.email]?.rotulo || sp.email, condicao: sp.quando ? humanizar(sp.quando, defs) : null })),
-        texto, clausulas: texto.clausulas.length, criticas: texto.clausulas.filter(c => c.critica).length,
+        texto: { ...texto, clausulas: comFundamentos(texto.clausulas) }, clausulas: texto.clausulas.length, criticas: texto.clausulas.filter(c => c.critica).length,
         contratos_gerados: repo.listar('contratos', c => c.organizacao_id === org(req).id && c.modelo?.chave === m.chave).length,
       })
     })
@@ -146,7 +149,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
       const d = { ...(req.body?.dados || {}), organizacao: dados(req) }
       const m = montarContrato({ modelo, biblioteca: biblioteca.indice, dados: d })
       const rotulos = Object.fromEntries(modelo.variaveis.map(v => [v.chave, v.rotulo]))
-      res.json({ pronto: m.ok, contrato: m.contrato, faltando: m.faltando, invalidos: m.invalidos, rotulos })
+      res.json({ pronto: m.ok, contrato: { ...m.contrato, clausulas: comFundamentos(m.contrato.clausulas) }, faltando: m.faltando, invalidos: m.invalidos, rotulos })
     })
 
     r.get('/contratos', (req, res) => res.json(servico.listarContratos(org(req).id, req.query)))
@@ -426,7 +429,18 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     const modelo = req.body?.modelo || biblioteca.obterModelo(req.params.chave)
     const organizacao = req.body?.organizacao || JSON.parse(readFileSync(join(RAIZ, 'exemplos', '_organizacao.json'), 'utf8'))
     const m = montarContrato({ modelo, biblioteca: biblioteca.indice, dados: { organizacao, ...(req.body?.dados || {}) } })
-    return { pronto: m.ok, contrato: m.contrato, faltando: m.faltando, invalidos: m.invalidos, rotulos: Object.fromEntries((modelo.variaveis || []).map(v => [v.chave, v.rotulo])) }
+    return { pronto: m.ok, contrato: { ...m.contrato, clausulas: comFundamentos(m.contrato.clausulas) }, faltando: m.faltando, invalidos: m.invalidos, rotulos: Object.fromEntries((modelo.variaveis || []).map(v => [v.chave, v.rotulo])) }
+  }))
+  // O editor de cláusula mostra o artigo enquanto o revisor digita a base legal,
+  // e diz o que não resolveu (artigo inexistente, norma que não está baixada).
+  dono.get('/biblioteca/legislacao', b(req => {
+    const citacao = String(req.query.citacao || '').slice(0, 500)
+    const itens = legislacao ? legislacao.resolver(citacao) : []
+    return {
+      itens: legislacao ? legislacao.fundamentos(citacao) : [],
+      problemas: itens.flatMap(i => i.problemas),
+      normas: legislacao ? legislacao.normas.map(n => ({ sigla: n.sigla, nome: n.nome, titulo: n.titulo, baixada: n.baixada, coletado_em: n.fonte?.coletado_em || null })) : [],
+    }
   }))
   dono.get('/biblioteca/clausulas/:chave', b(req => biblioteca.obterClausula(req.params.chave, req.query.versao)))
   dono.post('/biblioteca/clausulas', b(req => {
@@ -534,7 +548,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
         ok: m.ok,
         titulo: m.contrato.titulo,
         contratado: { nome: ex.dados.contratado?.nome || null, tipo },
-        clausulas: m.contrato.clausulas.map(c => ({ ...c, condicao: condicoes[c.chave] || null })),
+        clausulas: comFundamentos(m.contrato.clausulas.map(c => ({ ...c, condicao: condicoes[c.chave] || null }))),
         faltando: m.faltando,
         invalidos: m.invalidos,
       })

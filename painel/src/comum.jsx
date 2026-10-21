@@ -114,3 +114,30 @@ export function Copiar({ texto }) {
 export function Vazio({ children }) {
   return <p className="vazio">{children}</p>
 }
+
+// "O que diz a lei": o artigo citado na base legal da cláusula (o mesmo bloco
+// da tela de assinatura, em React). `itens` vem de legislacao.fundamentos().
+export const dataCurta = (iso) => (iso ? String(iso).slice(0, 10).split('-').reverse().join('/') : '')
+const rotuloLinha = (a, l) => (l.tipo === 'caput' ? `Art. ${a.numero}${/^\d$/.test(a.numero) ? 'º' : '.'}` : l.tipo === 'alinea' ? `${l.rotulo})` : l.tipo === 'item' ? `${l.rotulo}.` : l.rotulo)
+export function Fundamentos({ itens, aberto = false }) {
+  const lista = (itens || []).filter(f => f.artigos?.length || f.norma)
+  if (!lista.length) return null
+  return (
+    <details className="fundamento" open={aberto || undefined}>
+      <summary><span className="rotulo">O que diz a lei</span><span className="fund-citacoes">{lista.map(f => f.rotulo).join(' · ')}</span></summary>
+      <div className="fund-corpo">
+        {lista.map((f, i) => (
+          <div className="fund-item" key={i}>
+            <p className="fund-norma">{f.norma ? `${f.norma.nome} (${f.norma.titulo})` : f.rotulo}{f.observacao && <span className="fund-obs"> {f.observacao}</span>}</p>
+            {f.artigos.map(a => (
+              <div className={`fund-artigo${a.revogado ? ' revogado' : ''}`} key={a.numero}>
+                {a.linhas.map((l, j) => <p className={l.tipo} key={j}><span className="fund-rotulo">{rotuloLinha(a, l)}</span>{l.texto}{l.nota && <small className="fund-nota">{l.nota}</small>}</p>)}
+              </div>
+            ))}
+            {f.norma?.fonte && <p className="fund-fonte"><a href={f.norma.fonte} target="_blank" rel="noopener noreferrer">Texto compilado na fonte oficial</a> · coletado em {dataCurta(f.norma.coletado_em)}. Vale a publicação no Diário Oficial.</p>}
+          </div>
+        ))}
+      </div>
+    </details>
+  )
+}

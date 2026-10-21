@@ -400,3 +400,25 @@ p.condicao { display: inline-block; margin: 0 0 8px; }
 .form-duvida small { color: var(--tinta-3); font-size: 12.5px; }
 .acoes-duvida { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
 .acoes-duvida .link-botao { padding: 0; }
+
+/* "O que diz a lei": o artigo citado na base legal, fechado por padrão. */
+.fundamento { margin: 14px 0 4px; border: 1px solid var(--borda); border-radius: 14px; background: var(--folha); font-family: var(--sans); }
+.fundamento summary { list-style: none; cursor: pointer; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 10px 14px; }
+.fundamento summary::-webkit-details-marker { display: none; }
+.fundamento summary .rotulo { font: 600 13px var(--sans); color: var(--acao); white-space: nowrap; }
+.fundamento summary .rotulo::before { content: '+'; display: inline-block; width: 14px; }
+.fundamento[open] summary .rotulo::before { content: '–'; }
+.fundamento .fund-citacoes { font: 13.5px var(--sans); color: var(--tinta-2); }
+.fund-corpo { border-top: 1px solid var(--borda); padding: 10px 14px 12px; }
+.fund-item + .fund-item { margin-top: 14px; }
+.texto-juridico .fund-norma, .fund-norma { font: 600 13.5px/1.4 var(--sans); color: var(--tinta); margin: 0 0 6px; }
+.fund-obs { font-weight: 400; color: var(--tinta-2); }
+.texto-juridico .fund-artigo p, .fund-artigo p { font: 400 14px/1.6 var(--serif); margin: 0 0 4px; hyphens: auto; }
+.fund-artigo p.paragrafo, .fund-artigo p.inciso { padding-left: 14px; }
+.fund-artigo p.alinea, .fund-artigo p.item { padding-left: 28px; }
+.fund-rotulo { font: 600 12.5px var(--sans); color: var(--tinta-2); margin-right: 6px; }
+.fund-nota { display: block; font: 12px/1.4 var(--sans); color: var(--tinta-3); }
+.fund-artigo.revogado p { color: var(--tinta-3); }
+.texto-juridico .fund-fonte, .fund-fonte { font: 12.5px/1.4 var(--sans); color: var(--tinta-3); margin: 8px 0 0; }
+.fund-fonte a { color: inherit; }
+.clausula.critica .texto-juridico .fund-artigo p { font-weight: 400; } /* o destaque engrossa o contrato, não a lei */

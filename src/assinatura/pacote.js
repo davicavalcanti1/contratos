@@ -72,6 +72,7 @@ export async function montarPacote({ servico, contratoId, organizacaoId, baseUrl
     `5. Certificado ICP-Brasil (se houver): valide também em https://validar.iti.gov.br — o sistema confere assinatura, cadeia e CPF, mas não consulta revogação.`,
     ``,
     `Base legal: MP 2.200-2/2001 art. 10 §2º (validade do meio eletrônico admitido pelas partes); CPC art. 784, III e §4º (título executivo, testemunhas dispensadas quando a integridade é conferida pelo provedor); CDC arts. 46 e 54 §4º (ciência prévia e destaque das cláusulas que limitam direito).`,
+    ...fundamentosPorClausula(d),
   ].join('\n')
   entradas.unshift(['LEIA-ME.txt', Buffer.from(leiame, 'utf8')])
 
@@ -93,4 +94,12 @@ export function zipar(entradas) {
     for (const [nome, buffer] of entradas) arq.append(buffer, { name: nome })
     arq.finalize()
   })
+}
+
+// Fundamento legal de cada cláusula, como o redator escreveu na biblioteca e
+// como ficou gravado no snapshot do contrato (a bula mostra o texto do artigo).
+function fundamentosPorClausula(d) {
+  const com = (d.snapshot?.clausulas || []).filter(cl => cl.base_legal)
+  if (!com.length) return []
+  return ['', 'FUNDAMENTO LEGAL POR CLÁUSULA (como registrado na biblioteca de modelos)', ...com.map(cl => `${cl.numero}. ${cl.titulo}: ${cl.base_legal}`)]
 }
