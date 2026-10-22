@@ -5,6 +5,15 @@
 
 ## Onde estamos
 
+> **22/out, manhã seguinte (plano da básica):** duas rodadas de entrevista
+> com o Davi derrubaram o projeto e saiu o plano completo da **versão
+> básica** em [BASICA.md](BASICA.md): o que fica, o que se esconde
+> (), nova ordem de lançamentos (v0.1 link fora da máquina,
+> v0.2 termo de sigilo na IMAGO em lote, v0.3 contrato PJ médico), meta de
+> 100 documentos assinados até 20/jan/2027. Davi deu o ok e a seção 8 do BASICA.md está
+> **feita** (23/out): `EDICAO=basica`, site e painel reduzidos, 180 testes.
+> Davi vai à IMAGO em 23/out.
+
 > **22/out, noite:** nome BullaCheck decidido e aplicado; marca, Instagram e
 > post de apresentação prontos (`marca/`, `docs/INSTAGRAM.md`); e-mail real,
 > Dockerfile e checagens de produção feitos. **A semana de 27/out é a v0.1**:
@@ -32,7 +41,7 @@ página por página**, com foco em funcionalidade e design, nesta ordem:
 | 11 | Plataforma: biblioteca (modelos e cláusulas no banco) | ✅ pronto | `735ed7c` |
 | 12 | `/dev` | ⏭ depois (issue #10) | |
 
-140 testes passando (`npm test`).
+180 testes passando (`npm test`).
 
 ### Leitura de prontidão (17/out, fim do dia)
 

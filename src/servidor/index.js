@@ -18,6 +18,8 @@ import { criarRepo } from '../armazenamento/repo.js'
 import { criarRepoSupabase } from '../armazenamento/supabase.js'
 import { criarServico } from '../assinatura/servico.js'
 import { criarBibliotecaViva } from '../biblioteca.js'
+import { edicaoDoAmbiente } from '../edicao.js'
+import { legislacaoPadrao } from '../legislacao/legislacao.js'
 import { criarPartes } from '../partes.js'
 import { criarLotes } from '../lote/lotes.js'
 import { lintModelo } from '../motor/linter.js'
@@ -37,6 +39,8 @@ import { criarIndices } from '../vida/indices.js'
 import { criarApp } from './app.js'
 
 const producao = process.env.NODE_ENV === 'production'
+// EDICAO=basica liga só o que a primeira clínica usa (docs/BASICA.md); sem a variável, tudo.
+const edicao = edicaoDoAmbiente(process.env)
 // Em produção, o que falta derruba na subida, com a lista: melhor que descobrir no primeiro link.
 if (producao) {
   const faltam = ['BASE_URL', 'SUPABASE_URL', 'SUPABASE_KEY'].filter(k => !process.env[k])
@@ -71,17 +75,17 @@ const aoEvento = (org, tipo, dados) => {
   avisos.aoEvento(org, tipo, dados)
 }
 const plataforma = criarPlataforma({ repo, notificar, config: { baseUrl } })
-const carimbador = carimbadorDoAmbiente(process.env, { producao })
+const carimbador = edicao.carimbo ? carimbadorDoAmbiente(process.env, { producao }) : null
 // ICP-Brasil: as raízes oficiais do ITI (certs/icp-brasil). Fora de produção,
 // ICP_RAIZ_TESTE acrescenta uma raiz de teste — nunca vale em produção.
-const raizes = carregarRaizesOficiais()
-if (!producao && process.env.ICP_RAIZ_TESTE) raizes.push(new X509Certificate(readFileSync(process.env.ICP_RAIZ_TESTE)))
-const icp = criarVerificadorIcp({ raizes })
+const raizes = edicao.icp ? carregarRaizesOficiais() : []
+if (edicao.icp && !producao && process.env.ICP_RAIZ_TESTE) raizes.push(new X509Certificate(readFileSync(process.env.ICP_RAIZ_TESTE)))
+const icp = edicao.icp ? criarVerificadorIcp({ raizes }) : null
 const partes = criarPartes({ repo })
 const marca = criarMarca({ repo, auditar: plataforma.auditar })
-const servico = criarServico({ repo, biblioteca, notificar, config: { baseUrl }, aoEvento, carimbador, icp, partes, marcaDe: marca.publica })
+const servico = criarServico({ repo, biblioteca, notificar, config: { baseUrl }, aoEvento, carimbador, icp, partes, marcaDe: marca.publica, legislacao: edicao.lei ? legislacaoPadrao() : null })
 const lotes = criarLotes({ repo, biblioteca, servico })
-const demonstracao = criarDemonstracao({ repo, servico, plataforma, marca, notificar, config: { baseUrl, dev: !producao } })
+const demonstracao = edicao.demo ? criarDemonstracao({ repo, servico, plataforma, marca, notificar, config: { baseUrl, dev: !producao } }) : null
 const metricas = criarMetricas({ repo })
 const exportacao = criarExportacao({ repo, servico, partes, auditar: plataforma.auditar, config: { baseUrl } })
 const agenda = criarAgenda({ repo, servico, notificar, aoEvento, config: { baseUrl } })
@@ -104,11 +108,12 @@ if (!producao) {
   console.warn('Nenhum developer cadastrado. Crie o primeiro: node src/cli.js developer <email> "<nome completo>"')
 }
 
-webhooks.iniciar()
-agenda.iniciar() // roda agora e de hora em hora
+if (edicao.api) webhooks.iniciar()
+if (edicao.agenda) agenda.iniciar() // roda agora e de hora em hora
 // Carimbo que ficou pendente (ACT fora do ar) é tentado de novo a cada 10 min.
 if (carimbador) setInterval(() => servico.carimbarPendentes().catch(e => console.error('[carimbo]', e)), 10 * 60e3).unref()
-const app = criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes, marca, demonstracao, metricas, exportacao, dev: !producao, chaveDev: producao ? null : CHAVE_DEV })
+const contato = { whatsapp: process.env.CONTATO_WHATSAPP, email: process.env.EMAIL_RESPONDER_PARA }
+const app = criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes, marca, demonstracao, metricas, exportacao, edicao, contato, dev: !producao, chaveDev: producao ? null : CHAVE_DEV })
 
 // Escrita no Supabase que falhou (rede, chave) volta para a fila a cada 5 min.
 if (repo.reenfileirarFalhas) setInterval(() => { const n = repo.reenfileirarFalhas(); if (n) console.log(`[supabase] tentando de novo ${n} escrita(s)`) }, 5 * 60e3).unref()
@@ -124,11 +129,12 @@ for (const sinal of ['SIGINT', 'SIGTERM']) {
 
 app.listen(porta, () => {
   console.log(`contratos-saas em ${baseUrl}/painel`)
+  console.log(`  edição: ${edicao.nome}${edicao.nome === 'basica' ? ' (docs/BASICA.md)' : ''}`)
   console.log(`  e-mail: ${transporte.nome}`)
   console.log(`  armazenamento: ${process.env.SUPABASE_URL ? `Supabase (${process.env.SUPABASE_URL})` : `JSON em ${process.env.DADOS_DIR || join(process.cwd(), 'dados')}`}`)
   if (!producao) {
     console.log(`  logins de teste (senha "${SENHA_DEV}"): dev@contratos.local (plataforma), admin@clinica-exemplo.com.br (empresa)`)
-    console.log(`  caixa de saída e contrato avulso: ${baseUrl}/dev`)
+    if (edicao.dev) console.log(`  caixa de saída e contrato avulso: ${baseUrl}/dev`)
     console.log(`  carimbo do tempo: ${carimbador ? carimbador.nome : 'desligado'}`)
     console.log(`  ICP-Brasil: ${raizes.length} raízes confiáveis${process.env.ICP_RAIZ_TESTE ? ' (inclui a raiz de TESTE)' : ''}`)
   }

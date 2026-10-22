@@ -9,7 +9,7 @@ const saudacao = () => { const h = new Date().getHours(); return h < 12 ? 'Bom d
 const diasAte = (iso) => Math.ceil((new Date(iso).getTime() - Date.now()) / DIA)
 
 export function VisaoGeral() {
-  const { eu, podeEscrever, ehAdmin, org } = useSessao()
+  const { eu, podeEscrever, ehAdmin, org, edicao } = useSessao()
   const { dados, erro, carregando } = useDados(async () => {
     const [conta, recentes, aguardando, problemas, assinados, agenda, lotes] = await Promise.all([
       api('/org/conta'),
@@ -17,7 +17,7 @@ export function VisaoGeral() {
       api('/org/contratos?limite=50&status=enviado,parcialmente_assinado'),
       api('/org/contratos?limite=5&status=recusado,expirado'),
       api('/org/contratos?limite=1&status=assinado'),
-      api('/org/agenda?dias=30'),
+      edicao.agenda ? api('/org/agenda?dias=30') : { vencimentos: [], reajustes: [] },
       api('/org/lotes').catch(() => []),
     ])
     return { conta, recentes, aguardando, problemas, assinados, agenda, lotes }
@@ -27,7 +27,8 @@ export function VisaoGeral() {
   if (erro) return <Erro erro={erro} />
   const { conta, recentes, aguardando, problemas, assinados, agenda, lotes } = dados
   const c = conta.consumo
-  const pct = c.limite ? Math.min(100, Math.round((c.usados / c.limite) * 100)) : null
+  // Sem a noção de plano (edição básica), o número é só "gerados este mês".
+  const pct = edicao.plano && c.limite ? Math.min(100, Math.round((c.usados / c.limite) * 100)) : null
   const primeiroNome = eu.usuario.nome.split(' ')[0]
 
   // Precisa de atenção: quem está para expirar vem primeiro.
@@ -79,8 +80,8 @@ export function VisaoGeral() {
         </Link>
         <div className="numero">
           <span className="numero-rotulo">Gerados este mês</span>
-          <strong>{c.limite == null ? c.usados : <>{c.usados}<small> / {c.limite}</small></>}</strong>
-          <span className="numero-nota">plano {c.plano}{c.limite == null ? ', sem limite' : ''}</span>
+          <strong>{!edicao.plano || c.limite == null ? c.usados : <>{c.usados}<small> / {c.limite}</small></>}</strong>
+          <span className="numero-nota">{edicao.plano ? `plano ${c.plano}${c.limite == null ? ', sem limite' : ''}` : (c.usados ? 'contando os de lote' : 'nenhum ainda')}</span>
           {pct != null && <div className="medidor" role="meter" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Uso do plano"><i style={{ width: `${pct}%` }} className={pct >= 90 ? 'alto' : ''} /></div>}
         </div>
       </section>
@@ -130,7 +131,7 @@ export function VisaoGeral() {
           </section>
 
           <div className="coluna">
-            <section className="cartao">
+            {edicao.agenda && <section className="cartao">
               <div className="cartao-topo">
                 <h2>Próximos 30 dias</h2>
                 <Link to="/agenda">Agenda</Link>
@@ -150,7 +151,7 @@ export function VisaoGeral() {
                     ))}
                   </ul>
                 )}
-            </section>
+            </section>}
 
             {lotesAbertos.length > 0 && (
               <section className="cartao">

@@ -60,7 +60,7 @@ const MASCARAS = {
 }
 
 export function NovoContrato() {
-  const { podeEscrever, org } = useSessao()
+  const { podeEscrever, org, edicao } = useSessao()
   const navegar = useNavigate()
   const [params] = useSearchParams()
   const deId = params.get('de')
@@ -162,7 +162,8 @@ export function NovoContrato() {
   if (!podeEscrever) return <p className="aviso info">Seu acesso é só de leitura.</p>
 
   const necessarios = new Set(conferencia?.necessarios || modelo?.variaveis.map(v => v.chave) || [])
-  const visiveis = (modelo?.variaveis || []).filter(v => necessarios.has(v.chave))
+  // Sem reajuste na edição, o índice nem aparece: fica o padrão do modelo.
+  const visiveis = (modelo?.variaveis || []).filter(v => necessarios.has(v.chave) && (edicao.reajuste || v.chave !== 'contrato.indice_reajuste'))
   const grupos = [...new Set(visiveis.map(v => v.chave.split('.')[0]))]
   // Grupos que descrevem uma parte (origem parte/fonte) ganham a busca no diretório.
   const gruposParte = new Set((modelo?.variaveis || []).filter(v => ['parte', 'fonte'].includes(v.origem)).map(v => v.chave.split('.')[0]))
@@ -269,7 +270,7 @@ export function NovoContrato() {
                 <div className="campos">
                   <Campo rotulo="Nome completo" classe="c-12"><input value={s.nome} onChange={e => { const n = structuredClone(sigsParte); n[i].nome = e.target.value; setSigsEditados(n) }} /></Campo>
                   <Campo rotulo="E-mail" classe="c-12"><input type="email" value={s.email} onChange={e => { const n = structuredClone(sigsParte); n[i].email = e.target.value; setSigsEditados(n) }} /></Campo>
-                  <Metodo valor={{ metodo: metodos[i]?.metodo || 'otp', cpf: metodos[i]?.cpf ?? s.cpf ?? '' }} onMudar={v => setMetodos(m => ({ ...m, [i]: v }))} />
+                  {edicao.icp && <Metodo valor={{ metodo: metodos[i]?.metodo || 'otp', cpf: metodos[i]?.cpf ?? s.cpf ?? '' }} onMudar={v => setMetodos(m => ({ ...m, [i]: v }))} />}
                 </div>
               </div>
             ))}
@@ -279,7 +280,7 @@ export function NovoContrato() {
               <div className="campos">
                 <Campo rotulo="Nome completo" classe="c-12"><input value={pelaEmpresa.nome} onChange={e => setPelaEmpresa(p => ({ ...p, nome: e.target.value }))} /></Campo>
                 <Campo rotulo="E-mail" classe="c-12" dica={!pelaEmpresa.email.trim() ? 'Sem e-mail, a empresa não assina este contrato.' : undefined}><input type="email" value={pelaEmpresa.email} onChange={e => setPelaEmpresa(p => ({ ...p, email: e.target.value }))} /></Campo>
-                {pelaEmpresa.email.trim() && <Metodo valor={pelaEmpresa} onMudar={v => setPelaEmpresa(p => ({ ...p, ...v }))} />}
+                {edicao.icp && pelaEmpresa.email.trim() && <Metodo valor={pelaEmpresa} onMudar={v => setPelaEmpresa(p => ({ ...p, ...v }))} />}
               </div>
             </div>
           </section>

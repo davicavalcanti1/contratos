@@ -69,7 +69,7 @@ function Item({ to, icone, children, end }) {
 }
 
 function Moldura() {
-  const { eu, ehDeveloper, ehAdmin, suporte, fecharSuporte, sair, org } = useSessao()
+  const { eu, ehDeveloper, ehAdmin, suporte, fecharSuporte, sair, org, edicao } = useSessao()
   const [menuAberto, setMenuAberto] = useState(false)
   const local = useLocation()
   const navegar = useNavigate()
@@ -105,8 +105,8 @@ function Moldura() {
               <p className="grupo-titulo" title={org.nome}>{org.nome}</p>
               <Item to="/inicio" icone="inicio">Visão geral</Item>
               <Item to="/contratos" icone="contratos">Contratos</Item>
-              <Item to="/modelos" icone="biblioteca">Modelos</Item>
-              <Item to="/agenda" icone="agenda">Agenda</Item>
+              {edicao.modelos && <Item to="/modelos" icone="biblioteca">Modelos</Item>}
+              {edicao.agenda && <Item to="/agenda" icone="agenda">Agenda</Item>}
               <Item to="/lotes" icone="lotes">Lotes</Item>
               <Item to="/pessoas" icone="pessoas">Pessoas</Item>
               <Item to="/leitura" icone="leitura">Leitura</Item>
@@ -114,8 +114,8 @@ function Moldura() {
                 <p className="grupo-titulo grupo-titulo-sub">Administração</p>
                 <Item to="/empresa" icone="empresa">Dados da empresa</Item>
                 <Item to="/usuarios" icone="usuarios">Usuários</Item>
-                <Item to="/chaves" icone="chaves">Chaves de API</Item>
-                <Item to="/webhooks" icone="webhooks">Webhooks</Item>
+                {edicao.api && <Item to="/chaves" icone="chaves">Chaves de API</Item>}
+                {edicao.api && <Item to="/webhooks" icone="webhooks">Webhooks</Item>}
               </>}
             </div>
           )}
@@ -156,9 +156,9 @@ function Moldura() {
               <Route path="/contratos" element={<Contratos />} />
               <Route path="/contratos/novo" element={<NovoContrato />} />
               <Route path="/contratos/:id" element={<Contrato />} />
-              <Route path="/modelos" element={<Modelos />} />
-              <Route path="/modelos/:chave" element={<Modelo />} />
-              <Route path="/agenda" element={<Agenda />} />
+              {edicao.modelos && <Route path="/modelos" element={<Modelos />} />}
+              {edicao.modelos && <Route path="/modelos/:chave" element={<Modelo />} />}
+              {edicao.agenda && <Route path="/agenda" element={<Agenda />} />}
               <Route path="/lotes" element={<Lotes />} />
               <Route path="/lotes/novo" element={<NovoLote />} />
               <Route path="/lotes/:id" element={<Lote />} />
@@ -168,8 +168,8 @@ function Moldura() {
             {ehAdmin && <>
               <Route path="/empresa" element={<Empresa />} />
               <Route path="/usuarios" element={<Usuarios />} />
-              <Route path="/chaves" element={<Chaves />} />
-              <Route path="/webhooks" element={<Webhooks />} />
+              {edicao.api && <Route path="/chaves" element={<Chaves />} />}
+              {edicao.api && <Route path="/webhooks" element={<Webhooks />} />}
             </>}
             {ehDeveloper && <>
               <Route path="/plataforma" element={<Organizacoes />} />

@@ -6,6 +6,8 @@ import { createServer } from 'node:http'
 import { criarRepo } from '../src/armazenamento/repo.js'
 import { criarServico } from '../src/assinatura/servico.js'
 import { criarBibliotecaViva } from '../src/biblioteca.js'
+import { EDICOES } from '../src/edicao.js'
+import { legislacaoPadrao } from '../src/legislacao/legislacao.js'
 import { criarLotes } from '../src/lote/lotes.js'
 import { criarPartes } from '../src/partes.js'
 import { transporteCaixa } from '../src/notificacoes.js'
@@ -24,7 +26,9 @@ export const CHAVE = 'chave-teste'
 export const SENHA = 'senha-forte-de-teste'
 export const ORG = JSON.parse(readFileSync('exemplos/_organizacao.json', 'utf8'))
 
-export async function subirServidor({ fetchWebhook, fetchIndices, agora, carimbador = null, icp = null } = {}) {
+export async function subirServidor({ fetchWebhook, fetchIndices, agora, carimbador = null, icp = null, edicao = 'completa', contato = {} } = {}) {
+  const ed = EDICOES[edicao]
+  if (!ed) throw new Error(`edição desconhecida no teste: ${edicao}`)
   // A baseUrl vai nos links e só existe depois do listen: o servidor sobe
   // primeiro e o app entra em seguida.
   const servidor = createServer()
@@ -43,7 +47,7 @@ export async function subirServidor({ fetchWebhook, fetchIndices, agora, carimba
   const plataforma = criarPlataforma({ repo, notificar, config: { baseUrl: base } })
   const partes = criarPartes({ repo, ...(agora ? { agora } : {}) })
   const marca = criarMarca({ repo, auditar: plataforma.auditar })
-  const servico = criarServico({ repo, biblioteca, notificar, config: { baseUrl: base }, aoEvento, carimbador, icp, partes, marcaDe: marca.publica, ...(agora ? { agora } : {}) })
+  const servico = criarServico({ repo, biblioteca, notificar, config: { baseUrl: base }, aoEvento, carimbador, icp, partes, marcaDe: marca.publica, legislacao: ed.lei ? legislacaoPadrao() : null, ...(agora ? { agora } : {}) })
   const lotes = criarLotes({ repo, biblioteca, servico })
   const demonstracao = criarDemonstracao({ repo, servico, plataforma, marca, notificar, config: { baseUrl: base, dev: true }, ...(agora ? { agora } : {}) })
   const metricas = criarMetricas({ repo, ...(agora ? { agora } : {}) })
@@ -51,7 +55,7 @@ export async function subirServidor({ fetchWebhook, fetchIndices, agora, carimba
   const agenda = criarAgenda({ repo, servico, notificar, aoEvento, config: { baseUrl: base }, ...(agora ? { agora } : {}) })
   const indices = criarIndices({ fetchFn: fetchIndices || (async () => { throw new Error('sem rede no teste') }) })
   await plataforma.importarOrganizacoes({ org1: { api_key: CHAVE, dados: ORG } })
-  servidor.on('request', criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes, marca, demonstracao, metricas, exportacao, dev: true, log: false, chaveDev: CHAVE }))
+  servidor.on('request', criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes, marca, demonstracao, metricas, exportacao, edicao: ed, contato, dev: true, log: false, chaveDev: CHAVE }))
 
   const api = (caminho, { metodo = 'GET', corpo, chave = CHAVE, sessao, cookie, cabecalhos = {} } = {}) =>
     fetch(base + caminho, {

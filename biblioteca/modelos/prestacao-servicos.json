@@ -1,6 +1,6 @@
 {
   "chave": "prestacao_servicos",
-  "versao": 1,
+  "versao": 2,
   "titulo": "Contrato de Prestação de Serviços",
   "descricao": "Um modelo para contratado PF, PJ ou MEI, com prazo determinado ou indeterminado e pagamento mensal ou único.",
   "preambulo": "Pelo presente instrumento particular, as partes abaixo qualificadas celebram este Contrato de Prestação de Serviços, que se regerá pelas cláusulas seguintes.",
@@ -85,13 +85,15 @@
       "chave": "contratado.estado_civil",
       "rotulo": "estado civil do contratado",
       "tipo": "texto",
-      "origem": "parte"
+      "origem": "parte",
+      "obrigatoria": false
     },
     {
       "chave": "contratado.profissao",
       "rotulo": "profissão do contratado",
       "tipo": "texto",
-      "origem": "parte"
+      "origem": "parte",
+      "obrigatoria": false
     },
     {
       "chave": "contratado.endereco",
@@ -222,7 +224,7 @@
   "blocos": [
     {
       "clausula": "partes",
-      "versao": 1
+      "versao": 2
     },
     {
       "clausula": "objeto",

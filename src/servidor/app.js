@@ -16,7 +16,9 @@ import { fileURLToPath } from 'node:url'
 import { gerarDossiePdf } from '../assinatura/dossie-pdf.js'
 import { gerarPacote } from '../assinatura/pacote.js'
 import { ErroBiblioteca, acharModelo } from '../biblioteca.js'
+import { EDICOES, aplicarEdicao } from '../edicao.js'
 import { legislacaoPadrao } from '../legislacao/legislacao.js'
+import { planilhaDeExemplo } from '../lote/planilha-exemplo.js'
 import { signatariosDaLinha } from '../lote/mapear.js'
 import { camposNecessarios, montarContrato } from '../motor/montar.js'
 import { humanizar, textoDoModelo } from '../motor/texto-modelo.js'
@@ -34,8 +36,11 @@ const COOKIE = 'cs_painel'
 // Fontes e estilos vêm do próprio sistema (public/estatico/fontes): nada de terceiro na tela de quem assina.
 const CSP = "default-src 'self'; img-src 'self' data: blob:; style-src 'self'; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
 
-export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes = null, marca = null, demonstracao = null, metricas = null, exportacao = null, legislacao = legislacaoPadrao(), dev = false, log = true, chaveDev = null }) {
+export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices, repo, biblioteca, partes = null, marca = null, demonstracao = null, metricas = null, exportacao = null, edicao = EDICOES.completa, contato = {}, legislacao = edicao.lei ? legislacaoPadrao() : null, dev = false, log = true, chaveDev = null }) {
   const app = express()
+  // Edição (docs/BASICA.md): recurso desligado responde 404 em qualquer superfície,
+  // para que nem um link antigo nem a API alcancem o que o menu esconde.
+  const liga = (recurso) => (req, res, next) => (edicao[recurso] ? next() : res.status(404).json({ erro: 'Este recurso não está disponível nesta edição.' }))
   // Cada cláusula com "o que diz a lei" (texto do artigo citado na base legal), para as prévias e a demonstração.
   const comFundamentos = (clausulas) => clausulas.map(c => ({ ...c, fundamentos: legislacao && c.base_legal ? legislacao.fundamentos(c.base_legal) : [] }))
   app.disable('x-powered-by')
@@ -99,7 +104,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
       if (m.derivado) throw new ErroNegocio(404, 'Este modelo nasce de um contrato assinado, não sozinho.')
       return m
     }
-    r.get('/modelos/:chave', (req, res) => {
+    r.get('/modelos/:chave', liga('modelos'), (req, res) => {
       const m = modeloDaOrg(req)
       const defs = Object.fromEntries(m.variaveis.map(v => [v.chave, v]))
       const texto = textoDoModelo(m, biblioteca.indice)
@@ -112,7 +117,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
         contratos_gerados: repo.listar('contratos', c => c.organizacao_id === org(req).id && c.modelo?.chave === m.chave).length,
       })
     })
-    r.get('/modelos/:chave/amostra.pdf', h(async (req, res) => {
+    r.get('/modelos/:chave/amostra.pdf', liga('modelos'), h(async (req, res) => {
       const m = modeloDaOrg(req)
       const t = textoDoModelo(m, biblioteca.indice)
       const snapshot = {
@@ -167,9 +172,9 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     // Responder a dúvida que o signatário fez numa cláusula.
     r.post('/contratos/:id/duvidas/:did/responder', h(async (req, res) => res.json(await servico.responder(req.params.id, org(req).id, req.params.did, req.body || {}, req.acesso.ator, ctx(req)))))
     r.get('/contratos/:id/arquivo', h(async (req, res) => enviarPdf(res, await servico.arquivo(req.params.id, org(req).id, req.query.qual))))
-    r.get('/contratos/:id/assinaturas/:sid/arquivo', h(async (req, res) => enviarPdf(res, await servico.arquivoIcp(req.params.id, org(req).id, req.params.sid))))
+    r.get('/contratos/:id/assinaturas/:sid/arquivo', liga('icp'), h(async (req, res) => enviarPdf(res, await servico.arquivoIcp(req.params.id, org(req).id, req.params.sid))))
     // Token RFC 3161, para o perito: openssl ts -verify -data <pdf assinado> -in <este arquivo> -CAfile <cadeia da ACT>
-    r.get('/contratos/:id/carimbo.tsr', h(async (req, res) => {
+    r.get('/contratos/:id/carimbo.tsr', liga('carimbo'), h(async (req, res) => {
       const { buffer, nome } = await servico.arquivoCarimbo(req.params.id, org(req).id)
       if (!buffer) return res.status(404).json({ erro: 'Carimbo indisponível no momento. Tente de novo em instantes.' })
       res.set('Content-Type', 'application/timestamp-reply')
@@ -182,7 +187,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
       res.json(d)
     }))
     // Pacote de prova: tudo que o perito precisa num .zip, com LEIA-ME de conferência.
-    r.get('/contratos/:id/pacote.zip', h(async (req, res) => {
+    r.get('/contratos/:id/pacote.zip', liga('pacote'), h(async (req, res) => {
       const { buffer, nome } = await gerarPacote({ servico, contratoId: req.params.id, organizacaoId: org(req).id, baseUrl: servico.config.baseUrl })
       res.set('Content-Type', 'application/zip')
       res.set('Content-Disposition', `attachment; filename="${nome}"`)
@@ -191,18 +196,18 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     }))
 
     // Contrato vivo: aditivo e distrato nascem de um contrato assinado.
-    r.post('/contratos/:id/aditivo', h(async (req, res) => {
+    r.post('/contratos/:id/aditivo', liga('derivados'), h(async (req, res) => {
       plataforma.checarLimite(org(req).id, 1)
       res.status(201).json(await servico.gerarDerivado(req.params.id, org(req).id, dados(req), 'aditivo', req.body?.campos || req.body || {}))
     }))
-    r.post('/contratos/:id/distrato', h(async (req, res) => {
+    r.post('/contratos/:id/distrato', liga('derivados'), h(async (req, res) => {
       plataforma.checarLimite(org(req).id, 1)
       res.status(201).json(await servico.gerarDerivado(req.params.id, org(req).id, dados(req), 'distrato', req.body?.campos || req.body || {}))
     }))
-    r.get('/agenda', (req, res) => res.json(agenda.proximos(org(req).id, Math.min(Number(req.query.dias) || 90, 365))))
+    r.get('/agenda', liga('agenda'), (req, res) => res.json(agenda.proximos(org(req).id, Math.min(Number(req.query.dias) || 90, 365))))
     // Exportação completa: tudo da organização num .zip, escrito direto na
     // resposta. Só o administrador, o developer (suporte) ou a API.
-    r.get('/exportar', h(async (req, res) => {
+    r.get('/exportar', liga('exportar'), h(async (req, res) => {
       const ator = req.acesso.ator
       if (!(ator?.tipo === 'chave_api' || ['org_admin', 'developer'].includes(ator?.papel))) return res.status(403).json({ erro: 'Só o administrador da organização (ou a API) exporta tudo.' })
       res.set('Content-Type', 'application/zip')
@@ -213,7 +218,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     // Leitura e assinatura: funil, tempo por cláusula, dúvidas e recusas.
     r.get('/metricas', (req, res) => res.json(metricas.calcular({ organizacaoId: org(req).id, dias: req.query.dias, modelo: req.query.modelo || null })))
     // Acumulado do índice no período (ou no período padrão antes de uma data de reajuste).
-    r.get('/indices/:indice', h(async (req, res) => {
+    r.get('/indices/:indice', liga('reajuste'), h(async (req, res) => {
       const p = req.query.para ? periodoPadrao(String(req.query.para)) : { de: String(req.query.de || ''), ate: String(req.query.ate || '') }
       res.json(await indices.acumulado(req.params.indice, p.de, p.ate))
     }))
@@ -223,6 +228,14 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     r.get('/partes', (req, res) => res.json(partes.listar(org(req).id, req.query)))
     r.get('/partes/:id', (req, res) => res.json(partes.obter(org(req).id, req.params.id)))
 
+    // Planilha de exemplo do modelo: as colunas com o nome de cada campo e uma
+    // linha fictícia, para o RH começar pelo formato certo.
+    r.get('/lotes/exemplo.csv', (req, res) => {
+      const m = acharModelo(biblioteca, exigirPublicado(String(req.query.modelo || '')))
+      res.set('Content-Type', 'text/csv; charset=utf-8')
+      res.set('Content-Disposition', `attachment; filename="exemplo-${m.chave}.csv"`)
+      res.send(planilhaDeExemplo(m, lerExemplos()))
+    })
     const planilhaCrua = express.raw({ type: () => true, limit: '10mb' })
     r.post('/lotes/planilha', planilhaCrua, h(async (req, res) => {
       res.status(201).json(await lotes.receberPlanilha(org(req).id, req.body, String(req.query.nome || '')))
@@ -247,7 +260,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
   }
 
   // /v1: chave de API
-  app.use('/v1', (req, res, next) => {
+  app.use('/v1', liga('api'), (req, res, next) => {
     const valor = (req.get('authorization') || '').replace(/^Bearer\s+/i, '')
     const a = plataforma.autenticarChave(valor)
     if (!a) return res.status(401).json({ erro: 'Chave de API inválida ou revogada.' })
@@ -278,6 +291,8 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
   const eu = (u, org) => ({
     usuario: { id: u.id, nome: u.nome, email: u.email, papel: u.papel, papel_rotulo: plataforma.PAPEIS[u.papel] },
     organizacao: org ? { id: org.id, nome: org.dados.razao_social, status: org.status } : null,
+    // O painel esconde menu, rotas, botões e campos do que está desligado.
+    edicao,
   })
 
   const limitadorLogin = limitarPorIp({ janelaMs: 10 * 60e3, maximo: 30 })
@@ -354,6 +369,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
   admin.get('/usuarios', (req, res) => res.json(plataforma.listarUsuarios(req.orgId)))
   admin.post('/usuarios', h(async (req, res) => res.status(201).json(await plataforma.convidar({ organizacaoId: req.orgId, ...pick(req.body, ['nome', 'email', 'papel']) }, req.usuario))))
   admin.patch('/usuarios/:id', (req, res) => res.json(plataforma.alterarUsuario(req.orgId, req.params.id, req.body || {}, req.usuario)))
+  admin.use(['/chaves', '/webhooks', '/entregas'], liga('api'))
   admin.get('/chaves', (req, res) => res.json(plataforma.listarChaves(req.orgId)))
   admin.post('/chaves', (req, res) => res.status(201).json(plataforma.criarChave(req.orgId, req.body || {}, req.usuario)))
   admin.delete('/chaves/:id', (req, res) => res.json(plataforma.revogarChave(req.orgId, req.params.id, req.usuario)))
@@ -503,7 +519,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
   assinar.post('/duvida', (req, res) => res.status(201).json(servico.perguntar(req.params.token, sess(req), req.body, ctx(req))))
   assinar.get('/arquivo', h(async (req, res) => enviarPdf(res, await servico.arquivoDoSignatario(req.params.token, sess(req), req.query.qual))))
   // Assinatura ICP-Brasil: o PDF do contrato, assinado com o certificado de quem assina.
-  assinar.post('/icp', express.raw({ type: () => true, limit: '20mb' }), h(async (req, res) => res.json(await servico.assinarComIcp(req.params.token, sess(req), req.body, ctx(req)))))
+  assinar.post('/icp', liga('icp'), express.raw({ type: () => true, limit: '20mb' }), h(async (req, res) => res.json(await servico.assinarComIcp(req.params.token, sess(req), req.body, ctx(req)))))
   app.use('/api/assinar/:token', assinar)
 
   const lote = express.Router({ mergeParams: true })
@@ -533,6 +549,7 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
   // dados de quem visita) e devolve as cláusulas com bula, numeração e a regra
   // que fez cada uma entrar. É estático, então fica em cache na memória.
   const demo = new Map()
+  app.use('/api/demo', liga('demo'))
   app.get('/api/demo/contrato', (req, res) => {
     const nome = String(req.query.exemplo || 'pf-determinado')
     if (!demo.has(nome)) {
@@ -571,6 +588,14 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     res.set('Content-Security-Policy', CSP)
     res.sendFile(join(raiz, arquivo))
   }
+  // Páginas com trechos por edição (site e segurança): lidas uma vez, com os
+  // marcadores resolvidos e o link de contato no lugar. Em dev, a cada pedido.
+  const paginasProntas = new Map()
+  const paginaDaEdicao = (arquivo) => (req, res) => {
+    if (dev || !paginasProntas.has(arquivo)) paginasProntas.set(arquivo, aplicarEdicao(readFileSync(join(PUBLICO, arquivo), 'utf8'), edicao, contato))
+    res.set('Content-Security-Policy', CSP)
+    res.type('html').send(paginasProntas.get(arquivo))
+  }
   // Logotipo da organização nas telas públicas. O nome muda com o conteúdo, então o cache pode ser longo.
   app.get('/marca/:arquivo', h(async (req, res) => {
     const a = marca ? await marca.arquivoLogo(req.params.arquivo) : null
@@ -596,14 +621,14 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
     pagina('index.html', PAINEL)(req, res)
   })
   // Site de apresentação.
-  app.get('/', pagina('index.html'))
-  // Para o health check do host: sem dado nenhum, só "estou de pé" e a versão.
-  app.get('/saude', (req, res) => res.json({ ok: true, versao: VERSAO }))
+  app.get('/', paginaDaEdicao('index.html'))
+  // Para o health check do host: sem dado nenhum, só "estou de pé", a versão e a edição.
+  app.get('/saude', (req, res) => res.json({ ok: true, versao: VERSAO, edicao: edicao.nome }))
   // Segurança e privacidade: o que o sistema faz hoje, em palavras simples.
-  app.get('/seguranca', pagina('seguranca.html'))
+  app.get('/seguranca', paginaDaEdicao('seguranca.html'))
 
   // ── Desenvolvimento ───────────────────────────────────────────────────────
-  if (dev) {
+  if (dev && edicao.dev) {
     app.get('/dev', pagina('dev.html'))
     app.get('/dev/lotes', (req, res) => res.redirect('/painel/lotes'))
     app.get('/dev/exemplo-funcionarios.csv', (req, res) => res.download(join(RAIZ, 'exemplos', 'planilhas', 'funcionarios.csv'), 'funcionarios-exemplo.csv'))

@@ -4,7 +4,7 @@
 
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { api } from '../../api.js'
+import { api, baixar } from '../../api.js'
 import { Cabecalho, Campo, Carregando, Erro, Vazio, dataHora, plural, useAcao, useDados } from '../../comum.jsx'
 import { useSessao } from '../../sessao.jsx'
 
@@ -134,6 +134,7 @@ export function NovoLote() {
                 ? <><strong>{arquivo.name}</strong><span>{(arquivo.size / 1024).toFixed(0)} KB · clique para trocar</span></>
                 : <><strong>Escolha ou arraste a planilha aqui</strong><span>.xlsx ou .csv do Excel. Primeira linha com os títulos das colunas, uma pessoa por linha.</span></>}
             </label>
+            <p className="nota">Não sabe por onde começar? <button type="button" className="link-botao pequeno-link" disabled={acao.ocupado} onClick={() => acao.executar(() => baixar(`/org/lotes/exemplo.csv?modelo=${encodeURIComponent(modelo)}`, `exemplo-${modelo}.csv`))}>Baixe a planilha de exemplo deste modelo</button>, com uma coluna por campo e uma linha fictícia. Abra no Excel, troque pelos seus dados e suba.</p>
             <Erro erro={acao.erro} onFechar={acao.limparErro} />
             <div className="acoes">
               <button className="botao" disabled={acao.ocupado || !arquivo}>{acao.ocupado ? 'Lendo…' : 'Ler a planilha'}</button>

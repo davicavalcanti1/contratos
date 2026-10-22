@@ -19,15 +19,22 @@
     <div class="faixa">
       <a class="marca" href="/"><span class="marca-icone" aria-hidden="true"></span><span class="marca-nome"><mark>Bulla</mark>Check</span></a>
       <nav class="menu" aria-label="Principal">
+        <!--completa-->
         <a href="/#recursos">Recursos</a>
         <a href="/#como">Como funciona</a>
         <a href="/#validade">Validade jurídica</a>
+        <!--/completa-->
+        <!--basica
+        <a href="/#como">Como funciona</a>
+        <a href="/#quem">Para quem</a>
+        /basica-->
         <a href="/seguranca" aria-current="page">Segurança</a>
       </nav>
       <div class="topo-acoes">
         <a class="link-discreto so-desktop" href="/verificar">Conferir um contrato</a>
         <a class="botao secundario" href="/painel">Entrar</a>
-        <a class="botao so-desktop" href="/#experimentar">Receber um contrato de teste</a>
+        <!--completa--><a class="botao so-desktop" href="/#experimentar">Receber um contrato de teste</a><!--/completa-->
+        <!--basica <a class="botao so-desktop" href="__CONTATO__">Falar com a gente</a> /basica-->
       </div>
     </div>
   </header>
@@ -65,10 +72,11 @@
               <tr><td><b>A trilha de eventos</b>: link enviado e aberto, código confirmado, cada ciência de cláusula em destaque, leitura até o fim, dúvidas e respostas, assinatura ou recusa, selo, carimbo</td><td>é a história do documento. Cada evento carrega o hash do anterior.</td></tr>
               <tr><td><b>Evidências de quem assina</b>: nome digitado, e-mail, CPF quando informado pela organização, endereço IP, identificação do aparelho e navegador, e a localização <em>só se a pessoa permitir</em></td><td>autoria: quem assinou, de onde, com o quê.</td></tr>
               <tr><td><b>Tempo de leitura por cláusula</b>, informado pelo navegador</td><td>evidência auxiliar, rotulada assim no dossiê. Serve para comparar cláusulas, não para provar.</td></tr>
-              <tr><td><b>Carimbo do tempo</b> (RFC 3161) e <b>PDF assinado com certificado ICP-Brasil</b>, quando usados</td><td>horário de terceiro e assinatura qualificada, guardados byte a byte.</td></tr>
+              <!--completa--><tr><td><b>Carimbo do tempo</b> (RFC 3161) e <b>PDF assinado com certificado ICP-Brasil</b>, quando usados</td><td>horário de terceiro e assinatura qualificada, guardados byte a byte.</td></tr><!--/completa-->
             </tbody>
           </table>
-          <p>Da organização que usa o sistema guardamos o cadastro da empresa, os usuários (nome, e-mail, papel), a marca, as integrações e o registro de quem fez o quê na conta.</p>
+          <!--completa--><p>Da organização que usa o sistema guardamos o cadastro da empresa, os usuários (nome, e-mail, papel), a marca, as integrações e o registro de quem fez o quê na conta.</p><!--/completa-->
+          <!--basica <p>Da organização que usa o sistema guardamos o cadastro da empresa, os usuários (nome, e-mail, papel), a marca e o registro de quem fez o quê na conta.</p> /basica-->
         </section>
 
         <section id="integridade">
@@ -76,11 +84,13 @@
           <ul class="lista-check">
             <li><b>Hash em tudo.</b> O conteúdo do contrato, o PDF original e o PDF final recebem um código de integridade SHA-256. Um byte diferente, outro código.</li>
             <li><b>Trilha encadeada.</b> Cada evento guarda o hash do evento anterior. Alterar, remover ou reordenar um evento quebra a corrente dali em diante, e o dossiê mostra onde.</li>
-            <li><b>Carimbo do tempo de terceiro.</b> Quando configurado, uma Autoridade de Carimbo do Tempo assina que o PDF final existia naquele instante. O arquivo <code>.tsr</code> se confere com o OpenSSL, sem o nosso sistema. Com ACT credenciada na ICP-Brasil, o horário tem presunção legal; o dossiê diz qual é o caso.</li>
+            <!--completa--><li><b>Carimbo do tempo de terceiro.</b> Quando configurado, uma Autoridade de Carimbo do Tempo assina que o PDF final existia naquele instante. O arquivo <code>.tsr</code> se confere com o OpenSSL, sem o nosso sistema. Com ACT credenciada na ICP-Brasil, o horário tem presunção legal; o dossiê diz qual é o caso.</li><!--/completa-->
             <li><b>Verificação pública.</b> O QR e o código de cada página levam a uma página que mostra situação, quem assinou (com nome e CPF mascarados) e os hashes, e confere um PDF no próprio navegador, sem enviar o arquivo.</li>
-            <li><b>A prova é do cliente.</b> Cada contrato tem um pacote de prova em .zip (vias, dossiê em PDF e JSON, carimbo, instruções de conferência), e a organização exporta tudo de uma vez quando quiser.</li>
+            <!--completa--><li><b>A prova é do cliente.</b> Cada contrato tem um pacote de prova em .zip (vias, dossiê em PDF e JSON, carimbo, instruções de conferência), e a organização exporta tudo de uma vez quando quiser.</li><!--/completa-->
+            <!--basica <li><b>A prova é do cliente.</b> Cada contrato tem o PDF assinado, o original e o dossiê de provas para baixar a qualquer momento. Se a organização quiser sair, entregamos tudo de uma vez.</li> /basica-->
           </ul>
-          <p class="artigo-nota">Honestidade sobre a classificação: a assinatura por link, código e evidências prova <b>autoria, integridade e ciência</b>, conferidas pelo provedor. Não prometemos o rótulo "assinatura avançada" sem parecer jurídico. Quem precisa de presunção legal plena usa certificado ICP-Brasil, que o sistema aceita e confere.</p>
+          <!--completa--><p class="artigo-nota">Honestidade sobre a classificação: a assinatura por link, código e evidências prova <b>autoria, integridade e ciência</b>, conferidas pelo provedor. Não prometemos o rótulo "assinatura avançada" sem parecer jurídico. Quem precisa de presunção legal plena usa certificado ICP-Brasil, que o sistema aceita e confere.</p><!--/completa-->
+          <!--basica <p class="artigo-nota">Honestidade sobre a classificação: a assinatura por link, código e evidências registra <b>autoria, integridade e ciência</b>, conferidas pelo provedor. Não prometemos o rótulo "assinatura avançada" nem valor em juízo sem parecer jurídico. Certificado ICP-Brasil e carimbo do tempo não estão ligados nesta versão.</p> /basica-->
         </section>
 
         <section id="quem-ve">
@@ -105,8 +115,10 @@
             <li><b>Código de uso único</b> por e-mail, com validade de 10 minutos, 5 tentativas e limite por endereço IP. Cinco erros de senha bloqueiam o login por 15 minutos.</li>
             <li><b>Sessão do painel</b> em cookie HttpOnly e SameSite=Strict, 12 horas; trocar a senha encerra as outras sessões.</li>
             <li><b>Política de segurança de conteúdo</b> restrita nas telas públicas: sem scripts de fora, sem iframes, sem fontes de terceiros. O endereço do link não vaza para nenhum recurso externo.</li>
-            <li><b>Logs</b> com os tokens mascarados. <b>Webhooks</b> assinados com HMAC e protegidos contra endereços internos.</li>
-            <li><b>Segredos</b> (chave do banco, chaves de API, segredos de webhook) ficam só no ambiente do servidor; nunca em arquivo versionado nem nesta página.</li>
+            <!--completa--><li><b>Logs</b> com os tokens mascarados. <b>Webhooks</b> assinados com HMAC e protegidos contra endereços internos.</li>
+            <li><b>Segredos</b> (chave do banco, chaves de API, segredos de webhook) ficam só no ambiente do servidor; nunca em arquivo versionado nem nesta página.</li><!--/completa-->
+            <!--basica <li><b>Logs</b> com os tokens mascarados.</li>
+            <li><b>Segredos</b> (chave do banco, chave do e-mail) ficam só no ambiente do servidor; nunca em arquivo versionado nem nesta página.</li> /basica-->
           </ul>
         </section>
 
@@ -114,15 +126,16 @@
           <h2>LGPD: papéis e direitos</h2>
           <p>Nos contratos, <b>a organização que envia é a controladora</b> dos dados das partes, e <b>nós somos o operador</b>: tratamos os dados por conta dela, para gerar, colher a assinatura e guardar a prova. Nos dados da conta (usuários da organização, interessados pelo site), somos controladores.</p>
           <p><b>Base legal:</b> execução do contrato e das diligências pré-contratuais (art. 7º, V) e, para a guarda da prova depois dele, o exercício regular de direitos (art. 7º, VI). O consentimento só entra onde é a base certa: a localização de quem assina, por exemplo, é pedida e pode ser negada sem prejuízo.</p>
-          <p><b>Direitos de quem assina:</b> confirmação e acesso (a própria via e o selo), correção pela organização (gerando outro documento, porque o assinado não se edita), e portabilidade (o pacote de prova). A exclusão encontra o limite da guarda da prova: dados pessoais essenciais ao contrato são mantidos pelo prazo de guarda; o que não é essencial pode ser anonimizado a pedido depois dele.</p>
-          <p><b>Direitos da organização:</b> exportação completa a qualquer momento, com todos os contratos, o dossiê de cada um e os dados da conta.</p>
+          <p><b>Direitos de quem assina:</b> confirmação e acesso (a própria via e o selo), correção pela organização (gerando outro documento, porque o assinado não se edita), e portabilidade (<!--completa-->o pacote de prova<!--/completa--><!--basica o PDF assinado e o dossiê /basica-->). A exclusão encontra o limite da guarda da prova: dados pessoais essenciais ao contrato são mantidos pelo prazo de guarda; o que não é essencial pode ser anonimizado a pedido depois dele.</p>
+          <!--completa--><p><b>Direitos da organização:</b> exportação completa a qualquer momento, com todos os contratos, o dossiê de cada um e os dados da conta.</p><!--/completa-->
+          <!--basica <p><b>Direitos da organização:</b> cópia completa a pedido, com todos os contratos, o dossiê de cada um e os dados da conta.</p> /basica-->
           <p><b>Encarregado de dados:</b> o canal de privacidade é informado no termo de uso. Pedidos de titular são respondidos pela organização controladora, com o nosso apoio como operador.</p>
         </section>
 
         <section id="retencao">
           <h2>Por quanto tempo</h2>
           <p>A prova de cada contrato é guardada pelo prazo definido no termo de uso, nunca menor que o prazo prescricional aplicável às obrigações daquele contrato. Encerrar a conta não apaga a prova antes de a organização exportá-la; o que fica aqui depois só se apaga no fim do prazo de guarda.</p>
-          <p>Dados que não são prova têm vida curta: a planilha de um lote existe só até o lote ser criado (e no máximo 24 horas); códigos de uso único expiram em 10 minutos; o contrato de exemplo pedido pelo site expira em 2 dias.</p>
+          <p>Dados que não são prova têm vida curta: a planilha de um lote existe só até o lote ser criado (e no máximo 24 horas); códigos de uso único expiram em 10 minutos<!--completa-->; o contrato de exemplo pedido pelo site expira em 2 dias<!--/completa-->.</p>
         </section>
 
         <section id="nao-fazemos">
@@ -140,8 +153,10 @@
           <h2>O que o produto não é</h2>
           <ul class="lista-limites">
             <li>Não é cartório: não lavra ato notarial, não reconhece firma, não substitui escritura pública.</li>
-            <li>Não é parecer jurídico: os modelos são ponto de partida revisado, e o resumo em palavras simples explica a cláusula, mas o que vale é o texto do contrato.</li>
-            <li>Não consulta revogação de certificado ICP-Brasil; o dossiê aponta o validador oficial do ITI para essa conferência.</li>
+            <!--completa--><li>Não é parecer jurídico: os modelos são ponto de partida revisado, e o resumo em palavras simples explica a cláusula, mas o que vale é o texto do contrato.</li>
+            <li>Não consulta revogação de certificado ICP-Brasil; o dossiê aponta o validador oficial do ITI para essa conferência.</li><!--/completa-->
+            <!--basica <li>Não é parecer jurídico: os modelos disponíveis ainda não passaram por revisão de advogado, e o resumo em palavras simples explica a cláusula, mas o que vale é o texto do contrato.</li>
+            <li>Não aceita, nesta versão, assinatura com certificado ICP-Brasil nem aplica carimbo do tempo.</li> /basica-->
           </ul>
         </section>
 
@@ -162,20 +177,29 @@
       </div>
       <nav aria-label="Produto">
         <h4>Produto</h4>
+        <!--completa-->
         <a href="/#recursos">Recursos</a>
         <a href="/#como">Como funciona</a>
         <a href="/#validade">Validade jurídica</a>
+        <!--/completa-->
+        <!--basica
+        <a href="/#como">Como funciona</a>
+        <a href="/#quem">Para quem</a>
+        <a href="https://www.instagram.com/bullacheck" rel="noopener noreferrer" target="_blank">Instagram</a>
+        /basica-->
         <a href="/seguranca">Segurança e privacidade</a>
       </nav>
       <nav aria-label="Acesso">
         <h4>Acesso</h4>
         <a href="/painel">Entrar</a>
-        <a href="/#experimentar">Receber um contrato de teste</a>
+        <!--completa--><a href="/#experimentar">Receber um contrato de teste</a><!--/completa-->
+        <!--basica <a href="__CONTATO__">Falar com a gente</a> /basica-->
         <a href="/verificar">Conferir um contrato</a>
       </nav>
     </div>
     <div class="faixa rodape-nota">
-      <p>Produto em desenvolvimento. Os textos jurídicos desta página e da biblioteca de cláusulas passam por revisão de advogado antes do lançamento.</p>
+      <!--completa--><p>Produto em desenvolvimento. Os textos jurídicos desta página e da biblioteca de cláusulas passam por revisão de advogado antes do lançamento.</p><!--/completa-->
+      <!--basica <p>Os modelos de contrato disponíveis ainda não passaram por revisão de advogado. Estão em revisão. O resumo em palavras simples explica a cláusula; o que vale é o texto do contrato.</p> /basica-->
     </div>
   </footer>
 </body>

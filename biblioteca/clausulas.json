@@ -35,6 +35,101 @@
     "base_legal": "CC arts. 104 e 107"
   },
   {
+    "chave": "partes",
+    "versao": 2,
+    "categoria": "partes",
+    "titulo": "Das partes",
+    "paragrafos": [
+      "CONTRATANTE: {{organizacao.razao_social}}, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº {{organizacao.cnpj}}, com sede em {{organizacao.endereco}}, neste ato representada por {{organizacao.representante_nome}}, {{organizacao.representante_cargo}}.",
+      {
+        "quando": {
+          "campo": "contratado.tipo",
+          "op": "eq",
+          "valor": "pf"
+        },
+        "texto": "CONTRATADO: {{contratado.nome}}, {{contratado.nacionalidade}}, inscrito(a) no CPF sob o nº {{contratado.cpf}}, residente e domiciliado(a) em {{contratado.endereco}}, endereço eletrônico {{contratado.email}}."
+      },
+      {
+        "quando": {
+          "e": [
+            {
+              "campo": "contratado.tipo",
+              "op": "eq",
+              "valor": "pf"
+            },
+            {
+              "campo": "contratado.estado_civil",
+              "op": "existe"
+            },
+            {
+              "campo": "contratado.profissao",
+              "op": "existe"
+            }
+          ]
+        },
+        "texto": "O CONTRATADO declara ser {{contratado.estado_civil}} e exercer a profissão de {{contratado.profissao}}."
+      },
+      {
+        "quando": {
+          "e": [
+            {
+              "campo": "contratado.tipo",
+              "op": "eq",
+              "valor": "pf"
+            },
+            {
+              "campo": "contratado.estado_civil",
+              "op": "existe"
+            },
+            {
+              "campo": "contratado.profissao",
+              "op": "vazio"
+            }
+          ]
+        },
+        "texto": "O CONTRATADO declara ser {{contratado.estado_civil}}."
+      },
+      {
+        "quando": {
+          "e": [
+            {
+              "campo": "contratado.tipo",
+              "op": "eq",
+              "valor": "pf"
+            },
+            {
+              "campo": "contratado.estado_civil",
+              "op": "vazio"
+            },
+            {
+              "campo": "contratado.profissao",
+              "op": "existe"
+            }
+          ]
+        },
+        "texto": "O CONTRATADO declara exercer a profissão de {{contratado.profissao}}."
+      },
+      {
+        "quando": {
+          "campo": "contratado.tipo",
+          "op": "eq",
+          "valor": "pj"
+        },
+        "texto": "CONTRATADA: {{contratado.nome}}, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº {{contratado.cnpj}}, com sede em {{contratado.endereco}}, endereço eletrônico {{contratado.email}}, neste ato representada por {{contratado.representante_nome}}, inscrito(a) no CPF sob o nº {{contratado.representante_cpf}}, doravante denominada CONTRATADO."
+      },
+      {
+        "quando": {
+          "campo": "contratado.tipo",
+          "op": "eq",
+          "valor": "mei"
+        },
+        "texto": "CONTRATADO: {{contratado.nome}}, microempreendedor individual inscrito no CNPJ sob o nº {{contratado.cnpj}}, com sede em {{contratado.endereco}}, endereço eletrônico {{contratado.email}}, cujo titular é inscrito no CPF sob o nº {{contratado.cpf}}."
+      },
+      "Os signatários declaram possuir poderes para assumir as obrigações deste instrumento e que os dados acima são verdadeiros, obrigando-se a comunicar qualquer alteração à outra parte."
+    ],
+    "base_legal": "CC arts. 104 e 107"
+  },
+  {
     "chave": "objeto",
     "versao": 1,
     "categoria": "objeto",

@@ -18,6 +18,18 @@ públicos, e cada uma só fecha com validação registrada.
   (`src/notificacoes.js`), checagens de produção na subida, `Dockerfile`,
   `.env.example`, `/saude` para o host, plano da semana em
   `docs/LANCAMENTO-v0.1.md`.
+- **Também entra (23/out): a edição básica** (`docs/BASICA.md`, seção 8).
+  `EDICAO=basica` no ambiente liga só o que a primeira clínica usa: some
+  "o que diz a lei", ICP-Brasil, carimbo, pacote .zip, aditivo/distrato,
+  agenda, reajuste, chaves de API, webhooks, `/v1`, página de modelos,
+  demonstração do site, exportação, plano e `/dev`; tudo responde 404 em
+  qualquer superfície (`src/edicao.js`, `test/edicao.test.js`). O painel lê
+  `edicao` em `/eu` e esconde menu, rotas, botões e campos. O site e a
+  página de segurança têm trechos por edição (marcadores `completa` e
+  `basica`), com o botão "Falar com a gente" (`CONTATO_WHATSAPP`) e o
+  aviso de que os modelos não passaram por advogado. Planilha de exemplo
+  por modelo no novo lote (`/org/lotes/exemplo.csv`). Cláusula das partes
+  v2: estado civil e profissão do contratado PF viram opcionais.
 - **Validação:** três pessoas de fora assinam pelo celular sem instrução por
   telefone; o post do avanço sai com a tela de verdade.
 - **Post:** —

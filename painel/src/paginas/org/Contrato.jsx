@@ -15,7 +15,7 @@ const encurtar = (rotulo) => rotulo.replace(/\s*\(ou do titular do MEI\)/i, '').
 
 export function Contrato() {
   const { id } = useParams()
-  const { podeEscrever, org } = useSessao()
+  const { podeEscrever, org, edicao } = useSessao()
   const { dados: c, erro, carregando, recarregar } = useDados(() => api(`/org/contratos/${id}`), [id, org?.id])
   const modelos = useDados(() => api('/org/modelos').catch(() => []), [org?.id])
   const acao = useAcao()
@@ -57,7 +57,7 @@ export function Contrato() {
           ? <button className="botao" onClick={() => acao.executar(() => baixar(`/org/contratos/${c.id}/arquivo?qual=final`, 'contrato-assinado.pdf'))}>PDF assinado</button>
           : <button className="botao" onClick={() => acao.executar(() => baixar(`/org/contratos/${c.id}/arquivo?qual=original`, 'contrato.pdf'))}>PDF do contrato</button>}
         <button className="botao secundario" onClick={() => acao.executar(() => baixar(`/org/contratos/${c.id}/dossie?formato=pdf`, 'dossie.pdf'))}>Dossiê de provas</button>
-        <button className="botao secundario" title="Zip com o PDF assinado, o original, o dossiê, o carimbo do tempo e um LEIA-ME com os comandos de conferência" onClick={() => acao.executar(() => baixar(`/org/contratos/${c.id}/pacote.zip`, 'pacote-de-prova.zip'))}>Pacote .zip</button>
+        {edicao.pacote && <button className="botao secundario" title="Zip com o PDF assinado, o original, o dossiê, o carimbo do tempo e um LEIA-ME com os comandos de conferência" onClick={() => acao.executar(() => baixar(`/org/contratos/${c.id}/pacote.zip`, 'pacote-de-prova.zip'))}>Pacote .zip</button>}
         {c.pdf_final_sha256 && <button className="link-botao" onClick={() => acao.executar(() => baixar(`/org/contratos/${c.id}/arquivo?qual=original`, 'contrato.pdf'))}>PDF original</button>}
         {podeEscrever && !c.origem && <Link className="link-botao" to={`/contratos/novo?de=${c.id}`} title="Abre o formulário já preenchido com os dados deste contrato">Novo a partir deste</Link>}
       </Cabecalho>
@@ -85,9 +85,11 @@ export function Contrato() {
           </section>
 
           <Duvidas c={c} podeEscrever={podeEscrever} onRespondida={recarregar} />
-          <Vigencia c={c} />
-          <Ligados c={c} />
-          {podeEscrever && <div id="mudar"><AcoesVida c={c} onGerado={(d) => navegar(`/contratos/${d.id}`)} /></div>}
+          {edicao.derivados && <>
+            <Vigencia c={c} />
+            <Ligados c={c} />
+            {podeEscrever && <div id="mudar"><AcoesVida c={c} onGerado={(d) => navegar(`/contratos/${d.id}`)} /></div>}
+          </>}
 
           <DadosPreenchidos dados={c.dados} modelo={modelo} />
         </div>

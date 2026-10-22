@@ -40,7 +40,7 @@ function Exportar() {
 }
 
 export function Empresa() {
-  const { atualizar } = useSessao()
+  const { atualizar, edicao } = useSessao()
   const { dados: e, erro, carregando, recarregar } = useDados(() => api('/admin/empresa'), [])
   const [form, setForm] = useState({})
   const [salvo, setSalvo] = useState(false)
@@ -111,16 +111,16 @@ export function Empresa() {
           </p>
           <p className="nota">O encarregado de dados aparece na cláusula de proteção de dados: {form.encarregado_email || <mark className="lacuna">e-mail do DPO</mark>}.</p>
           <dl className="dados-lista dados-conta">
-            <div><dt>Plano</dt><dd>{e.plano?.nome || '—'}{e.plano?.contratos_mes != null ? ` · até ${e.plano.contratos_mes} contratos por mês` : ' · sem limite'}</dd></div>
+            {edicao.plano && <div><dt>Plano</dt><dd>{e.plano?.nome || '—'}{e.plano?.contratos_mes != null ? ` · até ${e.plano.contratos_mes} contratos por mês` : ' · sem limite'}</dd></div>}
             <div><dt>Este mês</dt><dd>{e.consumo?.usados ?? 0} {e.consumo?.usados === 1 ? 'contrato gerado' : 'contratos gerados'}</dd></div>
             <div><dt>Usuários ativos</dt><dd>{e.usuarios}</dd></div>
             <div><dt>Situação</dt><dd>{e.status === 'ativa' ? 'Ativa' : 'Suspensa'}</dd></div>
           </dl>
-          <p className="nota">Plano e limite são definidos pela plataforma. Para mudar, fale com o suporte.</p>
+          {edicao.plano && <p className="nota">Plano e limite são definidos pela plataforma. Para mudar, fale com o suporte.</p>}
         </aside>
       </form>
       <Marca razao={e.dados?.razao_social} />
-      <Exportar />
+      {edicao.exportar && <Exportar />}
     </>
   )
 }

@@ -18,12 +18,16 @@
        rodapé). A cláusula da demonstração reproduz o texto da biblioteca para
        o exemplo pf-determinado; a seção "O modelo é lógica" lê o motor de
        verdade em /api/demo/contrato. Textos jurídicos precisam de revisão de
-       advogado antes de ir ao ar (docs/VALIDADE-JURIDICA.md). -->
+       advogado antes de ir ao ar (docs/VALIDADE-JURIDICA.md).
+       Edições (docs/BASICA.md, src/edicao.js): os trechos entre os marcadores
+       completa/basica só aparecem na edição correspondente; o servidor resolve
+       os marcadores e troca __CONTATO__ pelo link de WhatsApp ou e-mail. -->
   <a class="pular" href="#conteudo">Ir para o conteúdo</a>
 
   <header class="topo-site">
     <div class="faixa">
       <a class="marca" href="/"><span class="marca-icone" aria-hidden="true"></span><span class="marca-nome"><mark>Bulla</mark>Check</span></a>
+      <!--completa-->
       <nav class="menu" aria-label="Principal">
         <a href="#recursos">Recursos</a>
         <a href="#como">Como funciona</a>
@@ -31,10 +35,19 @@
         <a href="#quem">Para quem</a>
         <a href="/seguranca">Segurança</a>
       </nav>
+      <!--/completa-->
+      <!--basica
+      <nav class="menu" aria-label="Principal">
+        <a href="#como">Como funciona</a>
+        <a href="#quem">Para quem</a>
+        <a href="/seguranca">Segurança</a>
+      </nav>
+      /basica-->
       <div class="topo-acoes">
         <a class="link-discreto so-desktop" href="/verificar">Conferir um contrato</a>
         <a class="botao secundario" href="/painel">Entrar</a>
-        <a class="botao so-desktop" href="#experimentar">Receber um contrato de teste</a>
+        <!--completa--><a class="botao so-desktop" href="#experimentar">Receber um contrato de teste</a><!--/completa-->
+        <!--basica <a class="botao so-desktop" href="__CONTATO__">Falar com a gente</a> /basica-->
       </div>
     </div>
   </header>
@@ -45,6 +58,7 @@
       <div class="abre-texto">
         <p class="olho">Contrato com bula</p>
         <h1>O contrato que quem assina <em>entende</em>.</h1>
+        <!--completa-->
         <p class="abre-sub">E que qualquer pessoa confere. Você escreve o modelo uma vez, o sistema monta cada contrato com os dados certos, quem assina lê cada cláusula com um resumo em palavras simples, e o PDF sai com um selo que se verifica em segundos.</p>
         <div class="abre-acoes">
           <a class="botao" href="#experimentar">Receber um contrato de teste</a>
@@ -55,6 +69,19 @@
           <li>Ciência registrada no que é crítico</li>
           <li>Selo com QR em cada página</li>
         </ul>
+        <!--/completa-->
+        <!--basica
+        <p class="abre-sub">Envie pelo celular. A pessoa lê cada cláusula com um resumo em palavras simples e assina em minutos. Sem imprimir, sem esperar, e com o registro de quem leu o quê.</p>
+        <div class="abre-acoes">
+          <a class="botao" href="__CONTATO__">Falar com a gente</a>
+          <a class="botao secundario" href="#demo">Ver a bula aqui mesmo</a>
+        </div>
+        <ul class="abre-provas" aria-label="Em resumo">
+          <li>Assinatura pelo celular, por link e código</li>
+          <li>Resumo simples em cada cláusula que importa</li>
+          <li>Toda a equipe de uma vez, pela planilha do RH</li>
+        </ul>
+        /basica-->
       </div>
 
       <!-- A demonstração funciona de verdade, só no navegador: nada é gravado. -->
@@ -124,6 +151,7 @@
       </div>
     </section>
 
+    <!--completa-->
     <!-- ── Teste de verdade: contrato por e-mail ────────────────────────── -->
     <section class="secao faixa banda" id="experimentar" aria-labelledby="t-experimentar">
       <div class="experimentar">
@@ -202,6 +230,7 @@
         </li>
       </ul>
     </section>
+    <!--/completa-->
 
     <!-- ── Como funciona ───────────────────────────────────────────────── -->
     <section class="secao faixa banda" id="como" aria-labelledby="t-como">
@@ -213,7 +242,7 @@
         <li>
           <span class="numero">1</span>
           <h3>Gere o contrato</h3>
-          <p>Escolha o modelo e preencha o formulário, ou suba a planilha e gere vários de uma vez. Se faltar algo, o sistema diz o quê e onde resolver antes do envio.</p>
+          <p>Escolha o modelo e preencha o formulário, ou suba a planilha do RH e gere um por pessoa. Se faltar algo, o sistema diz o quê e onde resolver antes do envio.</p>
         </li>
         <li>
           <span class="numero">2</span>
@@ -223,11 +252,12 @@
         <li>
           <span class="numero">3</span>
           <h3>O documento sai selado</h3>
-          <p>O PDF assinado leva QR e código em cada página, e o dossiê de provas fica disponível para download a qualquer momento.</p>
+          <p>O PDF assinado leva QR e código em cada página, e o registro de quem leu o quê, com horário, fica guardado com o contrato.</p>
         </li>
       </ol>
     </section>
 
+    <!--completa-->
     <!-- ── O motor de verdade ──────────────────────────────────────────── -->
     <section class="secao faixa" id="modelo" aria-labelledby="t-modelo">
       <div class="painel">
@@ -272,21 +302,29 @@
         </div>
       </div>
     </section>
+    <!--/completa-->
 
     <!-- ── Para quem ───────────────────────────────────────────────────── -->
     <section class="secao faixa banda" id="quem" aria-labelledby="t-quem">
       <div class="secao-cabeca">
         <p class="olho">Para quem</p>
-        <h2 id="t-quem">Feito para quem assina centenas de contratos por ano</h2>
+        <!--completa--><h2 id="t-quem">Feito para quem assina centenas de contratos por ano</h2><!--/completa-->
+        <!--basica
+        <h2 id="t-quem">Para clínicas e empresas que contratam PJ</h2>
+        <p>O contrato do médico, do técnico e do prestador, e o termo de sigilo que toda a equipe assina na admissão. Você envia pelo painel ou sobe a planilha do RH; cada pessoa recebe o próprio link e assina pelo celular. Hoje estamos começando com clínicas de imagem e, por enquanto, o atendimento é direto com a gente.</p>
+        /basica-->
       </div>
+      <!--completa-->
       <div class="publicos">
         <article><h3>RH e departamento pessoal</h3><p>Admissão, termo de confidencialidade, aditivo e distrato em lote, a partir da planilha que o RH já tem.</p></article>
         <article><h3>Escritórios de advocacia</h3><p>Biblioteca própria de cláusulas, modelos por cliente, versões controladas e dossiê pronto para juntar ao processo.</p></article>
         <article><h3>Imobiliárias e prestadores</h3><p>Locação e prestação de serviços, com pessoa física ou jurídica, assinados pelo celular em poucos minutos.</p></article>
         <article><h3>Sistemas que já existem</h3><p>API com chave e webhooks. O contrato nasce no seu sistema e volta assinado para ele, sem construir o módulo de novo.</p></article>
       </div>
+      <!--/completa-->
     </section>
 
+    <!--completa-->
     <!-- ── Limites ─────────────────────────────────────────────────────── -->
     <section class="secao faixa" aria-labelledby="t-limites">
       <div class="duas">
@@ -303,15 +341,26 @@
         </ul>
       </div>
     </section>
+    <!--/completa-->
 
     <!-- ── Chamada final + conferir ────────────────────────────────────── -->
     <section class="secao faixa" id="conferir" aria-labelledby="t-chamada">
       <div class="chamada">
+        <!--completa-->
         <div class="chamada-cta">
           <h2 id="t-chamada">Comece com um contrato de teste</h2>
           <p>Receba um contrato de exemplo no seu e-mail e assine como o seu médico assinaria. Gostou? A gente migra os seus modelos, com bula, em uma semana.</p>
           <a class="botao" href="#experimentar">Receber o contrato de exemplo</a>
         </div>
+        <!--/completa-->
+        <!--basica
+        <div class="chamada-cta">
+          <h2 id="t-chamada">Quer ver com os seus contratos?</h2>
+          <p>Chame a gente. Em uma conversa, a gente coloca o seu contrato e o seu termo no sistema, com a bula, e você manda o primeiro link no mesmo dia.</p>
+          <a class="botao" href="__CONTATO__">Falar com a gente</a>
+        </div>
+        /basica-->
+
         <div class="chamada-conferir">
           <h3>Recebeu um contrato?</h3>
           <p>Digite o código do rodapé do PDF ou leia o QR com a câmera.</p>
@@ -335,21 +384,30 @@
       </div>
       <nav aria-label="Produto">
         <h4>Produto</h4>
+        <!--completa-->
         <a href="#recursos">Recursos</a>
         <a href="#como">Como funciona</a>
         <a href="#modelo">Modelos com regras</a>
         <a href="#validade">Validade jurídica</a>
+        <!--/completa-->
+        <!--basica
+        <a href="#como">Como funciona</a>
+        <a href="#quem">Para quem</a>
+        <a href="https://www.instagram.com/bullacheck" rel="noopener noreferrer" target="_blank">Instagram</a>
+        /basica-->
         <a href="/seguranca">Segurança e privacidade</a>
       </nav>
       <nav aria-label="Acesso">
         <h4>Acesso</h4>
         <a href="/painel">Entrar</a>
-        <a href="#experimentar">Receber um contrato de teste</a>
+        <!--completa--><a href="#experimentar">Receber um contrato de teste</a><!--/completa-->
+        <!--basica <a href="__CONTATO__">Falar com a gente</a> /basica-->
         <a href="/verificar">Conferir um contrato</a>
       </nav>
     </div>
     <div class="faixa rodape-nota">
-      <p>Produto em desenvolvimento. Os textos jurídicos desta página e da biblioteca de cláusulas passam por revisão de advogado antes do lançamento.</p>
+      <!--completa--><p>Produto em desenvolvimento. Os textos jurídicos desta página e da biblioteca de cláusulas passam por revisão de advogado antes do lançamento.</p><!--/completa-->
+      <!--basica <p>Os modelos de contrato disponíveis ainda não passaram por revisão de advogado. Estão em revisão. O resumo em palavras simples explica a cláusula; o que vale é o texto do contrato.</p> /basica-->
     </div>
   </footer>
 </body>
