@@ -5,6 +5,14 @@
 
 ## Onde estamos
 
+> **22/out, noite:** nome BullaCheck decidido e aplicado; marca, Instagram e
+> post de apresentação prontos (`marca/`, `docs/INSTAGRAM.md`); e-mail real,
+> Dockerfile e checagens de produção feitos. **A semana de 27/out é a v0.1**:
+> plano dia a dia em [LANCAMENTO-v0.1.md](LANCAMENTO-v0.1.md). Próxima ação
+> do Davi: domínio, conta Resend e host. Próxima ação do dev: acompanhar a
+> primeira subida.
+
+
 As seis fases do plano (motor, assinatura, lote, plataforma, contrato vivo,
 plugáveis) estão prontas desde 16/out de manhã. À tarde começou a **refação
 página por página**, com foco em funcionalidade e design, nesta ordem:
