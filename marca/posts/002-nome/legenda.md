@@ -6,26 +6,26 @@ quantos comentários acertam o que o produto faz sem ler a bio.
 
 ## Legenda
 
-Sem ler a bio: o que você acha que o BullaCheck faz?
+o bebê tem nome: bullacheck 🎉
 
-O sistema tem nome. Bula, porque cada cláusula vem com um resumo em palavras simples, como a bula explica o remédio. Bulla, em latim, era o selo que fechava um documento e provava que ele era de verdade: é o selo verificável de cada contrato. Check, porque a pessoa confirma cláusula por cláusula que leu e entendeu, e qualquer um confere pelo QR que nada mudou.
+bula, porque cada cláusula vem com um resumo em português de gente (tipo bula de remédio, só que pra contrato). bulla, em latim, era o selo que fechava um documento e provava que era de verdade: é o selo com QR de cada contrato. check, porque você confirma cláusula por cláusula que entendeu, e qualquer um confere que ninguém mexeu.
 
-Foram três rodadas e doze nomes rejeitados até esse. O símbolo é um marca-texto com um check por cima.
+foram 3 rodadas e 12 nomes no lixo até chegar nesse. o símbolo é um marca-texto com um check em cima. simples assim.
 
-Agora o teste: responde aqui embaixo o que você acha que ele faz, antes de olhar o resto do perfil. Se dez pessoas acertarem, o nome fica. Se não, volto atrás, e conto aqui.
+agora o teste: sem ler a bio, o que você acha que o bullacheck faz? responde aqui 👇 10 acertando, o nome fica. errando, eu volto atrás (e conto).
 
-#buildinpublic #branding #saas #contratos #empreendedorismo
+#buildinpublic #branding #saas #contratos #indiehacker
 
 ## Alt text por slide
 
-1. O símbolo do BullaCheck (quadrado azul com traço amarelo e check branco) e o nome BULLACHECK com "BULLA" marcado em amarelo.
+1. O símbolo do BullaCheck (quadrado azul com traço amarelo e check branco) e o nome BULLACHECK com "BULLA" marcado em amarelo; abaixo, "o bebê tem nome".
 2. Dois cartões: "Bulla" (bula e selo) e "Check" (ciente e conferido).
-3. A anatomia do símbolo e ele em quatro tamanhos, do grande ao favicon.
-4. Texto sobre as três rodadas de nomes rejeitados e o domínio livre.
-5. A pergunta "Sem ler a bio: o que você acha que o BullaCheck faz?" e o aviso do próximo lançamento.
+3. O símbolo em quatro tamanhos, do grande ao favicon.
+4. Doze nomes riscados (ciente, clausa, grifa, legenda, candor…) e "bullacheck" marcado em amarelo.
+5. A pergunta "sem ler a bio: o que você acha que o bullacheck faz?" e o aviso do próximo lançamento.
 
 ## Stories
 
-1. Enquete: "BullaCheck: o nome diz o que faz?" (sim / mais ou menos / não)
+1. Enquete: "bullacheck: o nome diz o que faz?" (sim / mais ou menos / não)
 2. Caixinha: "o que você acha que ele faz?"
-3. Bastidor: print da lista de nomes rejeitados, texto "três rodadas"
+3. Print da lista de nomes rejeitados: "3 rodadas. 12 no lixo. 🗑️"

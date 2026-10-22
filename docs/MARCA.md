@@ -71,8 +71,10 @@ texto do contrato.
 > calendário de 30 dias) está em [INSTAGRAM.md](INSTAGRAM.md), escrito em
 > 22/out com base nos estudos de 2026. O que segue é o resumo original.
 
-**Conta da marca, voz na primeira pessoa do Davi.** Build in public funciona
-quando tem gente, não logotipo falando. A bio diz quem está construindo.
+**Conta da marca, voz na primeira pessoa do Davi**, no tom do grupo de amigos
+(minúsculas, frase curta, zoa o próprio erro; referência: AbacatePay; regras
+em INSTAGRAM.md, seção 0). Build in public funciona quando tem gente, não
+logotipo falando. A bio diz quem está construindo.
 
 - **Handle**: `@bullacheck` (conferir no app; reserva: `@bullacheck.app`).
   Nome de exibição: "BullaCheck · contrato com bula".

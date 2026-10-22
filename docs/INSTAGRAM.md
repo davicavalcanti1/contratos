@@ -6,6 +6,37 @@
 > conteúdo repostado não é mais recomendado) e no princípio de build in
 > public que funciona: gente segue pessoa construindo, não logotipo.
 
+## 0. A voz (revisada em 22/out, referência: AbacatePay)
+
+O Davi pediu o tom do build in public da AbacatePay, e é o oposto de
+manifesto editorial. É **a voz do grupo de amigos** contando o que fez hoje:
+
+- **Minúsculas e frase curta.** "construí um sistema de contratos em 4 dias.
+  e ninguém usou 💀". Maiúscula só em nome próprio e sigla.
+- **Fala com "vocês" e por "eu".** Nada de "o produto oferece". É "fiz",
+  "quebrei", "me ajuda aqui".
+- **Zoa o próprio erro antes que alguém zoe.** O erro é o conteúdo. "clássico
+  de quem constrói sozinho", "o linter me pegou 2x hoje 🫠".
+- **Celebra o pequeno.** Um teste passando, um comentário de desconhecido, o
+  primeiro link que chegou. "tô feliz demais" é legenda válida.
+- **Gíria leve, sem forçar.** tipo, pra, tá, bora, deu ruim, manja. Nada de
+  "fdp"/palavrão na conta da marca; nos stories, à vontade.
+- **Emoji onde dá risada ou marca o ritmo**, não em toda frase. 💀 🫠 🎉 👀 🥁
+  👇 ✅. O ✅ é o emoji da marca (é o check do símbolo).
+- **Print é prova.** Terminal, DM, comentário, Discord, a tela de verdade.
+  Os "flagras" deles (gente usando o produto) viram os nossos "flagras" assim
+  que existir gente usando.
+- **Número seco, sem adjetivo.** "45 commits. 166 testes. 0 pessoas." O
+  leitor tira a conclusão.
+- **Pergunta no fim, direta.** "qual foi a última cláusula que você assinou
+  sem entender? 👇"
+- **O que não muda**: a identidade visual (branco, marca-texto, caixa-alta
+  condensada nos títulos) e as regras da seção 9. Casual no texto, sério no
+  que é prova e no que é jurídico.
+
+Teste rápido antes de publicar: lê em voz alta. Se parece release de
+empresa, reescreve. Se parece mensagem pro grupo, publica.
+
 ## 1. Três decisões que mandam em tudo
 
 1. **Conta da marca com o rosto do Davi.** O handle é `@bullacheck`, mas quem
@@ -31,9 +62,9 @@
 | Nome (campo pesquisável) | **BullaCheck · contrato com bula** |
 | Categoria | Software |
 | Avatar | `marca/avatar.png` (símbolo em 1080) |
-| Bio (≤ 150 caracteres) | Construindo em público um jeito de assinar contrato entendendo o que está assinando. Por Davi, estudante de medicina. Um lançamento por semana. |
+| Bio (≤ 150 caracteres) | contrato com bula: você entende antes de assinar ✅ construindo em público, 1 lançamento por semana. por davi, estudante de medicina |
 | Link | o site; até ter domínio, o GitHub do projeto |
-| Destaques (nesta ordem) | **Começo** · **Produto** · **Bastidor** · **Lançamentos** · **Pergunte** (capas em `marca/destaques/`) |
+| Destaques (nesta ordem) | **Começo** · **Produto** · **Bastidor** · **Feedbacks** · **Lançamentos** (capas em `marca/destaques/`) |
 | Posts fixados | 1) post 1 "voltar atrás" · 2) post 2 "o nome" · 3) o primeiro Reel mostrando a bula na tela |
 
 O que vai em cada destaque:
@@ -44,7 +75,9 @@ O que vai em cada destaque:
 - **Bastidor**: commits, testes quebrando, decisões, o que deu errado.
 - **Lançamentos**: um story por versão (v0.10, v0.11…), com data e o que
   provou. É o CHANGELOG em stories.
-- **Pergunte**: respostas às caixinhas, dúvidas de quem assina contrato.
+- **Feedbacks**: print de comentário, DM e caixinha de quem opinou (com
+  autorização e sem dado pessoal). Quando houver gente usando, vira o
+  "flagras" da casa.
 
 ## 3. Grade
 
@@ -99,8 +132,8 @@ o feed é o resumo. Toda sexta: enquete "o que eu testo semana que vem?".
 
 ## 5. Legenda, hashtags e alt text
 
-- **Primeira linha é o gancho** (até 125 caracteres, antes do "mais"). Não
-  começar com "Hoje eu…" nem com emoji.
+- **Primeira linha é o gancho** (até 125 caracteres, antes do "mais"), na
+  voz da seção 0: minúscula, curta, com o erro ou o número na cara.
 - 3 a 6 linhas, primeira pessoa, parágrafos curtos, uma pergunta no fim.
 - **Hashtags**: 3 a 5, no fim da legenda (em 2026 o primeiro comentário não
   dá vantagem). Mistura de nicho e tema: `#buildinpublic #saas #contratos
@@ -112,26 +145,26 @@ o feed é o resumo. Toda sexta: enquete "o que eu testo semana que vem?".
 
 Escritos para a primeira linha ou para o slide 1. Usar e variar.
 
-1. Construí um sistema de contratos em 4 dias. Agora vou voltar atrás.
-2. Você leu o último contrato que assinou?
-3. Um contrato de médico PJ tem 15 cláusulas. Ninguém lê a 7.
-4. "Li e concordo" é a mentira mais assinada do Brasil.
-5. O que acontece quando a pessoa não entende a cláusula e assina mesmo assim.
-6. Isso aqui entrou ontem: o artigo da lei embaixo de cada cláusula.
-7. 166 testes passando. 0 pessoas de fora usaram. Esse é o problema.
-8. Três rodadas, doze nomes rejeitados. Esse ficou.
-9. O primeiro link que saiu da minha máquina.
-10. Pedi para 10 pessoas lerem um contrato. Só 3 entenderam a multa.
-11. Contrato com bula: o remédio explica, por que o contrato não?
-12. O que uma clínica faz hoje para contratar um médico PJ (spoiler: Word e e-mail).
-13. O erro que eu cometi por construir rápido demais.
-14. Essa cláusula tem destaque por lei. Quase ninguém faz isso.
-15. Como provar que a pessoa leu, não só assinou.
-16. O selo que qualquer um confere pelo QR, sem conta.
-17. A funcionalidade que ninguém pediu e eu fiz mesmo assim (e vou desligar).
-18. Se você assina contrato pela empresa, isso aqui é para você.
-19. Esta semana reprovou. Aqui está o que eu volto a fazer.
-20. Sem ler a bio: o que você acha que o BullaCheck faz?
+1. construí um sistema de contratos inteiro em 4 dias. e ninguém usou 💀
+2. você leu o último contrato que assinou? (eu também não)
+3. contrato de médico PJ tem 15 cláusulas. ninguém lê a 7.
+4. "li e concordo" é a mentira mais assinada do brasil
+5. isso aqui entrou ontem e eu tô feliz demais
+6. 166 testes passando. 0 pessoas usando. clássico.
+7. 3 rodadas, 12 nomes no lixo. esse ficou 🗑️
+8. o primeiro link que saiu do meu pc (deu ruim?)
+9. pedi pra 10 pessoas lerem um contrato. 3 entenderam a multa 🫠
+10. bula de remédio explica. por que contrato não?
+11. como uma clínica contrata médico PJ hoje: word, e-mail e fé
+12. o erro que eu cometi por construir rápido demais
+13. essa cláusula tem que vir em destaque por lei. quase ninguém faz
+14. provar que a pessoa leu, não só que assinou
+15. o selo que qualquer um confere pelo QR, sem conta, sem app
+16. fiz uma função que ninguém pediu. vou desligar e contar por quê
+17. se você assina contrato pela empresa, isso aqui é pra você
+18. essa semana reprovou. é isso que eu volto a fazer
+19. sem ler a bio: o que você acha que o bullacheck faz?
+20. primeiro comentário de alguém que eu não conheço 🎉 (print)
 
 ## 6. Calendário semanal e horários
 

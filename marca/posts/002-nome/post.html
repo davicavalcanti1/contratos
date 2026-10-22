@@ -16,11 +16,11 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: #d9dee3; font-family: var(--sans); color: var(--tinta); }
   .slide { width: 1080px; height: 1350px; background: var(--papel); position: relative; overflow: hidden; padding: 88px 84px 120px; display: flex; flex-direction: column; margin: 24px auto; }
-  .olho { font: 500 26px var(--sans); color: var(--acao); letter-spacing: .02em; margin: 0 0 28px; }
+  .olho { font: 500 26px var(--sans); color: var(--acao); margin: 0 0 28px; }
   h1 { font: 800 112px/0.98 var(--bula); font-stretch: 72%; text-transform: uppercase; margin: 0; text-wrap: balance; }
-  h2 { font: 800 72px/1.02 var(--bula); font-stretch: 72%; text-transform: uppercase; margin: 0 0 36px; text-wrap: balance; }
+  h2 { font: 800 78px/1.02 var(--bula); font-stretch: 72%; text-transform: uppercase; margin: 0 0 36px; text-wrap: balance; }
   mark { background: var(--marca); color: inherit; padding: 0 .08em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
-  p { font: 400 36px/1.4 var(--sans); margin: 0 0 22px; }
+  p { font: 400 38px/1.4 var(--sans); margin: 0 0 24px; }
   p.sub { color: var(--tinta-2); font-size: 32px; }
   .rodape { position: absolute; left: 84px; right: 84px; bottom: 56px; display: flex; justify-content: space-between; align-items: center; border-top: 1.5px solid var(--borda); padding-top: 22px; font: 500 24px var(--sans); color: var(--tinta-3); }
   .wordmark { font: 800 1em/1 var(--bula); font-stretch: 72%; text-transform: uppercase; color: var(--tinta); letter-spacing: .01em; white-space: nowrap; }
@@ -41,76 +41,77 @@
   .tam { display: flex; align-items: flex-end; gap: 48px; margin-top: 40px; }
   .tam .simbolo { --s: 220px; }
   .tam .simbolo.m { --s: 96px; } .tam .simbolo.p { --s: 44px; } .tam .simbolo.pp { --s: 22px; }
-  .anatomia { list-style: none; padding: 0; margin: 30px 0 0; display: grid; gap: 18px; }
-  .anatomia li { display: flex; gap: 22px; align-items: center; font: 400 32px/1.3 var(--sans); }
-  .anatomia i { width: 56px; height: 24px; border-radius: 4px; flex: none; }
-  .pergunta { background: var(--acao-claro); border-radius: 26px; padding: 36px 40px; font: 500 40px/1.3 var(--sans); color: var(--acao); margin-top: 40px; }
+  .lixo { display: flex; flex-wrap: wrap; gap: 14px; margin: 10px 0 30px; }
+  .lixo span { font: 500 30px/1 var(--sans); color: var(--tinta-3); border: 1.5px solid var(--borda); border-radius: 999px; padding: 14px 22px; text-decoration: line-through; }
+  .lixo span.ficou { color: var(--tinta); text-decoration: none; background: var(--marca); border-color: var(--marca); font-weight: 600; }
+  .pergunta { background: var(--marca); border-radius: 26px; padding: 36px 40px; font: 500 40px/1.3 var(--sans); color: var(--tinta); margin-top: 40px; }
   .fim { margin-top: auto; }
 </style>
 </head>
 <body>
 
 <section class="slide">
-  <p class="olho">build in public · post 2</p>
+  <p class="olho">build in public · dia 3</p>
   <div class="reveal">
     <span class="simbolo"></span>
     <span class="wordmark"><mark>Bulla</mark>Check</span>
   </div>
-  <p class="sub fim">O sistema de contratos tem nome. Esse nome diz o que ele faz?</p>
+  <p class="sub fim">o bebê tem nome 🎉 agora me diz se ele faz sentido (sem ler a bio, hein)</p>
   <div class="rodape"><span class="wordmark"><mark>Bulla</mark>Check</span><span class="pagina">1 / 5</span></div>
 </section>
 
 <section class="slide">
-  <p class="olho">duas palavras</p>
-  <h2>Uma bula e um check</h2>
+  <p class="olho">traduzindo</p>
+  <h2>bula + check. é isso.</h2>
   <div class="parte">
     <div class="cartao">
       <h3><mark>Bulla</mark></h3>
-      <p><b>Bula</b>: o resumo em palavras simples que acompanha cada cláusula, como a bula explica o remédio.</p>
-      <p><b>Bulla</b>, em latim: o selo que fechava um documento e provava que ele era de verdade. É o selo verificável de cada contrato.</p>
+      <p><b>bula</b>: o resumo em português de gente que vem em cada cláusula. tipo bula de remédio, só que pra contrato.</p>
+      <p><b>bulla</b> (latim): o selo que fechava um documento e provava que era de verdade. é o selo com QR de cada contrato.</p>
     </div>
     <div class="cartao">
       <h3>Check</h3>
-      <p><b>Ciente</b>: a pessoa confirma cláusula por cláusula que leu e entendeu.</p>
-      <p><b>Conferido</b>: qualquer um confere pelo QR que o documento não mudou.</p>
+      <p><b>ciente</b>: você confirma, cláusula por cláusula, que leu e entendeu.</p>
+      <p><b>conferido</b>: qualquer pessoa confere pelo QR que ninguém mexeu no documento.</p>
     </div>
   </div>
-  <p class="sub fim">Bula + check. O contrato que a pessoa entende antes de assinar, e que dá para provar depois.</p>
+  <p class="sub fim">contrato que você entende antes de assinar, e que dá pra provar depois. em duas palavras.</p>
   <div class="rodape"><span class="wordmark"><mark>Bulla</mark>Check</span><span class="pagina">2 / 5</span></div>
 </section>
 
 <section class="slide">
   <p class="olho">o símbolo</p>
-  <h2>Um marca-texto e um check</h2>
-  <ul class="anatomia">
-    <li><i style="background:#1f6aa5"></i>O azul do produto: a única cor de ação nas telas.</li>
-    <li><i style="background:#ffe04a"></i>O traço amarelo de marca-texto: é como o resumo aparece em cada cláusula.</li>
-    <li><i style="background:#fff;border:2px solid #1b2633"></i>O check branco por cima: "li e entendi".</li>
-  </ul>
+  <h2>um marca-texto e um check</h2>
+  <p>azul do produto, traço amarelo de marca-texto (é como o resumo aparece na tela) e o check de "li e entendi" por cima.</p>
   <div class="tam">
     <span class="simbolo"></span>
     <span class="simbolo m"></span>
     <span class="simbolo p"></span>
     <span class="simbolo pp"></span>
   </div>
-  <p class="sub fim">Funciona em 22 pixels, no favicon, e em 1080, no avatar. Sem caneta, sem documento, sem cadeado: isso todo mundo já usa.</p>
+  <p class="sub fim">funciona de 22 px (favicon) a 1080 (avatar). sem caneta, sem cadeado, sem documentinho. isso todo mundo já usa.</p>
   <div class="rodape"><span class="wordmark"><mark>Bulla</mark>Check</span><span class="pagina">3 / 5</span></div>
 </section>
 
 <section class="slide">
-  <p class="olho">como foi escolher</p>
-  <h2>Três rodadas, doze nomes rejeitados</h2>
-  <p>Primeiro tentei nomes do jargão: Ciente, Clausa, Lido e Ciente. Depois nomes do gesto: Grifa, Legenda, Sublinha. Depois palavras de marca: Candor, Consente.</p>
-  <p>Nenhum dizia as duas coisas ao mesmo tempo: que o contrato é explicado <b>e</b> que a leitura é provada. Bula e check dizem.</p>
-  <p class="sub fim">Domínio bullacheck.com.br livre no dia da escolha. Marca ainda não registrada no INPI: é o próximo passo.</p>
+  <p class="olho">bastidor</p>
+  <h2>3 rodadas, 12 nomes no lixo 🗑️</h2>
+  <div class="lixo">
+    <span>ciente</span><span>lido e ciente</span><span>bulla</span><span>clausa</span>
+    <span>grifa</span><span>legenda</span><span>sublinha</span><span>legível</span>
+    <span>candor</span><span>consente</span><span>concordo</span><span>entendo</span>
+    <span class="ficou">bullacheck ✅</span>
+  </div>
+  <p>nenhum dizia as duas coisas ao mesmo tempo: que o contrato é explicado E que a leitura é provada. bula e check dizem.</p>
+  <p class="sub fim">bullacheck.com.br tava livre no dia. INPI ainda não, é o próximo passo (se alguém manja, me chama).</p>
   <div class="rodape"><span class="wordmark"><mark>Bulla</mark>Check</span><span class="pagina">4 / 5</span></div>
 </section>
 
 <section class="slide">
   <p class="olho">sua vez</p>
-  <h2>Sem ler a bio: o que você acha que o BullaCheck faz?</h2>
-  <p>Responde nos comentários antes de olhar o resto do perfil. Se dez pessoas acertarem, o nome fica. Se não, volto atrás, e conto aqui.</p>
-  <div class="pergunta">Semana que vem: o primeiro link que sai da minha máquina. Alguém longe de mim recebe um contrato no celular e assina.</div>
+  <h2>sem ler a bio: o que você acha que o bullacheck faz?</h2>
+  <p>responde nos comentários antes de olhar o resto do perfil. 10 pessoas acertando, o nome fica. errando, eu volto atrás e conto aqui.</p>
+  <div class="pergunta">semana que vem: o primeiro link que sai do meu pc. alguém longe de mim recebe um contrato no celular e assina 👀</div>
   <div class="rodape"><span class="wordmark"><mark>Bulla</mark>Check</span><span class="pagina">5 / 5 · @bullacheck</span></div>
 </section>
 
