@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Post 1: voltar atrás</title>
+<link rel="stylesheet" href="../../../public/estatico/fontes.css">
+<style>
+  :root {
+    --papel: #ffffff; --tinta: #1b2633; --tinta-2: #4f5b68; --tinta-3: #77828e;
+    --borda: #e6ebf0; --acao: #1f6aa5; --acao-claro: #e2f0fb; --marca: #ffe04a;
+    --sans: "Lexend", "Segoe UI", system-ui, sans-serif;
+    --bula: "Archivo", "Arial Narrow", sans-serif;
+    --serif: "Source Serif 4", Georgia, serif;
+    --mono: "IBM Plex Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #d9dee3; font-family: var(--sans); color: var(--tinta); }
+  .slide { width: 1080px; height: 1350px; background: var(--papel); position: relative; overflow: hidden; padding: 88px 84px 120px; display: flex; flex-direction: column; margin: 24px auto; }
+  .olho { font: 500 26px var(--sans); color: var(--acao); letter-spacing: .02em; margin: 0 0 28px; }
+  h1 { font: 800 112px/0.98 var(--bula); font-stretch: 72%; text-transform: uppercase; margin: 0; text-wrap: balance; }
+  h1 mark, h2 mark, .wordmark mark { background: var(--marca); color: inherit; padding: 0 .08em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  h2 { font: 800 72px/1.02 var(--bula); font-stretch: 72%; text-transform: uppercase; margin: 0 0 36px; text-wrap: balance; }
+  p { font: 400 36px/1.4 var(--sans); margin: 0 0 22px; color: var(--tinta); }
+  p.sub { color: var(--tinta-2); font-size: 32px; }
+  .rodape { position: absolute; left: 84px; right: 84px; bottom: 56px; display: flex; justify-content: space-between; align-items: center; border-top: 1.5px solid var(--borda); padding-top: 22px; font: 500 24px var(--sans); color: var(--tinta-3); }
+  .wordmark { font: 800 30px var(--bula); font-stretch: 72%; text-transform: uppercase; color: var(--tinta); letter-spacing: .01em; }
+  .pagina { font-family: var(--mono); }
+  ol.etapas { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px 28px; }
+  ol.etapas li { border: 1.5px solid var(--borda); border-radius: 18px; padding: 18px 22px; font: 500 28px/1.25 var(--sans); display: flex; gap: 14px; align-items: baseline; }
+  ol.etapas li b { font: 800 26px var(--bula); font-stretch: 72%; color: var(--tinta-3); min-width: 44px; }
+  .numeros { display: flex; gap: 24px; margin-top: 40px; }
+  .numeros div { flex: 1; border: 1.5px solid var(--borda); border-radius: 22px; padding: 26px 28px; }
+  .numeros strong { display: block; font: 800 84px/1 var(--bula); font-stretch: 72%; }
+  .numeros strong.zero { color: #b3261e; }
+  .numeros span { font: 400 26px/1.3 var(--sans); color: var(--tinta-2); }
+  .regra { counter-reset: p; list-style: none; padding: 0; margin: 0; }
+  .regra li { counter-increment: p; display: flex; gap: 26px; align-items: flex-start; padding: 22px 0; border-bottom: 1.5px dotted var(--borda); font: 400 36px/1.3 var(--sans); }
+  .regra li::before { content: counter(p); flex: 0 0 64px; height: 64px; border-radius: 999px; background: var(--acao-claro); color: var(--acao); font: 800 34px/64px var(--bula); font-stretch: 72%; text-align: center; }
+  .regra li b { font-weight: 600; }
+  .citacao { font: 500 44px/1.3 var(--sans); padding: 36px 40px; border-left: 10px solid var(--marca); margin: 24px 0 0; }
+  .fim { margin-top: auto; }
+  .pergunta { background: var(--acao-claro); border-radius: 26px; padding: 36px 40px; font: 500 38px/1.3 var(--sans); color: var(--acao); margin-top: 40px; }
+  .linha { display: flex; gap: 40px; align-items: stretch; margin-top: 36px; }
+  .linha .pergunta { flex: 1; margin-top: 0; align-self: flex-start; }
+  .tela { flex: 0 0 400px; height: 560px; border: 1.5px solid var(--borda); border-radius: 26px; overflow: hidden; box-shadow: 0 24px 60px rgba(27,38,51,.12); background: #fff; position: relative; }
+  .tela img { width: 100%; display: block; margin-top: -775px; }
+  .legenda-tela { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 18px; background: var(--marca); font: 600 22px var(--sans); color: var(--tinta); }
+</style>
+</head>
+<body>
+
+<section class="slide">
+  <p class="olho">build in public · post 1</p>
+  <h1>Construí um sistema de contratos em 4 dias.<br>Agora vou <mark>voltar atrás.</mark></h1>
+  <p class="sub fim">Um contrato que a pessoa entende antes de assinar. Estou construindo em público, e esta é a primeira semana.</p>
+  <div class="rodape"><span class="wordmark">{{NOME}}</span><span class="pagina">1 / 5</span></div>
+</section>
+
+<section class="slide">
+  <p class="olho">o que existe hoje</p>
+  <h2>Nove etapas de código, do motor à lei</h2>
+  <ol class="etapas">
+    <li><b>E1</b>Motor: o modelo é lógica, não Word</li>
+    <li><b>E2</b>Assinatura com bula e selo verificável</li>
+    <li><b>E3</b>Lote pela planilha do RH</li>
+    <li><b>E4</b>Painel da empresa e da plataforma</li>
+    <li><b>E5</b>Contrato vivo: vigência, reajuste, aditivo</li>
+    <li><b>E6</b>Carimbo do tempo e ICP-Brasil</li>
+    <li><b>E7</b>Identidade: bula na tela, fé pública no PDF</li>
+    <li><b>E8</b>Operação: banco, backup, avisos</li>
+    <li><b>E9</b>O artigo da lei embaixo de cada cláusula</li>
+  </ol>
+  <div class="numeros">
+    <div><strong>45</strong><span>commits em 4 dias</span></div>
+    <div><strong>166</strong><span>testes automáticos</span></div>
+    <div><strong class="zero">0</strong><span>pessoas de fora usaram</span></div>
+  </div>
+  <div class="rodape"><span class="wordmark">{{NOME}}</span><span class="pagina">2 / 5</span></div>
+</section>
+
+<section class="slide">
+  <p class="olho">o problema de construir rápido</p>
+  <h2>Nenhuma etapa foi <mark>validada</mark> com gente</h2>
+  <p>Cada tela funciona. Cada teste passa. E ninguém de fora leu um contrato nele, muito menos assinou.</p>
+  <p>Num projeto grande, voltar atrás não é apagar código. É parar de acrescentar e perguntar, etapa por etapa, se aquilo resolve alguma coisa para alguém.</p>
+  <p class="citacao">Código pronto não é etapa pronta.</p>
+  <div class="rodape"><span class="wordmark">{{NOME}}</span><span class="pagina">3 / 5</span></div>
+</section>
+
+<section class="slide">
+  <p class="olho">a regra a partir de agora</p>
+  <h2>Um lançamento por semana, e cada um prova uma coisa</h2>
+  <ol class="regra">
+    <li><span><b>Hipótese.</b> Uma frase: "se X, então Y".</span></li>
+    <li><span><b>Construir pequeno.</b> Só o que testa a hipótese.</span></li>
+    <li><span><b>Testar com gente.</b> Quem, quantos, qual pergunta.</span></li>
+    <li><span><b>Postar aqui.</b> O que fiz, o que aprendi, o que vem.</span></li>
+    <li><span><b>Decidir.</b> Segue, ajusta ou volta.</span></li>
+  </ol>
+  <div class="rodape"><span class="wordmark">{{NOME}}</span><span class="pagina">4 / 5</span></div>
+</section>
+
+<section class="slide">
+  <p class="olho">o que vem</p>
+  <h2>Primeiro, um nome.<br>Depois, o primeiro link que sai da minha máquina.</h2>
+  <p>Semana que vem eu mostro o nome e o símbolo, e peço a sua opinião. Na outra, alguém longe de mim recebe um contrato pelo celular e assina.</p>
+  <div class="linha">
+    <div class="pergunta">Me conta: o que você não entendeu no último contrato que assinou?</div>
+    <div class="tela"><img src="tela.png" alt="Tela de assinatura: a cláusula de autonomia com o artigo da lei aberto"><span class="legenda-tela">isso aqui entrou ontem</span></div>
+  </div>
+  <div class="rodape"><span class="wordmark">{{NOME}}</span><span class="pagina">5 / 5 · {{HANDLE}}</span></div>
+</section>
+
+</body>
+</html>
