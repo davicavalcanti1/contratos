@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "SaaS de contratos: modelos como lógica, contrato com bula e selo verificável.",
+  "description": "BullaCheck: contrato com bula. Modelos como lógica, assinatura com ciência cláusula a cláusula e selo verificável.",
   "scripts": {
     "start": "node src/servidor/index.js",
     "build": "vite build --config painel/vite.config.js",

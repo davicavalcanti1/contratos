@@ -220,7 +220,8 @@ basta; não precisa de certificado ICP-Brasil do médico.
   em 17/out; os ~100 registros de teste da tabela ficaram (o conector não pôde
   apagar em massa): limpar com `delete from public.registros;` no SQL Editor
   antes de usar de verdade.
-- E-mail real ainda não existe (tudo cai na caixa do `/dev`).
+- E-mail real: transporte Resend pronto em 22/out (`src/notificacoes.js`), falta a
+  chave e o domínio verificado. Plano da semana de v0.1 em [LANCAMENTO-v0.1.md](LANCAMENTO-v0.1.md).
 - Biblioteca de cláusulas sem revisão de advogado; raízes ICP-Brasil com
   impressões digitais a conferir antes de produção; ZapSign adiado.
 - Teste de ICP-Brasil (`plugaveis.test.js`) falhou uma vez de forma

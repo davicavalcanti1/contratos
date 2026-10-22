@@ -27,6 +27,7 @@ import { EVENTOS_WEBHOOK } from '../plataforma/webhooks.js'
 import { periodoPadrao } from '../vida/indices.js'
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
+const VERSAO = JSON.parse(readFileSync(join(RAIZ, 'package.json'), 'utf8')).version
 const PUBLICO = join(RAIZ, 'public')
 const PAINEL = join(PUBLICO, 'painel')
 const COOKIE = 'cs_painel'
@@ -596,6 +597,8 @@ export function criarApp({ servico, lotes, plataforma, webhooks, agenda, indices
   })
   // Site de apresentação.
   app.get('/', pagina('index.html'))
+  // Para o health check do host: sem dado nenhum, só "estou de pé" e a versão.
+  app.get('/saude', (req, res) => res.json({ ok: true, versao: VERSAO }))
   // Segurança e privacidade: o que o sistema faz hoje, em palavras simples.
   app.get('/seguranca', pagina('seguranca.html'))
 

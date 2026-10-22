@@ -16,7 +16,7 @@ respondida. Código pronto não é etapa pronta. Cada lançamento tem:
 | 1. Hipótese | Uma frase: "se X, então Y" | linha no CHANGELOG |
 | 2. Construção | O menor pedaço que testa a hipótese | commits, issue fechada |
 | 3. Portão técnico | `npm test`, `npm run build`, `node src/cli.js lint`, `node ferramentas/legislacao.mjs conferir`, screenshot 390 e 1440 sem vazamento | CI verde + shots |
-| 4. Versão | tag `vX.Y` e entrada no CHANGELOG com data | `git tag` |
+| 4. Versão | tag `vX.Y` e entrada no CHANGELOG com data (v0.1 é o primeiro lançamento público) | `git tag` |
 | 5. Validação com gente | quem, quantos, qual pergunta, qual resultado conta como "passou" | nota de validação no CHANGELOG |
 | 6. Post | o que fizemos, o que aprendemos, o que vem (Instagram, ver MARCA.md) | link do post |
 | 7. Decisão | segue, ajusta ou volta | próxima hipótese |
@@ -48,12 +48,11 @@ isso que a ordem abaixo começa pelo que destrava validação, não por feature.
 
 | Versão | Semana | Lançamento | Hipótese | Validação |
 |---|---|---|---|---|
-| v0.10 | 27/out | **Nome, marca e Instagram** (MARCA.md); troca do nome no site e painel; post 1 | O nome comunica "contrato que a pessoa entende" | 10 pessoas ouvem o nome e dizem o que acham que é; o post 1 recebe ao menos 3 comentários de gente que não conhecemos |
-| v0.11 | 3/nov | **Primeiro link fora da máquina**: domínio, Resend (#5), hospedagem (#6) | Um link chega e é assinado por alguém longe | 3 amigos assinam de casa, pelo celular, sem instrução por telefone |
-| v0.12 | 10/nov | **Teste de compreensão da bula** (fecha E2 e E9) | ver E2 | 10 leitores, 5 perguntas |
-| v0.13 | 17/nov | **Gerador público de contratos** no site: formulário a partir do modelo, PDF e DOCX | Quem gera um contrato de graça volta para assinar | 20 contratos gerados; 3 pedem "enviar para assinar" |
-| v0.14 | 24/nov | **Kit saúde v1** (#2–#4), depende da IMAGO (#1) | O modelo médico PJ cobre o que a clínica faz hoje | a IMAGO compara com o contrato atual e lista o que falta |
-| v0.15 | 1/dez | **Revisão do advogado** (#11) e termo de uso (#12) | Os modelos podem ser usados de verdade | advogado aprova e publica os modelos pelo painel |
+| v0.1 | 27/out a 2/nov | **Primeiro lançamento público**: nome e marca, domínio, e-mail real (#5), hospedagem (#6). Plano dia a dia em [LANCAMENTO-v0.1.md](LANCAMENTO-v0.1.md) | Um link chega e é assinado por alguém longe | 3 amigos assinam de casa, pelo celular, sem instrução por telefone |
+| v0.2 | 10/nov | **Teste de compreensão da bula** (fecha E2 e E9) | ver E2 | 10 leitores, 5 perguntas |
+| v0.3 | 17/nov | **Gerador público de contratos** no site: formulário a partir do modelo, PDF e DOCX | Quem gera um contrato de graça volta para assinar | 20 contratos gerados; 3 pedem "enviar para assinar" |
+| v0.4 | 24/nov | **Kit saúde v1** (#2–#4), depende da IMAGO (#1) | O modelo médico PJ cobre o que a clínica faz hoje | a IMAGO compara com o contrato atual e lista o que falta |
+| v0.5 | 1/dez | **Revisão do advogado** (#11) e termo de uso (#12) | Os modelos podem ser usados de verdade | advogado aprova e publica os modelos pelo painel |
 | v1.0 | dez | **Piloto** na IMAGO (#7) | A clínica troca o Word pelo produto | 10 contratos reais assinados no mês |
 
 Tudo que entrar fora dessa lista (onda 3 do ESTUDO: importador .docx,
@@ -63,8 +62,9 @@ papéis, plano Rede, cobrança) espera o piloto, salvo se uma validação pedir.
 
 - `CHANGELOG.md` na raiz, uma seção por versão, com data, hipótese, o que
   entrou, resultado da validação e link do post.
-- Tag git por versão (`v0.10`…). As etapas retroativas E1–E9 ganharam as
-  tags `v0.1`–`v0.9` apontando para o último commit de cada uma.
+- Tag git por versão (`v0.1`, `v0.2`…), só para lançamentos públicos. As
+  etapas retroativas E1–E9 têm as tags `etapa-1`…`etapa-9` apontando para o
+  último commit de cada uma.
 - Issues no GitHub continuam sendo a lista de pendências; cada lançamento
   cita as issues que fecha.
 

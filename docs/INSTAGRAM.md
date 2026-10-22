@@ -191,10 +191,10 @@ Insights, registrar a decisão no CHANGELOG.
 | # | Tipo | Título | Quando |
 |---|---|---|---|
 | 1 | Apresentação | BullaCheck: contrato com bula | ao abrir a conta (`marca/posts/001-apresentacao/`, pronto) |
-| 2 | Avanço | O primeiro contrato enviado para alguém de fora | quando v0.11 sair (domínio, e-mail real) |
-| 3 | Resultado | Dez pessoas leram um contrato com bula | quando v0.12 terminar |
-| 4 | Avanço | Gere o contrato no site e receba em PDF | quando v0.13 sair |
-| 5 | Avanço | O modelo médico PJ, revisado por advogado | quando v0.14/v0.15 saírem |
+| 2 | Avanço | O primeiro contrato enviado para alguém de fora | quando v0.1 sair (domínio, e-mail real) |
+| 3 | Resultado | Dez pessoas leram um contrato com bula | quando v0.2 terminar |
+| 4 | Avanço | Gere o contrato no site e receba em PDF | quando v0.3 sair |
+| 5 | Avanço | O modelo médico PJ, revisado por advogado | quando v0.4/v0.5 saírem |
 | 6 | Resultado | O piloto | v1.0 |
 
 Entre um lançamento e outro, se um avanço menor merecer post (uma tela

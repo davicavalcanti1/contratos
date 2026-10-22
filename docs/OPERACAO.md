@@ -17,10 +17,16 @@ NODE_ENV=production BASE_URL=https://<dominio> SUPABASE_URL=https://<ref>.supaba
 | `BASE_URL` | URL pública: vai nos links, no QR impresso no PDF e nos e-mails. **Não trocar depois que houver PDF assinado**: o QR impresso aponta para ela |
 | `SUPABASE_URL`, `SUPABASE_KEY` | banco e arquivos. A chave é a **service_role**: só no ambiente do servidor, nunca em arquivo versionado nem no front |
 | `DADOS_DIR` | sem Supabase: onde ficam os JSON e os PDFs. Com Supabase: onde fica o **diário** de escritas pendentes (`fila-supabase.json` e `pendentes/`). Padrão `./dados`; precisa ser disco persistente |
-| `NODE_ENV=production` | desliga `/dev`, exige https nos webhooks, não cria contas de teste |
+| `NODE_ENV=production` | desliga `/dev`, exige https nos webhooks, não cria contas de teste, e **derruba na subida** se faltar BASE_URL (https), SUPABASE_URL, SUPABASE_KEY ou o e-mail |
+| `RESEND_API_KEY`, `EMAIL_REMETENTE`, `EMAIL_RESPONDER_PARA` | e-mail real pelo Resend. O remetente é `Nome <email@dominio-verificado>`; sem domínio verificado, `onboarding@resend.dev` só entrega para o e-mail da conta. Cada envio (ou erro) fica na coleção `caixa`. `EMAIL_TRANSPORTE=caixa` sobe sem e-mail, de propósito |
 | `CARIMBO_URL`, `CARIMBO_NOME`, `CARIMBO_ICP_BRASIL`, `CARIMBO_USUARIO`, `CARIMBO_SENHA` | carimbo do tempo (ver PLUGAVEIS.md). Vazio = desligado em produção |
 
 Primeiro developer: `node src/cli.js developer <email> "<nome>"` imprime o link do convite.
+
+**Com Docker** (Railway, Render, EasyPanel, VPS): o `Dockerfile` compila o painel e
+sobe `node src/servidor/index.js` na porta 3000, com health check em `/saude`.
+Montar um volume em `/app/dados` e colar as variáveis do `.env.example`. Passo a
+passo da primeira subida em [LANCAMENTO-v0.1.md](LANCAMENTO-v0.1.md).
 
 ## O que vigiar
 

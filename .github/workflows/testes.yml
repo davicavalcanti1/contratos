@@ -17,6 +17,8 @@ jobs:
       - run: npm run build
       - run: npm test
       - run: npm run lint:modelos
+      # A imagem que o host vai usar precisa construir; sem Docker na máquina do Davi, é o CI que confere.
+      - run: docker build -t bullacheck:ci .
       # Vulnerabilidade conhecida avisa, mas não derruba o commit: a decisão é humana.
       - run: npm audit --audit-level=high
         continue-on-error: true

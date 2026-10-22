@@ -4,6 +4,8 @@
 //   BASE_URL             URL pública, usada nos links, no QR e nos convites (padrão http://localhost:PORT)
 //   DADOS_DIR            sem Supabase: coleções JSON e PDFs; com Supabase: o diário de escritas pendentes (padrão ./dados)
 //   SUPABASE_URL         https://<ref>.supabase.co — liga o armazenamento no Supabase (Postgres + Storage)
+//   RESEND_API_KEY       liga o e-mail real (Resend); EMAIL_REMETENTE é o "Nome <email@dominio>"; EMAIL_RESPONDER_PARA opcional
+//   EMAIL_TRANSPORTE     =caixa para subir em produção sem e-mail, de propósito
 //   SUPABASE_KEY         chave service_role do projeto (nunca a anon, nunca no front)
 //   ORGANIZACOES_ARQUIVO opcional: importa organizações no formato antigo { id: { api_key, dados } }
 //   NODE_ENV=production  desliga /dev, exige https nos webhooks e não cria contas de teste
@@ -19,7 +21,7 @@ import { criarBibliotecaViva } from '../biblioteca.js'
 import { criarPartes } from '../partes.js'
 import { criarLotes } from '../lote/lotes.js'
 import { lintModelo } from '../motor/linter.js'
-import { transporteCaixa } from '../notificacoes.js'
+import { transporteDoAmbiente } from '../notificacoes.js'
 import { criarAvisos } from '../plataforma/avisos.js'
 import { criarDemonstracao } from '../plataforma/demonstracao.js'
 import { criarExportacao } from '../plataforma/exportacao.js'
@@ -35,6 +37,12 @@ import { criarIndices } from '../vida/indices.js'
 import { criarApp } from './app.js'
 
 const producao = process.env.NODE_ENV === 'production'
+// Em produção, o que falta derruba na subida, com a lista: melhor que descobrir no primeiro link.
+if (producao) {
+  const faltam = ['BASE_URL', 'SUPABASE_URL', 'SUPABASE_KEY'].filter(k => !process.env[k])
+  if (process.env.BASE_URL && !/^https:\/\//.test(process.env.BASE_URL)) faltam.push('BASE_URL com https://')
+  if (faltam.length) { console.error(`Produção sem: ${faltam.join(', ')}. Ver .env.example.`); process.exit(1) }
+}
 const porta = Number(process.env.PORT || 3000)
 const baseUrl = (process.env.BASE_URL || `http://localhost:${porta}`).replace(/\/$/, '')
 
@@ -52,7 +60,9 @@ for (const m of biblioteca.publicados) {
   const r = lintModelo(m, biblioteca.indice)
   if (!r.ok) { console.warn(`[biblioteca] modelo ${m.chave} reprovado no linter e despublicado: ${r.graves.map(g => g.msg).join('; ')}`); biblioteca.despublicarModelo(m.chave) }
 }
-const notificar = transporteCaixa(repo)
+// E-mail: Resend quando há chave; em produção sem chave o servidor não sobe (ver notificacoes.js).
+const transporte = transporteDoAmbiente(repo, process.env, { producao })
+const notificar = transporte.enviar
 const webhooks = criarWebhooks({ repo, producao })
 const avisos = criarAvisos({ repo, notificar, config: { baseUrl } })
 // Um acontecimento, dois ouvintes: webhook para quem integra, e-mail para quem emitiu.
@@ -114,6 +124,7 @@ for (const sinal of ['SIGINT', 'SIGTERM']) {
 
 app.listen(porta, () => {
   console.log(`contratos-saas em ${baseUrl}/painel`)
+  console.log(`  e-mail: ${transporte.nome}`)
   console.log(`  armazenamento: ${process.env.SUPABASE_URL ? `Supabase (${process.env.SUPABASE_URL})` : `JSON em ${process.env.DADOS_DIR || join(process.cwd(), 'dados')}`}`)
   if (!producao) {
     console.log(`  logins de teste (senha "${SENHA_DEV}"): dev@contratos.local (plataforma), admin@clinica-exemplo.com.br (empresa)`)

@@ -1,0 +1,13 @@
+node_modules
+dados
+saida
+backup
+public/painel
+ferramentas/shots
+marca
+docs
+test
+.git
+.github
+.env
+*.md
