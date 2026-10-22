@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Post 1: apresentação</title>
+<link rel="stylesheet" href="../../../public/estatico/fontes.css">
+<style>
+  :root {
+    --papel: #ffffff; --tinta: #1b2633; --tinta-2: #4f5b68; --tinta-3: #77828e;
+    --borda: #e6ebf0; --acao: #1f6aa5; --acao-claro: #e2f0fb; --marca: #ffe04a;
+    --sans: "Lexend", "Segoe UI", system-ui, sans-serif;
+    --bula: "Archivo", "Arial Narrow", sans-serif;
+    --mono: "IBM Plex Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #d9dee3; font-family: var(--sans); color: var(--tinta); }
+  .slide { width: 1080px; height: 1350px; background: var(--papel); position: relative; overflow: hidden; padding: 88px 84px 120px; display: flex; flex-direction: column; margin: 24px auto; }
+  .olho { font: 500 26px var(--sans); color: var(--acao); margin: 0 0 28px; }
+  h1 { font: 800 108px/0.98 var(--bula); font-stretch: 72%; text-transform: uppercase; margin: 0; text-wrap: balance; }
+  h2 { font: 800 76px/1.02 var(--bula); font-stretch: 72%; text-transform: uppercase; margin: 0 0 30px; text-wrap: balance; }
+  mark { background: var(--marca); color: inherit; padding: 0 .08em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  p { font: 400 36px/1.42 var(--sans); margin: 0 0 22px; }
+  p.sub { color: var(--tinta-2); font-size: 31px; }
+  .rodape { position: absolute; left: 84px; right: 84px; bottom: 56px; display: flex; justify-content: space-between; align-items: center; border-top: 1.5px solid var(--borda); padding-top: 22px; font: 500 24px var(--sans); color: var(--tinta-3); }
+  .wordmark { font: 800 1em/1 var(--bula); font-stretch: 72%; text-transform: uppercase; color: var(--tinta); letter-spacing: .01em; white-space: nowrap; }
+  .wordmark mark { padding: .04em .06em .02em; border-radius: .04em; }
+  .rodape .wordmark { font-size: 30px; }
+  .pagina { font-family: var(--mono); }
+  .simbolo { --s: 64px; display: inline-block; width: var(--s); height: var(--s); border-radius: calc(var(--s) * .25); background: var(--acao); position: relative; flex: none; }
+  .simbolo::before { content: ""; position: absolute; left: 18.75%; right: 18.75%; top: 42%; height: 17%; border-radius: calc(var(--s) * .03); background: var(--marca); }
+  .simbolo::after { content: ""; position: absolute; inset: 0; background: #fff; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M21 33.5 L29 41.5 L45 23' fill='none' stroke='%23000' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M21 33.5 L29 41.5 L45 23' fill='none' stroke='%23000' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; }
+  .reveal { margin: auto 0; display: grid; justify-items: center; gap: 56px; }
+  .reveal .simbolo { --s: 300px; }
+  .reveal .wordmark { font-size: 150px; }
+  .fim { margin-top: auto; }
+  /* texto à esquerda, print do celular à direita */
+  .duas { display: flex; gap: 44px; flex: 1; min-height: 0; }
+  .duas .texto { flex: 1; display: flex; flex-direction: column; }
+  .tela { flex: 0 0 420px; align-self: flex-start; max-height: 1010px; border: 1.5px solid var(--borda); border-radius: 30px; overflow: hidden; background: #fff; box-shadow: 0 24px 60px rgba(27,38,51,.10); }
+  .tela img { width: 100%; display: block; }
+  .tela.lei img { margin-top: -800px; }
+  .tela.selo img { margin-top: -10px; }
+</style>
+</head>
+<body>
+
+<section class="slide">
+  <div class="reveal">
+    <span class="simbolo"></span>
+    <span class="wordmark"><mark>Bulla</mark>Check</span>
+  </div>
+  <p class="sub fim">Contrato com bula: a pessoa entende o que está assinando. Estou construindo em público e vou mostrar cada avanço aqui.</p>
+  <div class="rodape"><span class="wordmark"><mark>Bulla</mark>Check</span><span class="pagina">1 / 6</span></div>
+</section>
+
+<section class="slide">
+  <p class="olho">o problema</p>
+  <h2>Um contrato de prestação de serviço tem <mark>15 cláusulas</mark>. Quase ninguém lê. Todo mundo assina.</h2>
+  <p>Vi médicos assinando contrato PJ sem entender uma linha: multa, foro, exclusividade. Depois, no problema, descobrem o que assinaram.</p>
+  <p class="sub fim">O BullaCheck começou por isso. É um sistema de contratos onde a leitura faz parte da assinatura.</p>
+  <div class="rodape"><span class="wordmark"><mark>Bulla</mark>Check</span><span class="pagina">2 / 6</span></div>
+</section>
+
+<section class="slide">
+  <p class="olho">a bula</p>
+  <div class="duas">
+    <div class="texto">
+      <h2>Cada cláusula vem com um resumo em <mark>palavras simples</mark></h2>
+      <p>O resumo é o marca-texto amarelo. O texto completo do contrato fica logo abaixo, e é ele que vale.</p>
+      <p class="sub fim">A tela é a de quem assina, no celular.</p>
+    </div>
+    <div class="tela"><img src="bula.png" alt="Cláusula de multa com o resumo em marca-texto amarelo e o texto completo abaixo"></div>
+  </div>
+  <div class="rodape"><span class="wordmark"><mark>Bulla</mark>Check</span><span class="pagina">3 / 6</span></div>
+</section>
+
+<section class="slide">
+  <p class="olho">a ciência</p>
+  <div class="duas">
+    <div class="texto">
+      <h2>Nas cláusulas que importam, a pessoa confirma que <mark>entendeu</mark></h2>
+      <p>Multa, foro, autonomia: cada uma pede "li e entendi", e isso fica registrado com data e hora.</p>
+      <p>Embaixo, o artigo da lei que sustenta a cláusula, no texto compilado.</p>
+    </div>
+    <div class="tela lei"><img src="lei.png" alt="Bloco 'O que diz a lei' aberto, mostrando o artigo 593 do Código Civil e o botão 'Li e entendi esta cláusula'"></div>
+  </div>
+  <div class="rodape"><span class="wordmark"><mark>Bulla</mark>Check</span><span class="pagina">4 / 6</span></div>
+</section>
+
+<section class="slide">
+  <p class="olho">a prova</p>
+  <div class="duas">
+    <div class="texto">
+      <h2>Todo contrato assinado ganha um <mark>selo</mark></h2>
+      <p>Código e QR em cada página. Qualquer pessoa confere que o documento não mudou, sem precisar de conta.</p>
+      <p class="sub fim">Junto vai o dossiê: quem assinou, quando, de onde, e o que confirmou ter lido.</p>
+    </div>
+    <div class="tela selo"><img src="selo.png" alt="Página do selo de verificação com o código do contrato, as garantias e quem assinou"></div>
+  </div>
+  <div class="rodape"><span class="wordmark"><mark>Bulla</mark>Check</span><span class="pagina">5 / 6</span></div>
+</section>
+
+<section class="slide">
+  <p class="olho">build in public</p>
+  <h2>Cada avanço do sistema vira um post aqui, à medida que sair.</h2>
+  <p>O próximo: o primeiro contrato enviado para alguém de fora, assinado pelo celular.</p>
+  <p class="sub fim">Segue para acompanhar.</p>
+  <div class="rodape"><span class="wordmark"><mark>Bulla</mark>Check</span><span class="pagina">6 / 6 · @bullacheck</span></div>
+</section>
+
+</body>
+</html>

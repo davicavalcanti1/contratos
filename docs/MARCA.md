@@ -71,9 +71,9 @@ texto do contrato.
 > calendário de 30 dias) está em [INSTAGRAM.md](INSTAGRAM.md), escrito em
 > 22/out com base nos estudos de 2026. O que segue é o resumo original.
 
-**Conta da marca, voz na primeira pessoa do Davi**, no tom do grupo de amigos
-(minúsculas, frase curta, zoa o próprio erro; referência: AbacatePay; regras
-em INSTAGRAM.md, seção 0). Build in public funciona quando tem gente, não
+**Conta da marca, voz simples e direta**, sem emoji e sem diário: apresenta o
+projeto uma vez e depois mostra cada avanço quando sai (regras em
+INSTAGRAM.md, seção 0). Build in public funciona quando tem gente, não
 logotipo falando. A bio diz quem está construindo.
 
 - **Handle**: `@bullacheck` (conferir no app; reserva: `@bullacheck.app`).
@@ -117,17 +117,6 @@ logotipo falando. A bio diz quem está construindo.
   organização de exemplo.
 - Não prometer data; dizer "próximo lançamento" e o que ele testa.
 
-## 5. Primeiros seis posts
+## 5. Sequência de posts
 
-| # | Pilar | Título (slide 1) | Quando |
-|---|---|---|---|
-| 1 | Bastidor | "Construí um sistema de contratos em 4 dias. Agora vou voltar atrás." | ao decidir o nome |
-| 2 | Pergunta | "Esse nome diz o que o produto faz?" (o nome, a frase de apoio, o símbolo) | 2 dias depois |
-| 3 | O problema | "Você leu o último contrato que assinou?" | semana 1 |
-| 4 | Diário | "A bula: o contrato explicado em palavras simples, cláusula a cláusula" (prints) | semana 1 |
-| 5 | Diário | "O que diz a lei, embaixo de cada cláusula" (prints do bloco aberto) | semana 2 |
-| 6 | Diário | "O primeiro link que saiu da minha máquina" (v0.11) | semana 2 |
-
-Os textos estão em `marca/posts/001-voltar-atras/legenda.md` e
-`marca/posts/002-nome/legenda.md`; os slides saem de `post.html` com
-`node ferramentas/post.mjs <pasta>`.
+Ver INSTAGRAM.md, seção 10: apresentação uma vez, depois um post por avanço.

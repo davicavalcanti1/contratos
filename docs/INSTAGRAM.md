@@ -6,36 +6,27 @@
 > conteúdo repostado não é mais recomendado) e no princípio de build in
 > public que funciona: gente segue pessoa construindo, não logotipo.
 
-## 0. A voz (revisada em 22/out, referência: AbacatePay)
+## 0. A voz (revisada em 22/out)
 
-O Davi pediu o tom do build in public da AbacatePay, e é o oposto de
-manifesto editorial. É **a voz do grupo de amigos** contando o que fez hoje:
+Decisão do Davi: **simples, sem emoji, sem diário**. O perfil mostra o
+sistema e os avanços, não a rotina de quem constrói.
 
-- **Minúsculas e frase curta.** "construí um sistema de contratos em 4 dias.
-  e ninguém usou 💀". Maiúscula só em nome próprio e sigla.
-- **Fala com "vocês" e por "eu".** Nada de "o produto oferece". É "fiz",
-  "quebrei", "me ajuda aqui".
-- **Zoa o próprio erro antes que alguém zoe.** O erro é o conteúdo. "clássico
-  de quem constrói sozinho", "o linter me pegou 2x hoje 🫠".
-- **Celebra o pequeno.** Um teste passando, um comentário de desconhecido, o
-  primeiro link que chegou. "tô feliz demais" é legenda válida.
-- **Gíria leve, sem forçar.** tipo, pra, tá, bora, deu ruim, manja. Nada de
-  "fdp"/palavrão na conta da marca; nos stories, à vontade.
-- **Emoji onde dá risada ou marca o ritmo**, não em toda frase. 💀 🫠 🎉 👀 🥁
-  👇 ✅. O ✅ é o emoji da marca (é o check do símbolo).
-- **Print é prova.** Terminal, DM, comentário, Discord, a tela de verdade.
-  Os "flagras" deles (gente usando o produto) viram os nossos "flagras" assim
-  que existir gente usando.
-- **Número seco, sem adjetivo.** "45 commits. 166 testes. 0 pessoas." O
-  leitor tira a conclusão.
-- **Pergunta no fim, direta.** "qual foi a última cláusula que você assinou
-  sem entender? 👇"
-- **O que não muda**: a identidade visual (branco, marca-texto, caixa-alta
-  condensada nos títulos) e as regras da seção 9. Casual no texto, sério no
-  que é prova e no que é jurídico.
-
-Teste rápido antes de publicar: lê em voz alta. Se parece release de
-empresa, reescreve. Se parece mensagem pro grupo, publica.
+- O primeiro post apresenta o projeto. Daí em diante, **cada avanço vira um
+  post quando sai**: o que entrou, o que faz, uma tela de verdade. Não se
+  conta o que já estava feito; conta-se o que mudou.
+- Frase curta, em caixa normal, sem gíria forçada e sem emoji. Primeira
+  pessoa quando for decisão ("estou construindo", "o próximo é"), terceira
+  quando for o produto ("cada cláusula vem com um resumo").
+- O número entra quando muda a leitura (15 cláusulas, 10 leis). Sem
+  contagem de commits ou testes como enfeite.
+- Tela real sempre, em alta resolução (prints em 3x, slides em 2x). As
+  cores do produto (branco, azul, amarelo do marca-texto) são a identidade
+  do perfil; não introduzir outras.
+- Fecho de cada post: o que vem a seguir, em uma frase. Sem pedir
+  comentário a cada post; a pergunta entra só quando é uma validação de
+  verdade (teste de nome, recrutar leitores).
+- O que não muda: as regras da seção 9 (nada de cliente real, nada de
+  promessa jurídica além do documentado).
 
 ## 1. Três decisões que mandam em tudo
 
@@ -62,15 +53,15 @@ empresa, reescreve. Se parece mensagem pro grupo, publica.
 | Nome (campo pesquisável) | **BullaCheck · contrato com bula** |
 | Categoria | Software |
 | Avatar | `marca/avatar.png` (símbolo em 1080) |
-| Bio (≤ 150 caracteres) | contrato com bula: você entende antes de assinar ✅ construindo em público, 1 lançamento por semana. por davi, estudante de medicina |
+| Bio (≤ 150 caracteres) | Contrato com bula: a pessoa entende o que está assinando. Construindo em público; cada avanço vira um post. Por Davi. |
 | Link | o site; até ter domínio, o GitHub do projeto |
 | Destaques (nesta ordem) | **Começo** · **Produto** · **Bastidor** · **Feedbacks** · **Lançamentos** (capas em `marca/destaques/`) |
-| Posts fixados | 1) post 1 "voltar atrás" · 2) post 2 "o nome" · 3) o primeiro Reel mostrando a bula na tela |
+| Posts fixados | 1) a apresentação · 2) o avanço mais recente |
 
 O que vai em cada destaque:
 
-- **Começo**: os stories do primeiro dia, a origem (contrato de médico PJ que
-  ninguém lia), o nome.
+- **Começo**: a apresentação, a origem (contrato de médico PJ que ninguém
+  lia) e o nome.
 - **Produto**: tela de assinatura, a bula, "o que diz a lei", o selo com QR.
 - **Bastidor**: commits, testes quebrando, decisões, o que deu errado.
 - **Lançamentos**: um story por versão (v0.10, v0.11…), com data e o que
@@ -88,47 +79,22 @@ O que vai em cada destaque:
 - Fundo branco predominante, como o produto. O azul só no símbolo e em
   destaques; o amarelo só no marca-texto. A grade tem que parecer o site.
 
-## 4. Formatos
+## 4. Tipos de post e formato
 
-### Reel (metade do volume)
-
-Duração 15 a 40 s, vertical 1080×1920, legendas queimadas no vídeo (a
-maioria assiste sem som), gancho falado ou escrito nos primeiros 2 s, sem
-intro. Quatro receitas, revezadas:
-
-| Receita | Como | Exemplo |
+| Tipo | Quando | Exemplo |
 |---|---|---|
-| **Tela gravada** | gravação do celular ou do painel, zoom no que importa, texto na tela e voz do Davi | "Olha o que acontece quando a pessoa clica em 'tenho uma dúvida'" |
-| **Rosto, 20 s** | Davi, câmera do celular, luz de janela, uma ideia só | "Construí 9 etapas em 4 dias e nenhuma foi validada. Esta semana vou corrigir isso." |
-| **Antes e depois** | contrato no Word à esquerda, a mesma cláusula com bula à direita | "Cláusula 7 no Word. Cláusula 7 com bula." |
-| **Número do dia** | um número grande na tela e a explicação em 15 s | "166 testes. 0 pessoas. Esse é o problema." |
+| **Apresentação** | uma vez, fixado | o que é o BullaCheck, em 6 slides |
+| **Avanço** | a cada lançamento (ver ROTEIRO.md) | "O primeiro contrato enviado para alguém de fora" |
+| **Resultado** | quando uma validação termina | "10 pessoas leram um contrato com bula; 8 entenderam a multa" |
+| **Decisão** | quando algo muda de rumo | "Desliguei o carimbo do tempo até o piloto" |
 
-Áudio: voz própria ou som original baixo. Sem trend de dança, sem música
-licenciada que a conta comercial não pode usar.
-
-### Carrossel (40%)
-
-1080×1350, 5 a 7 slides, gerado por `ferramentas/post.mjs` na identidade do
-produto. Estrutura fixa:
-
-1. **Gancho** em até 8 palavras, marca-texto na palavra que importa.
-2. **Promessa ou contexto** em uma frase.
-3. a 5. **Um ponto por slide**, com print real quando houver.
-6. **Fecho**: o que vem + pergunta.
-
-Texto mínimo de 28 px no slide (lê no celular). Alt text em todo slide (o
-campo "texto alternativo" ao publicar): descreve a tela, não repete o título.
-
-### Imagem única e pergunta (10%)
-
-Uma frase com marca-texto, fundo branco. Serve para pergunta ao público e
-para registrar uma decisão ("Nome decidido: BullaCheck").
-
-### Stories (todo dia, 2 a 4)
-
-Sem edição: foto do notebook, trecho de teste rodando, enquete, caixinha,
-repost de comentário bom. É aqui que o build in public acontece de verdade;
-o feed é o resumo. Toda sexta: enquete "o que eu testo semana que vem?".
+Formato padrão: **carrossel 1080×1350 em 2x**, 4 a 6 slides, gerado por
+`ferramentas/post.mjs` na identidade do produto: slide 1 diz o avanço em uma
+frase; slides seguintes, um ponto por slide com a tela real ao lado (prints
+em 3x, `ferramentas/shots/prints-apresentacao.mjs` é o modelo); último slide,
+o próximo passo. Texto mínimo de 30 px no slide. Alt text em todo slide.
+Reel de tela gravada (15 a 30 s, legenda queimada, sem trilha) quando o
+avanço é melhor mostrado em movimento. Stories só com tela nova ou resultado.
 
 ## 5. Legenda, hashtags e alt text
 
@@ -141,49 +107,31 @@ o feed é o resumo. Toda sexta: enquete "o que eu testo semana que vem?".
 - Mencionar `@` só de quem participou (advogado, clínica), com autorização.
 - Alt text sempre.
 
-### Banco de ganchos
+### Primeiras linhas (banco)
 
-Escritos para a primeira linha ou para o slide 1. Usar e variar.
+1. BullaCheck: contrato com bula.
+2. O primeiro contrato enviado para alguém de fora.
+3. Cada cláusula vem com um resumo em palavras simples.
+4. O artigo da lei embaixo de cada cláusula.
+5. Dez pessoas leram um contrato com bula. Este foi o resultado.
+6. O selo que qualquer pessoa confere pelo QR.
+7. Como uma clínica contrata um médico PJ hoje, e como fica com bula.
+8. Desliguei uma função que ninguém pediu.
+9. O modelo médico PJ, revisado por advogado.
+10. O que mudou esta semana.
 
-1. construí um sistema de contratos inteiro em 4 dias. e ninguém usou 💀
-2. você leu o último contrato que assinou? (eu também não)
-3. contrato de médico PJ tem 15 cláusulas. ninguém lê a 7.
-4. "li e concordo" é a mentira mais assinada do brasil
-5. isso aqui entrou ontem e eu tô feliz demais
-6. 166 testes passando. 0 pessoas usando. clássico.
-7. 3 rodadas, 12 nomes no lixo. esse ficou 🗑️
-8. o primeiro link que saiu do meu pc (deu ruim?)
-9. pedi pra 10 pessoas lerem um contrato. 3 entenderam a multa 🫠
-10. bula de remédio explica. por que contrato não?
-11. como uma clínica contrata médico PJ hoje: word, e-mail e fé
-12. o erro que eu cometi por construir rápido demais
-13. essa cláusula tem que vir em destaque por lei. quase ninguém faz
-14. provar que a pessoa leu, não só que assinou
-15. o selo que qualquer um confere pelo QR, sem conta, sem app
-16. fiz uma função que ninguém pediu. vou desligar e contar por quê
-17. se você assina contrato pela empresa, isso aqui é pra você
-18. essa semana reprovou. é isso que eu volto a fazer
-19. sem ler a bio: o que você acha que o bullacheck faz?
-20. primeiro comentário de alguém que eu não conheço 🎉 (print)
+## 6. Ritmo e horários
 
-## 6. Calendário semanal e horários
+Um post por avanço, no dia em que o avanço sai (ROTEIRO.md: um lançamento
+por semana, então cerca de um post por semana). Formato: carrossel de 4 a 6
+slides com tela real; Reel de tela gravada quando o avanço é melhor
+mostrado em movimento (sem rosto obrigatório, sem trilha, legenda queimada).
+Stories só quando houver tela nova ou resultado; sem rotina.
 
-| Dia | Formato | Pilar | Observação |
-|---|---|---|---|
-| Segunda | Reel (rosto ou número) | O que vem | a hipótese da semana, 20 s |
-| Quarta | Carrossel | Diário de construção | o que entrou, com print |
-| Sexta | Reel (tela gravada ou antes/depois) | Produto ou problema | o que a pessoa vê |
-| Sábado (quinzenal) | Imagem única | Pergunta ao público | alimenta a caixinha |
-| Todo dia | 2 a 4 stories | Bastidor | sexta: enquete da semana seguinte |
-
-**Horário**: os estudos de 2026 para o Brasil divergem; o consenso parcial é
-terça a quinta, 9h às 12h, com um segundo pico 18h às 21h. Hipótese de
-partida: **feed às 11h, Reel de sexta às 18h30, stories ao longo do dia**.
-Depois de 4 semanas, abrir Insights → Público → "horários mais ativos" e
-ajustar. O horário certo é o da nossa conta, não o do artigo.
-
-Produzir em lote: domingo à tarde grava os dois Reels da semana e gera o
-carrossel com `post.mjs`; durante a semana só publica e responde.
+**Horário**: os estudos de 2026 para o Brasil divergem; consenso parcial é
+terça a quinta, 9h às 12h, com segundo pico 18h às 21h. Hipótese de
+partida: **11h**. Depois de 4 semanas, abrir Insights → Público → "horários
+mais ativos" e ajustar.
 
 ## 7. Engajamento: o que fazer depois de publicar
 
@@ -238,39 +186,27 @@ Insights, registrar a decisão no CHANGELOG.
   em build in public, e é a regra do ROTEIRO.
 - Dados pessoais de quem comenta ou manda DM não viram conteúdo.
 
-## 10. Calendário dos primeiros 30 dias
+## 10. Sequência de posts
 
-| Data | Dia | Formato | Título ou gancho | Material |
-|---|---|---|---|---|
-| 27/out | seg | Carrossel (fixado) | Construí um sistema de contratos em 4 dias. Agora vou voltar atrás. | `marca/posts/001-voltar-atras/` ✅ |
-| 27/out | seg | Stories | primeiro dia: notebook, o repo, a caixinha "o que você não entendeu no último contrato?" | ✅ no legenda.md |
-| 29/out | qua | Carrossel (fixado) | Sem ler a bio: o que você acha que o BullaCheck faz? | `marca/posts/002-nome/` ✅ |
-| 31/out | sex | Reel tela gravada | Isso aqui entrou ontem: o artigo da lei embaixo de cada cláusula | roteiro em `marca/reels/001-o-que-diz-a-lei/` ✅ capa; gravar |
-| 1/nov | sáb | Imagem | "Li e concordo" é a mentira mais assinada do Brasil. | gerar com `post.mjs` |
-| 3/nov | seg | Reel rosto | A hipótese da semana: um link que sai da minha máquina (v0.11) | gravar |
-| 5/nov | qua | Carrossel | Você leu o último contrato que assinou? (o problema, com a cláusula 7) | gerar |
-| 7/nov | sex | Reel antes/depois | Cláusula 7 no Word. Cláusula 7 com bula. | gravar |
-| 10/nov | seg | Reel rosto | O primeiro link que saiu da minha máquina: deu certo? (resultado de v0.11) | gravar |
-| 12/nov | qua | Carrossel | Como provar que a pessoa leu, não só assinou (dossiê, ciência, selo) | gerar |
-| 14/nov | sex | Reel tela | O selo que qualquer um confere pelo QR, sem conta | gravar |
-| 15/nov | sáb | Imagem/pergunta | Quero 10 pessoas para ler um contrato e responder 5 perguntas. Topa? (recruta v0.12) | gerar |
-| 17/nov | seg | Reel rosto | A hipótese da semana: 10 leitores, 5 perguntas | gravar |
-| 19/nov | qua | Carrossel | O que uma clínica faz hoje para contratar um médico PJ | gerar |
-| 21/nov | sex | Reel número | 10 pessoas leram. X entenderam a multa. (resultado de v0.12) | gravar |
-| 24/nov | seg | Reel rosto | Esta semana reprovou (ou passou): o que eu volto a fazer | gravar |
-| 26/nov | qua | Carrossel | Três rodadas, doze nomes rejeitados: como escolhi o nome | gerar |
+| # | Tipo | Título | Quando |
+|---|---|---|---|
+| 1 | Apresentação | BullaCheck: contrato com bula | ao abrir a conta (`marca/posts/001-apresentacao/`, pronto) |
+| 2 | Avanço | O primeiro contrato enviado para alguém de fora | quando v0.11 sair (domínio, e-mail real) |
+| 3 | Resultado | Dez pessoas leram um contrato com bula | quando v0.12 terminar |
+| 4 | Avanço | Gere o contrato no site e receba em PDF | quando v0.13 sair |
+| 5 | Avanço | O modelo médico PJ, revisado por advogado | quando v0.14/v0.15 saírem |
+| 6 | Resultado | O piloto | v1.0 |
 
-Cada post sai de uma pasta `marca/posts/NNN-slug/` (carrossel e imagem) ou
-`marca/reels/NNN-slug/` (roteiro, capa, legenda). O changelog aponta o link
-do post de cada versão.
+Entre um lançamento e outro, se um avanço menor merecer post (uma tela
+nova, uma função), ele entra como "Avanço" de 4 slides. Cada post sai de
+`marca/posts/NNN-slug/` com `post.html`, prints e `legenda.md`.
 
 ## Checklist antes de publicar
 
-- [ ] Gancho na primeira linha e no slide 1 (≤ 8 palavras no slide)
+- [ ] Primeira linha diz o avanço em uma frase; slide 1 idem
 - [ ] Print ou vídeo real, da organização de exemplo
 - [ ] Alt text em cada slide
-- [ ] Legenda com pergunta no fim e 3 a 5 hashtags
-- [ ] Capa do Reel com texto no terço de cima
+- [ ] Legenda curta, sem emoji, com o próximo passo no fim e 3 hashtags
 - [ ] Nada de nome de cliente, data prometida ou "validade garantida"
-- [ ] Horário do teste (11h feed, 18h30 Reel de sexta)
+- [ ] Horário do teste (11h)
 - [ ] Agenda bloqueada: 60 minutos no app depois de publicar

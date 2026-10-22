@@ -31,7 +31,7 @@ const PECAS = [
 const browser = await puppeteer.launch({ executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true, args: ['--hide-scrollbars'] })
 try {
   const page = await browser.newPage()
-  await page.setViewport({ width: 1700, height: 1400, deviceScaleFactor: 1 })
+  await page.setViewport({ width: 1700, height: 1400, deviceScaleFactor: 2 })
   await page.goto(pathToFileURL(temp).href, { waitUntil: 'networkidle0' })
   await page.evaluate(() => document.fonts.ready)
   for (const [sel, nome, escala] of PECAS) {

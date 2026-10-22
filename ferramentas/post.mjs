@@ -2,7 +2,7 @@
 // Renderiza um post do Instagram (carrossel 1080×1350) a partir do post.html
 // da pasta: cada elemento `.slide` vira slide-N.png na mesma pasta.
 //
-//   node ferramentas/post.mjs marca/posts/001-voltar-atras [--nome=Ciente] [--handle=@ciente.app]
+//   node ferramentas/post.mjs marca/posts/001-apresentacao [--dpr=2]   (2x: 2160×2700, o Instagram reduz sem borrar)
 //
 // {{NOME}} e {{HANDLE}} no HTML são trocados antes de renderizar. As fontes
 // são as do produto (public/estatico/fontes.css). Ver docs/MARCA.md.
@@ -36,7 +36,7 @@ try {
   const erros = []
   page.on('pageerror', e => erros.push(e.message))
   page.on('requestfailed', r => erros.push(`falhou: ${r.url()}`))
-  await page.setViewport({ width: 1080, height: 1350, deviceScaleFactor: 1 })
+  await page.setViewport({ width: 1080, height: 1350, deviceScaleFactor: Number(flag('dpr', 2)) })
   await page.goto(pathToFileURL(temp).href, { waitUntil: 'networkidle0' })
   await page.evaluate(() => document.fonts.ready)
   const slides = await page.$$('.slide')
