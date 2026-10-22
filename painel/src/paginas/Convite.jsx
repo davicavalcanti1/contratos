@@ -29,7 +29,7 @@ export function Convite() {
   return (
     <div className="tela-entrada">
       <form className="cartao" onSubmit={enviar}>
-        <div className="marca grande"><span className="marca-icone" aria-hidden="true" /><span>Contratos</span></div>
+        <div className="marca grande"><span className="marca-icone" aria-hidden="true" /><span className="marca-nome"><mark>Bulla</mark>Check</span></div>
         <h1>Olá, {c.nome.split(' ')[0]}</h1>
         <p>Você entra como <strong>{c.papel.toLowerCase()}</strong>{c.organizacao ? <> de <strong>{c.organizacao}</strong></> : ' da plataforma'}. Crie uma senha para {c.email}.</p>
         <Erro erro={erro} />

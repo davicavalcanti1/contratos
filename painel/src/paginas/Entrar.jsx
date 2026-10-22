@@ -41,7 +41,7 @@ export function Entrar() {
   return (
     <div className="entrada">
       <aside className="entrada-lado" aria-hidden="true">
-        <div className="entrada-lado-marca"><span className="marca-icone" /><span>Contratos</span></div>
+        <div className="entrada-lado-marca"><span className="marca-icone" /><span className="marca-nome"><mark>Bulla</mark>Check</span></div>
         <div className="entrada-lado-texto">
           <h2>O contrato que quem assina entende.</h2>
           <p>Modelos com regras, assinatura com bula e ciência registrada, selo com QR em cada página.</p>
@@ -55,7 +55,7 @@ export function Entrar() {
 
       <main className="entrada-form">
         <div className="entrada-caixa">
-          <div className="marca grande so-estreito"><span className="marca-icone" aria-hidden="true" /><span>Contratos</span></div>
+          <div className="marca grande so-estreito"><span className="marca-icone" aria-hidden="true" /><span className="marca-nome"><mark>Bulla</mark>Check</span></div>
 
           {modo === 'entrar' && (
             <form onSubmit={enviar} noValidate>

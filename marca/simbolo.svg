@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="BullaCheck">
+  <!-- Símbolo: o quadrado azul do produto, o traço de marca-texto (a bula) e o check (ciente). -->
+  <rect width="64" height="64" rx="16" fill="#1F6AA5"/>
+  <rect x="12" y="27" width="40" height="11" rx="2" fill="#FFE04A"/>
+  <path d="M21 33.5 L29 41.5 L45 23" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

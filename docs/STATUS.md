@@ -206,9 +206,9 @@ basta; não precisa de certificado ICP-Brasil do médico.
 > dossiê, #12 termo de uso e privacidade. O que está abaixo é o contexto.
 > A equipe (quem faz o quê, por fase) está em [ATUACAO.md](ATUACAO.md), seção 9.
 
-- **Nome do produto.** "Contratos" é provisório. Sugestões levantadas: Ciente
-  (recomendada), Bulla, Clausa, Nítido. Davi pediu para pensar depois. Onde
-  trocar está em [IDENTIDADE.md](IDENTIDADE.md).
+- **Nome do produto: BullaCheck**, decidido em 21/out (docs/MARCA.md).
+  Domínios `bullacheck.com.br` e `.com` estavam livres nesse dia: comprar.
+  Handle `@bullacheck` a conferir; INPI a buscar.
 - **Supabase: ligado.** Projeto "contratos" (ref `gjpfplwirjterbkrybds`), tabela
   `registros` com RLS e bucket privado `arquivos`, criados pelo conector em
   17/out (`supabase/migrations/`). O servidor usa a **service_role** via

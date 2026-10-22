@@ -293,3 +293,8 @@ body.site .chamada-cta .botao.botao:not(.secundario) { background: #fff; color: 
 .tabela-artigo td { vertical-align: top; padding: 11px 12px 11px 0; border-top: 1px solid var(--borda); color: var(--tinta-2); line-height: 1.5; }
 .tabela-artigo td:first-child { width: 38%; color: var(--tinta); }
 @media (max-width: 600px) { .tabela-artigo tr { display: grid; } .tabela-artigo td { border-top: 0; padding: 4px 0; } .tabela-artigo td:first-child { width: auto; padding-top: 12px; border-top: 1px solid var(--borda); } .tabela-artigo thead { display: none; } }
+
+/* Símbolo BullaCheck: quadrado azul, traço de marca-texto (::after) e check branco por cima (::before). marca/simbolo.svg é a versão vetorial. */
+.marca-icone::after { left: 19%; right: 19%; top: 42%; height: 17%; }
+.marca-icone::before { content: ""; position: absolute; inset: 0; background: #fff; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M21 33.5 L29 41.5 L45 23' fill='none' stroke='%23000' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M21 33.5 L29 41.5 L45 23' fill='none' stroke='%23000' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; }
+.marca-nome mark { background: var(--marca); color: inherit; padding: 0 .1em 0 .08em; border-radius: 2px; }

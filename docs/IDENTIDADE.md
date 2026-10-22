@@ -61,7 +61,12 @@ vermelho-carimbo na página de assinaturas. As fontes vão embutidas
 A página de verificação usa a mesma roseta em volta do ✓. Assim, quem chega
 pelo QR reconhece o documento.
 
-## Ao trocar o nome do produto
+## Nome: BullaCheck (21/out/2026)
+
+Decidido pelo Davi depois de três rodadas (docs/MARCA.md). O wordmark é
+"BULLACHECK" em Archivo condensada, com marca-texto amarelo em BULLA; o
+símbolo é o quadrado azul com o traço amarelo e um check branco por cima
+(`marca/simbolo.svg`, CSS `.marca-icone`). Onde o nome aparece:
 
 Trocar "Contratos" em `public/index.html` (topo, `<title>`, rodapé),
 no componente da marca do painel (`painel/src/App.jsx`, `Entrar.jsx` e `Convite.jsx`) e no

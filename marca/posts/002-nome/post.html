@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Post 2: o nome</title>
+<link rel="stylesheet" href="../../../public/estatico/fontes.css">
+<style>
+  :root {
+    --papel: #ffffff; --tinta: #1b2633; --tinta-2: #4f5b68; --tinta-3: #77828e;
+    --borda: #e6ebf0; --acao: #1f6aa5; --acao-claro: #e2f0fb; --marca: #ffe04a;
+    --sans: "Lexend", "Segoe UI", system-ui, sans-serif;
+    --bula: "Archivo", "Arial Narrow", sans-serif;
+    --serif: "Source Serif 4", Georgia, serif;
+    --mono: "IBM Plex Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #d9dee3; font-family: var(--sans); color: var(--tinta); }
+  .slide { width: 1080px; height: 1350px; background: var(--papel); position: relative; overflow: hidden; padding: 88px 84px 120px; display: flex; flex-direction: column; margin: 24px auto; }
+  .olho { font: 500 26px var(--sans); color: var(--acao); letter-spacing: .02em; margin: 0 0 28px; }
+  h1 { font: 800 112px/0.98 var(--bula); font-stretch: 72%; text-transform: uppercase; margin: 0; text-wrap: balance; }
+  h2 { font: 800 72px/1.02 var(--bula); font-stretch: 72%; text-transform: uppercase; margin: 0 0 36px; text-wrap: balance; }
+  mark { background: var(--marca); color: inherit; padding: 0 .08em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  p { font: 400 36px/1.4 var(--sans); margin: 0 0 22px; }
+  p.sub { color: var(--tinta-2); font-size: 32px; }
+  .rodape { position: absolute; left: 84px; right: 84px; bottom: 56px; display: flex; justify-content: space-between; align-items: center; border-top: 1.5px solid var(--borda); padding-top: 22px; font: 500 24px var(--sans); color: var(--tinta-3); }
+  .wordmark { font: 800 1em/1 var(--bula); font-stretch: 72%; text-transform: uppercase; color: var(--tinta); letter-spacing: .01em; white-space: nowrap; }
+  .wordmark mark { padding: .04em .06em .02em; border-radius: .04em; }
+  .rodape .wordmark { font-size: 30px; }
+  .pagina { font-family: var(--mono); }
+  .simbolo { --s: 64px; display: inline-block; width: var(--s); height: var(--s); border-radius: calc(var(--s) * .25); background: var(--acao); position: relative; flex: none; }
+  .simbolo::before { content: ""; position: absolute; left: 18.75%; right: 18.75%; top: 42%; height: 17%; border-radius: calc(var(--s) * .03); background: var(--marca); }
+  .simbolo::after { content: ""; position: absolute; inset: 0; background: #fff; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M21 33.5 L29 41.5 L45 23' fill='none' stroke='%23000' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M21 33.5 L29 41.5 L45 23' fill='none' stroke='%23000' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; }
+  .reveal { margin: auto 0; display: grid; justify-items: center; gap: 56px; }
+  .reveal .simbolo { --s: 300px; }
+  .reveal .wordmark { font-size: 150px; }
+  .parte { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 10px; }
+  .cartao { border: 1.5px solid var(--borda); border-radius: 26px; padding: 34px 36px; }
+  .cartao h3 { font: 800 64px/1 var(--bula); font-stretch: 72%; text-transform: uppercase; margin: 0 0 18px; }
+  .cartao p { font-size: 29px; line-height: 1.38; margin: 0 0 12px; color: var(--tinta-2); }
+  .cartao p b { color: var(--tinta); font-weight: 600; }
+  .tam { display: flex; align-items: flex-end; gap: 48px; margin-top: 40px; }
+  .tam .simbolo { --s: 220px; }
+  .tam .simbolo.m { --s: 96px; } .tam .simbolo.p { --s: 44px; } .tam .simbolo.pp { --s: 22px; }
+  .anatomia { list-style: none; padding: 0; margin: 30px 0 0; display: grid; gap: 18px; }
+  .anatomia li { display: flex; gap: 22px; align-items: center; font: 400 32px/1.3 var(--sans); }
+  .anatomia i { width: 56px; height: 24px; border-radius: 4px; flex: none; }
+  .pergunta { background: var(--acao-claro); border-radius: 26px; padding: 36px 40px; font: 500 40px/1.3 var(--sans); color: var(--acao); margin-top: 40px; }
+  .fim { margin-top: auto; }
+</style>
+</head>
+<body>
+
+<section class="slide">
+  <p class="olho">build in public · post 2</p>
+  <div class="reveal">
+    <span class="simbolo"></span>
+    <span class="wordmark"><mark>Bulla</mark>Check</span>
+  </div>
+  <p class="sub fim">O sistema de contratos tem nome. Esse nome diz o que ele faz?</p>
+  <div class="rodape"><span class="wordmark"><mark>Bulla</mark>Check</span><span class="pagina">1 / 5</span></div>
+</section>
+
+<section class="slide">
+  <p class="olho">duas palavras</p>
+  <h2>Uma bula e um check</h2>
+  <div class="parte">
+    <div class="cartao">
+      <h3><mark>Bulla</mark></h3>
+      <p><b>Bula</b>: o resumo em palavras simples que acompanha cada cláusula, como a bula explica o remédio.</p>
+      <p><b>Bulla</b>, em latim: o selo que fechava um documento e provava que ele era de verdade. É o selo verificável de cada contrato.</p>
+    </div>
+    <div class="cartao">
+      <h3>Check</h3>
+      <p><b>Ciente</b>: a pessoa confirma cláusula por cláusula que leu e entendeu.</p>
+      <p><b>Conferido</b>: qualquer um confere pelo QR que o documento não mudou.</p>
+    </div>
+  </div>
+  <p class="sub fim">Bula + check. O contrato que a pessoa entende antes de assinar, e que dá para provar depois.</p>
+  <div class="rodape"><span class="wordmark"><mark>Bulla</mark>Check</span><span class="pagina">2 / 5</span></div>
+</section>
+
+<section class="slide">
+  <p class="olho">o símbolo</p>
+  <h2>Um marca-texto e um check</h2>
+  <ul class="anatomia">
+    <li><i style="background:#1f6aa5"></i>O azul do produto: a única cor de ação nas telas.</li>
+    <li><i style="background:#ffe04a"></i>O traço amarelo de marca-texto: é como o resumo aparece em cada cláusula.</li>
+    <li><i style="background:#fff;border:2px solid #1b2633"></i>O check branco por cima: "li e entendi".</li>
+  </ul>
+  <div class="tam">
+    <span class="simbolo"></span>
+    <span class="simbolo m"></span>
+    <span class="simbolo p"></span>
+    <span class="simbolo pp"></span>
+  </div>
+  <p class="sub fim">Funciona em 22 pixels, no favicon, e em 1080, no avatar. Sem caneta, sem documento, sem cadeado: isso todo mundo já usa.</p>
+  <div class="rodape"><span class="wordmark"><mark>Bulla</mark>Check</span><span class="pagina">3 / 5</span></div>
+</section>
+
+<section class="slide">
+  <p class="olho">como foi escolher</p>
+  <h2>Três rodadas, doze nomes rejeitados</h2>
+  <p>Primeiro tentei nomes do jargão: Ciente, Clausa, Lido e Ciente. Depois nomes do gesto: Grifa, Legenda, Sublinha. Depois palavras de marca: Candor, Consente.</p>
+  <p>Nenhum dizia as duas coisas ao mesmo tempo: que o contrato é explicado <b>e</b> que a leitura é provada. Bula e check dizem.</p>
+  <p class="sub fim">Domínio bullacheck.com.br livre no dia da escolha. Marca ainda não registrada no INPI: é o próximo passo.</p>
+  <div class="rodape"><span class="wordmark"><mark>Bulla</mark>Check</span><span class="pagina">4 / 5</span></div>
+</section>
+
+<section class="slide">
+  <p class="olho">sua vez</p>
+  <h2>Sem ler a bio: o que você acha que o BullaCheck faz?</h2>
+  <p>Responde nos comentários antes de olhar o resto do perfil. Se dez pessoas acertarem, o nome fica. Se não, volto atrás, e conto aqui.</p>
+  <div class="pergunta">Semana que vem: o primeiro link que sai da minha máquina. Alguém longe de mim recebe um contrato no celular e assina.</div>
+  <div class="rodape"><span class="wordmark"><mark>Bulla</mark>Check</span><span class="pagina">5 / 5 · @bullacheck</span></div>
+</section>
+
+</body>
+</html>

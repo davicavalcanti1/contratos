@@ -15,8 +15,8 @@ import { pathToFileURL } from 'node:url'
 const [pasta, ...flags] = process.argv.slice(2)
 if (!pasta) { console.error('uso: node ferramentas/post.mjs <pasta> [--nome=X] [--handle=@x]'); process.exit(2) }
 const flag = (n, padrao) => { const f = flags.find(f => f.startsWith(`--${n}=`)); return f ? f.slice(n.length + 3) : padrao }
-const nome = flag('nome', 'CONTRATOS')
-const handle = flag('handle', '@contratos')
+const nome = flag('nome', 'BullaCheck')
+const handle = flag('handle', '@bullacheck')
 
 const dir = resolve(pasta)
 // As fontes do produto: fontes.css aponta para /estatico/fontes/, que só existe

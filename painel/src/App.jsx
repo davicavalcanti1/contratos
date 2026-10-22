@@ -86,7 +86,7 @@ function Moldura() {
       <aside className={`lateral${menuAberto ? ' aberta' : ''}`}>
         <div className="marca">
           <span className="marca-icone" aria-hidden="true" />
-          <span>Contratos</span>
+          <span className="marca-nome"><mark>Bulla</mark>Check</span>
         </div>
         <nav aria-label="Principal">
           {ehDeveloper && (

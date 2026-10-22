@@ -1,4 +1,4 @@
-# contratos-saas (nome provisório)
+# BullaCheck (pacote `contratos-saas`)
 
 SaaS de contratos, multi-tenant e independente: modelos inteligentes, contrato
 gerado a partir dos dados da empresa e assinatura com validade jurídica.

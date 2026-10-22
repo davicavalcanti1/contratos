@@ -821,3 +821,10 @@ button.numero:hover { border-color: var(--acao); }
 .documento.compacto .texto-juridico .fund-norma { font-size: 13px; }
 .documento.compacto .texto-juridico .fund-fonte { font-size: 12px; }
 .fund-problemas { margin: 6px 0 0; }
+
+/* Símbolo BullaCheck: quadrado azul, traço de marca-texto (::after) e check branco por cima (::before). marca/simbolo.svg é a versão vetorial. */
+.marca-icone::after { left: 19%; right: 19%; top: 42%; height: 17%; }
+.marca-icone::before { content: ""; position: absolute; inset: 0; background: #fff; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M21 33.5 L29 41.5 L45 23' fill='none' stroke='%23000' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M21 33.5 L29 41.5 L45 23' fill='none' stroke='%23000' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; }
+.marca-nome mark { background: var(--marca); color: inherit; padding: 0 .1em 0 .08em; border-radius: 2px; }
+.entrada-lado-marca .marca-icone::before { background: var(--acao); }
+.entrada-lado-marca .marca-nome mark { color: var(--tinta); }

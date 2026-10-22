@@ -14,6 +14,16 @@ que todo concorrente vende.
 
 ## 2. Nome
 
+**Decidido em 21/out/2026: BullaCheck** (ideia do Davi, depois de três
+rodadas rejeitadas). Bula (o resumo de cada cláusula) + *bulla* (o selo que
+fechava e autenticava um documento) + check (ciente e conferido). No dia da
+escolha estavam livres `bullacheck.com.br`, `bullacheck.app.br`,
+`bullacheck.com` e `bullacheck.net`: comprar o `.com.br` e o `.com` antes de
+postar. Handle `@bullacheck` a conferir no app. Buscar no INPI (classes 42 e
+45) antes de registrar. Grafia: BullaCheck em prosa, BULLACHECK no wordmark.
+
+As rodadas anteriores, para registro:
+
 Candidatos levantados em 17/out e checados em 21/out (registro.br via RDAP;
 Instagram não dá para checar sem conta, conferir no app):
 
@@ -25,9 +35,9 @@ Instagram não dá para checar sem conta, conferir no app):
 | **Clausa** | de cláusula; soa a software | `clausa.com.br` ocupado; livre `clausa.app.br` | não diz "entender" |
 | Nítido | clareza | ocupado | genérico |
 
-Recomendação: **Ciente**, com "lido e ciente" como frase de apoio. Decisão
-do Davi (issue #8). Antes de comprar domínio: busca no INPI
-(busca.inpi.gov.br, classe 42 e 45) e conferir o handle no Instagram.
+Segunda rodada (gesto do produto): Grifa, Legenda, Sublinha, Legível.
+Terceira (palavra de marca): Candor, Consente, Concordo, Entendo. Todas
+rejeitadas; o Davi propôs BullaCheck.
 
 Para trocar o nome no código: IDENTIDADE.md, última seção.
 
@@ -36,20 +46,19 @@ Para trocar o nome no código: IDENTIDADE.md, última seção.
 Princípio: **o símbolo é o marca-texto**. É o único elemento visual que o
 produto já tem e que ninguém mais usa.
 
-- **Wordmark**: o nome em caixa-alta condensada (Archivo, `font-stretch:
-  72%`, peso 800), a mesma fonte dos títulos de cláusula. Uma faixa de
-  marca-texto amarelo `#FFE04A` atrás da palavra que carrega o sentido
-  (em "Lido e Ciente", atrás de CIENTE; em "Ciente", atrás da palavra
-  inteira). Tinta `#1B2633`.
-- **Símbolo** (ícone, favicon, avatar do Instagram): um quadrado branco com
-  borda fina, e dentro dele um traço curto de marca-texto amarelo com a
-  inicial do nome por cima, em caixa-alta condensada. Lê-se de longe, funciona
-  em 32 px, e é a bula em miniatura.
+- **Wordmark**: BULLACHECK em caixa-alta condensada (Archivo, `font-stretch:
+  72%`, peso 800), a mesma fonte dos títulos de cláusula. Marca-texto amarelo
+  `#FFE04A` atrás de BULLA (a bula); CHECK em tinta `#1B2633`.
+- **Símbolo** (ícone, favicon, avatar do Instagram): o quadrado azul
+  `#1F6AA5` que o produto já usava, com o traço de marca-texto amarelo e um
+  check branco por cima. Bula + check. Lê-se em 22 px e em 1080 px.
 - **Não fazer**: gradiente, roxo (pedido do Davi), ícone de caneta ou de
   documento com assinatura (é o que os outros usam), fundo escuro.
-- Arquivos: `marca/logo.svg` (wordmark), `marca/simbolo.svg`, `marca/avatar.png`
-  (1080×1080), gerados por `node ferramentas/marca.mjs` depois do nome
-  decidido. Até lá o site e o painel seguem com "CONTRATOS".
+- Arquivos em `marca/`: `simbolo.svg` (vetor, sem fonte), e os PNG gerados
+  por `node ferramentas/marca.mjs` a partir de `marca.html`: `logo.png`
+  (horizontal), `logo-empilhado.png`, `simbolo-512.png`, `avatar.png`
+  (1080×1080) e `capa.png` (1500×500). No site e no painel o símbolo é CSS
+  (`.marca-icone`) e o wordmark é texto (`.marca-nome`).
 
 Paleta e tipografia já estão em `public/estatico/app.css` e IDENTIDADE.md:
 branco, tinta `#1B2633`, azul `#1F6AA5`, amarelo `#FFE04A`, Lexend para
@@ -61,8 +70,8 @@ texto do contrato.
 **Conta da marca, voz na primeira pessoa do Davi.** Build in public funciona
 quando tem gente, não logotipo falando. A bio diz quem está construindo.
 
-- **Handle**: o nome decidido (`@ciente.app`, `@lidoeciente`…), conferir
-  disponibilidade no app. Nome de exibição: "Ciente · contrato com bula".
+- **Handle**: `@bullacheck` (conferir no app; reserva: `@bullacheck.app`).
+  Nome de exibição: "BullaCheck · contrato com bula".
 - **Bio** (150 caracteres):
   > Construindo em público um jeito de assinar contrato entendendo o que
   > está assinando. Por Davi, estudante de medicina. Progresso toda semana.
@@ -113,4 +122,6 @@ quando tem gente, não logotipo falando. A bio diz quem está construindo.
 | 5 | Diário | "O que diz a lei, embaixo de cada cláusula" (prints do bloco aberto) | semana 2 |
 | 6 | Diário | "O primeiro link que saiu da minha máquina" (v0.11) | semana 2 |
 
-O texto do post 1 está em `marca/posts/001-voltar-atras/legenda.md`.
+Os textos estão em `marca/posts/001-voltar-atras/legenda.md` e
+`marca/posts/002-nome/legenda.md`; os slides saem de `post.html` com
+`node ferramentas/post.mjs <pasta>`.

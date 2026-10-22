@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>BullaCheck: marca</title>
+<link rel="stylesheet" href="../public/estatico/fontes.css">
+<style>
+  :root { --tinta: #1b2633; --tinta-2: #4f5b68; --borda: #e6ebf0; --acao: #1f6aa5; --marca: #ffe04a; --bula: "Archivo", "Arial Narrow", sans-serif; --sans: "Lexend", system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 40px; background: #d9dee3; font-family: var(--sans); color: var(--tinta); display: grid; gap: 40px; justify-items: start; }
+  .peca { background: #fff; }
+  /* Símbolo: quadrado azul, traço de marca-texto, check branco. Tamanho por variável. */
+  .simbolo { --s: 64px; display: inline-block; width: var(--s); height: var(--s); border-radius: calc(var(--s) * .25); background: var(--acao); position: relative; flex: none; }
+  .simbolo::before { content: ""; position: absolute; left: 18.75%; right: 18.75%; top: 42%; height: 17%; border-radius: calc(var(--s) * .03); background: var(--marca); }
+  .simbolo::after { content: ""; position: absolute; inset: 0; background: #fff; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M21 33.5 L29 41.5 L45 23' fill='none' stroke='%23000' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M21 33.5 L29 41.5 L45 23' fill='none' stroke='%23000' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; }
+  /* Wordmark: Archivo condensada, caixa-alta; BULLA com marca-texto, CHECK em tinta. */
+  .wordmark { font: 800 1em/1 var(--bula); font-stretch: 72%; text-transform: uppercase; letter-spacing: .01em; color: var(--tinta); white-space: nowrap; }
+  .wordmark mark { background: var(--marca); color: inherit; padding: .04em .06em .02em; border-radius: .04em; }
+  .logo { display: inline-flex; align-items: center; gap: .42em; font-size: 160px; padding: 60px 80px; }
+  .logo .simbolo { --s: 1em; }
+  #avatar { width: 1080px; height: 1080px; display: grid; place-items: center; }
+  #avatar .simbolo { --s: 1080px; border-radius: 0; }
+  #simbolo-512 .simbolo { --s: 512px; }
+  #simbolo-512 { padding: 0; background: transparent; }
+  #empilhado { display: grid; justify-items: center; gap: 40px; padding: 120px 140px; font-size: 180px; }
+  #empilhado .simbolo { --s: 1.3em; }
+  #capa { width: 1500px; height: 500px; display: flex; align-items: center; justify-content: space-between; padding: 0 110px; }
+  #capa .logo { padding: 0; font-size: 120px; }
+  #capa p { font: 500 36px/1.3 var(--sans); color: var(--tinta-2); margin: 0; max-width: 11em; text-align: right; }
+</style>
+</head>
+<body>
+  <div id="logo" class="peca logo"><span class="simbolo"></span><span class="wordmark"><mark>Bulla</mark>Check</span></div>
+  <div id="empilhado" class="peca"><span class="simbolo"></span><span class="wordmark"><mark>Bulla</mark>Check</span></div>
+  <div id="simbolo-512" class="peca"><span class="simbolo"></span></div>
+  <div id="avatar" class="peca"><span class="simbolo"></span></div>
+  <div id="capa" class="peca"><div class="logo"><span class="simbolo"></span><span class="wordmark"><mark>Bulla</mark>Check</span></div><p>Contrato com bula: a pessoa entende antes de assinar.</p></div>
+</body>
+</html>

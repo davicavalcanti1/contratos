@@ -422,3 +422,8 @@ p.condicao { display: inline-block; margin: 0 0 8px; }
 .texto-juridico .fund-fonte, .fund-fonte { font: 12.5px/1.4 var(--sans); color: var(--tinta-3); margin: 8px 0 0; }
 .fund-fonte a { color: inherit; }
 .clausula.critica .texto-juridico .fund-artigo p { font-weight: 400; } /* o destaque engrossa o contrato, não a lei */
+
+/* Símbolo BullaCheck: quadrado azul, traço de marca-texto (::after) e check branco por cima (::before). marca/simbolo.svg é a versão vetorial. */
+.marca-link .marca-icone::after { left: 19%; right: 19%; top: 42%; height: 17%; }
+.marca-link .marca-icone::before { content: ""; position: absolute; inset: 0; background: #fff; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M21 33.5 L29 41.5 L45 23' fill='none' stroke='%23000' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M21 33.5 L29 41.5 L45 23' fill='none' stroke='%23000' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; }
+.marca-link .marca-nome mark { background: var(--marca); color: inherit; padding: 0 .1em 0 .08em; border-radius: 2px; }

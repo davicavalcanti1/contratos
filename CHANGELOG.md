@@ -8,8 +8,10 @@ com validação registrada.
 ## v0.10 — em andamento (semana de 27/out/2026)
 
 - **Hipótese:** o nome comunica "contrato que a pessoa entende".
-- **Entra:** nome, logomarca, identidade da marca, Instagram build in
-  public, post 1, roteiro de etapas (`docs/ROTEIRO.md`) e este changelog.
+- **Entra:** nome **BullaCheck** (decidido em 21/out), símbolo e wordmark
+  (`marca/`), nome trocado no site e no painel, Instagram build in public
+  (`docs/MARCA.md`), posts 1 e 2 prontos, roteiro de etapas
+  (`docs/ROTEIRO.md`) e este changelog.
 - **Validação:** 10 pessoas ouvem o nome e dizem o que acham que é; post 1
   com ao menos 3 comentários de desconhecidos.
 - **Post:** —
