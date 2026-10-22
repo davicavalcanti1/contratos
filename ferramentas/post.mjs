@@ -45,7 +45,7 @@ try {
     i++
     const caminho = join(dir, `slide-${i}.png`)
     const box = await s.boundingBox()
-    if (Math.round(box.width) !== 1080 || Math.round(box.height) !== 1350) console.warn(`  ⚠ slide ${i} mede ${Math.round(box.width)}×${Math.round(box.height)} (esperado 1080×1350)`)
+    if (Math.round(box.width) !== 1080 || ![1350, 1920, 1080].includes(Math.round(box.height))) console.warn(`  ⚠ slide ${i} mede ${Math.round(box.width)}×${Math.round(box.height)} (esperado 1080×1350, 1080×1920 ou 1080×1080)`)
     const estouro = await s.evaluate(el => el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth)
     if (estouro) console.warn(`  ⚠ slide ${i}: conteúdo passa da borda`)
     await s.screenshot({ path: caminho })

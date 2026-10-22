@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Capas dos destaques</title>
+<link rel="stylesheet" href="../../public/estatico/fontes.css">
+<style>
+  :root { --tinta: #1b2633; --acao: #1f6aa5; --marca: #ffe04a; --borda: #e6ebf0; --bula: "Archivo", "Arial Narrow", sans-serif; --sans: "Lexend", system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #d9dee3; display: flex; flex-wrap: wrap; gap: 24px; padding: 24px; }
+  /* Capa de destaque: 1080×1920; o Instagram mostra o círculo central, então tudo fica no meio. */
+  .slide { flex: none; width: 1080px; height: 1920px; background: #fff; display: grid; place-items: center; position: relative; overflow: hidden; }
+  .miolo { display: grid; justify-items: center; gap: 44px; }
+  .simbolo { --s: 300px; display: inline-block; width: var(--s); height: var(--s); border-radius: calc(var(--s) * .25); background: var(--acao); position: relative; }
+  .simbolo::before { content: ""; position: absolute; left: 18.75%; right: 18.75%; top: 42%; height: 17%; border-radius: calc(var(--s) * .03); background: var(--marca); }
+  .simbolo::after { content: ""; position: absolute; inset: 0; background: #fff; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M21 33.5 L29 41.5 L45 23' fill='none' stroke='%23000' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M21 33.5 L29 41.5 L45 23' fill='none' stroke='%23000' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; }
+  .rotulo { font: 800 118px/1 var(--bula); font-stretch: 72%; text-transform: uppercase; color: var(--tinta); }
+  .rotulo mark { background: var(--marca); color: inherit; padding: .04em .1em .02em; border-radius: .04em; }
+  /* Variação: só o marca-texto, sem o símbolo, para alternar na fileira. */
+  .so-texto .simbolo { display: none; }
+  .so-texto .rotulo { font-size: 150px; }
+</style>
+</head>
+<body>
+  <section class="slide"><div class="miolo"><span class="simbolo"></span><span class="rotulo"><mark>Começo</mark></span></div></section>
+  <section class="slide"><div class="miolo"><span class="simbolo"></span><span class="rotulo"><mark>Produto</mark></span></div></section>
+  <section class="slide"><div class="miolo"><span class="simbolo"></span><span class="rotulo"><mark>Bastidor</mark></span></div></section>
+  <section class="slide"><div class="miolo"><span class="simbolo"></span><span class="rotulo"><mark>Lançamentos</mark></span></div></section>
+  <section class="slide"><div class="miolo"><span class="simbolo"></span><span class="rotulo"><mark>Pergunte</mark></span></div></section>
+</body>
+</html>

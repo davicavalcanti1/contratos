@@ -67,6 +67,10 @@ texto do contrato.
 
 ## 4. Instagram build in public
 
+> O playbook completo (perfil, formatos, horários, engajamento, métricas e
+> calendário de 30 dias) está em [INSTAGRAM.md](INSTAGRAM.md), escrito em
+> 22/out com base nos estudos de 2026. O que segue é o resumo original.
+
 **Conta da marca, voz na primeira pessoa do Davi.** Build in public funciona
 quando tem gente, não logotipo falando. A bio diz quem está construindo.
 

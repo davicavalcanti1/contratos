@@ -11,7 +11,9 @@ com validação registrada.
 - **Entra:** nome **BullaCheck** (decidido em 21/out), símbolo e wordmark
   (`marca/`), nome trocado no site e no painel, Instagram build in public
   (`docs/MARCA.md`), posts 1 e 2 prontos, roteiro de etapas
-  (`docs/ROTEIRO.md`) e este changelog.
+  (`docs/ROTEIRO.md`), playbook do Instagram (`docs/INSTAGRAM.md`: perfil,
+  destaques, calendário de 30 dias, métricas), capas de destaques e do
+  primeiro Reel, e este changelog.
 - **Validação:** 10 pessoas ouvem o nome e dizem o que acham que é; post 1
   com ao menos 3 comentários de desconhecidos.
 - **Post:** —
