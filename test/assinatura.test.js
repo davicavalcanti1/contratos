@@ -218,6 +218,11 @@ test('envio recusa e-mail sintético, repetido ou nome incompleto', async () => 
   await assert.rejects(enviar([{ nome: 'Fulano Teste', email: 'fulano@exameqr.app' }]), /não é uma caixa/)
   await assert.rejects(enviar([{ nome: 'Fulano', email: 'f@exemplo.com.br' }]), /nome completo/)
   await assert.rejects(enviar([{ nome: 'A Um', email: 'a@x.com.br' }, { nome: 'B Dois', email: 'A@x.com.br' }]), /repetido/)
+  // Em papéis diferentes, o mesmo e-mail vale: a parte e quem assina pela empresa podem ser a mesma caixa.
+  await enviar([{ nome: 'A Um', email: 'a@x.com.br', papel: 'parte' }, { nome: 'B Dois', email: 'a@x.com.br', papel: 'representante' }])
+  assert.equal(amb.servico.consultar(c.id, 'org1').signatarios.length, 2)
+  const links = amb.caixa.filter(m => m.para === 'a@x.com.br' && m.meta.tipo === 'link').map(m => m.meta.link)
+  assert.equal(new Set(links).size, 2, 'dois links distintos para a mesma caixa')
 })
 
 test('contrato com lacunas não é gerado', async () => {

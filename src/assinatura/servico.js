@@ -1157,8 +1157,13 @@ export function criarServico({ repo, biblioteca, notificar, config = {}, agora =
       if (s.metodo === 'icp' && !s.cpf) throw new ErroNegocio(400, `${onde}: assinatura com certificado ICP-Brasil exige o CPF de quem assina (é com ele que o certificado é conferido).`)
       if (s.metodo === 'icp' && !icp) throw new ErroNegocio(400, `${onde}: a verificação ICP-Brasil não está ligada neste servidor.`)
       if (s.papel && !PAPEIS[s.papel]) throw new ErroNegocio(400, `${onde}: papel deve ser ${Object.keys(PAPEIS).join(', ')}.`)
-      const e = String(s.email).trim().toLowerCase()
-      if (emails.has(e)) throw new ErroNegocio(400, `${onde}: e-mail repetido — cada signatário precisa do próprio.`)
+      // O mesmo e-mail em dois papéis diferentes é permitido (a pessoa que
+      // assina pela empresa pode ser a mesma que assina como parte, e é assim
+      // que se testa um contrato de duas assinaturas com uma caixa só). Cada
+      // signatário continua com o próprio link e o próprio código. Repetido
+      // no MESMO papel costuma ser erro de digitação.
+      const e = `${s.papel || 'parte'}:${String(s.email).trim().toLowerCase()}`
+      if (emails.has(e)) throw new ErroNegocio(400, `${onde}: e-mail repetido no mesmo papel — cada signatário precisa do próprio.`)
       emails.add(e)
     })
   }
